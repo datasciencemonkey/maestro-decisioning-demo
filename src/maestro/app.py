@@ -71,6 +71,7 @@ def _bootstrap_for_app():
 
     # LLM via AI Gateway (custom endpoint at /ai-gateway/mlflow/v1)
     from openai import AsyncOpenAI
+    from pydantic_ai.profiles.openai import OpenAIModelProfile
 
     host = os.environ.get("DATABRICKS_HOST", w.config.host).rstrip("/")
     if not host.startswith("http"):
@@ -78,7 +79,8 @@ def _bootstrap_for_app():
     token = os.environ.get("DATABRICKS_TOKEN", "")
     client = AsyncOpenAI(api_key=token, base_url=f"{host}/ai-gateway/mlflow/v1")
     provider = OpenAIProvider(openai_client=client)
-    model = OpenAIChatModel("maestro-endpoint", provider=provider)
+    profile = OpenAIModelProfile(openai_supports_strict_tool_definition=False)
+    model = OpenAIChatModel("maestro-endpoint", provider=provider, profile=profile)
 
     return model, None  # db_url not needed for agent-only mode
 

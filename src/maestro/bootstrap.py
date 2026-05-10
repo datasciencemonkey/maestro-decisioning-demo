@@ -101,6 +101,7 @@ def bootstrap(profile: str = "9cefok"):
 
     # LLM via AI Gateway (custom endpoint at /ai-gateway/mlflow/v1)
     from openai import AsyncOpenAI
+    from pydantic_ai.profiles.openai import OpenAIModelProfile
 
     host = w.config.host.rstrip("/")
     if not host.startswith("http"):
@@ -111,7 +112,9 @@ def bootstrap(profile: str = "9cefok"):
         base_url=f"{host}/ai-gateway/mlflow/v1",
     )
     provider = OpenAIProvider(openai_client=client)
-    model = OpenAIChatModel("maestro-endpoint", provider=provider)
+    # AI Gateway doesn't support strict tool definitions
+    profile = OpenAIModelProfile(openai_supports_strict_tool_definition=False)
+    model = OpenAIChatModel("maestro-endpoint", provider=provider, profile=profile)
 
     # Lakebase URL
     db_url = get_lakebase_url(profile=profile)

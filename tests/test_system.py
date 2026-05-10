@@ -43,13 +43,16 @@ def model(workspace):
     from pydantic_ai.models.openai import OpenAIChatModel
     from pydantic_ai.providers.openai import OpenAIProvider
 
+    from pydantic_ai.profiles.openai import OpenAIModelProfile
+
     host = workspace.config.host.rstrip("/")
     if not host.startswith("http"):
         host = f"https://{host}"
     token = workspace.config.authenticate()["Authorization"].replace("Bearer ", "")
     client = AsyncOpenAI(api_key=token, base_url=f"{host}/ai-gateway/mlflow/v1")
     provider = OpenAIProvider(openai_client=client)
-    return OpenAIChatModel("maestro-endpoint", provider=provider)
+    profile = OpenAIModelProfile(openai_supports_strict_tool_definition=False)
+    return OpenAIChatModel("maestro-endpoint", provider=provider, profile=profile)
 
 
 @pytest.fixture(scope="module")
