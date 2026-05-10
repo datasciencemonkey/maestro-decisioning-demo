@@ -60,10 +60,15 @@ def _bootstrap_for_app():
     except Exception:
         w = WorkspaceClient(profile="9cefok")
 
-    os.environ.setdefault("DATABRICKS_HOST", w.config.host)
-    token = w.config.authenticate().get("Authorization", "").replace("Bearer ", "")
-    if token:
-        os.environ.setdefault("DATABRICKS_TOKEN", token)
+    host = w.config.host
+    if host and not host.startswith("http"):
+        host = f"https://{host}"
+    os.environ.setdefault("DATABRICKS_HOST", host)
+    auth = w.config.authenticate()
+    if isinstance(auth, dict):
+        token = auth.get("Authorization", "").replace("Bearer ", "")
+        if token:
+            os.environ.setdefault("DATABRICKS_TOKEN", token)
 
     mlflow.set_tracking_uri("databricks")
     mlflow.set_experiment("/Users/sathish.gangichetty@databricks.com/maestro-cdp")
