@@ -69,9 +69,16 @@ def _bootstrap_for_app():
     mlflow.set_experiment("/Users/sathish.gangichetty@databricks.com/maestro-cdp")
     mlflow.pydantic_ai.autolog()
 
-    client = AsyncDatabricksOpenAI(workspace_client=w)
+    # LLM via AI Gateway (custom endpoint at /ai-gateway/mlflow/v1)
+    from openai import AsyncOpenAI
+
+    host = os.environ.get("DATABRICKS_HOST", w.config.host).rstrip("/")
+    if not host.startswith("http"):
+        host = f"https://{host}"
+    token = os.environ.get("DATABRICKS_TOKEN", "")
+    client = AsyncOpenAI(api_key=token, base_url=f"{host}/ai-gateway/mlflow/v1")
     provider = OpenAIProvider(openai_client=client)
-    model = OpenAIChatModel("databricks-claude-sonnet-4-6", provider=provider)
+    model = OpenAIChatModel("maestro-endpoint", provider=provider)
 
     return model, None  # db_url not needed for agent-only mode
 

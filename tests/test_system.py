@@ -38,14 +38,18 @@ def workspace():
 
 @pytest.fixture(scope="module")
 def model(workspace):
-    """AI Gateway model via Databricks OpenAI."""
-    from databricks_openai import AsyncDatabricksOpenAI
+    """AI Gateway model via custom maestro-endpoint."""
+    from openai import AsyncOpenAI
     from pydantic_ai.models.openai import OpenAIChatModel
     from pydantic_ai.providers.openai import OpenAIProvider
 
-    client = AsyncDatabricksOpenAI(workspace_client=workspace)
+    host = workspace.config.host.rstrip("/")
+    if not host.startswith("http"):
+        host = f"https://{host}"
+    token = workspace.config.authenticate()["Authorization"].replace("Bearer ", "")
+    client = AsyncOpenAI(api_key=token, base_url=f"{host}/ai-gateway/mlflow/v1")
     provider = OpenAIProvider(openai_client=client)
-    return OpenAIChatModel("databricks-claude-sonnet-4-6", provider=provider)
+    return OpenAIChatModel("maestro-endpoint", provider=provider)
 
 
 @pytest.fixture(scope="module")
@@ -64,10 +68,21 @@ class TestLayer1Gateway:
     """Verify we can hit the databricks-claude-sonnet-4-6 on AI Gateway."""
 
     def test_gateway_endpoint_exists(self, workspace):
-        """The databricks-claude-sonnet-4-6 serving endpoint is accessible."""
-        eps = workspace.serving_endpoints.list()
-        names = [e.name for e in eps]
-        assert "databricks-claude-sonnet-4-6" in names, f"databricks-claude-sonnet-4-6 not found in: {names[:10]}"
+        """The maestro-endpoint AI Gateway endpoint is accessible."""
+        from openai import OpenAI
+
+        host = workspace.config.host.rstrip("/")
+        if not host.startswith("http"):
+            host = f"https://{host}"
+        token = workspace.config.authenticate()["Authorization"].replace("Bearer ", "")
+        client = OpenAI(api_key=token, base_url=f"{host}/ai-gateway/mlflow/v1")
+        r = client.chat.completions.create(
+            model="maestro-endpoint",
+            messages=[{"role": "user", "content": "ping"}],
+            max_tokens=5,
+        )
+        assert r.choices[0].message.content is not None
+        print(f"  maestro-endpoint responded: {r.choices[0].message.content[:20]}")
 
     @pytest.mark.asyncio
     async def test_gateway_responds(self, model):

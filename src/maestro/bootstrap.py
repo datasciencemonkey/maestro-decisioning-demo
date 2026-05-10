@@ -99,10 +99,19 @@ def bootstrap(profile: str = "9cefok"):
     mlflow.set_experiment("/Users/sathish.gangichetty@databricks.com/maestro-cdp")
     mlflow.pydantic_ai.autolog()
 
-    # LLM via AI Gateway
-    client = AsyncDatabricksOpenAI(workspace_client=w)
+    # LLM via AI Gateway (custom endpoint at /ai-gateway/mlflow/v1)
+    from openai import AsyncOpenAI
+
+    host = w.config.host.rstrip("/")
+    if not host.startswith("http"):
+        host = f"https://{host}"
+    token = os.environ["DATABRICKS_TOKEN"]
+    client = AsyncOpenAI(
+        api_key=token,
+        base_url=f"{host}/ai-gateway/mlflow/v1",
+    )
     provider = OpenAIProvider(openai_client=client)
-    model = OpenAIChatModel("databricks-claude-sonnet-4-6", provider=provider)
+    model = OpenAIChatModel("maestro-endpoint", provider=provider)
 
     # Lakebase URL
     db_url = get_lakebase_url(profile=profile)
