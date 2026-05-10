@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+.venv/
+
+# IDE
+.DS_Store
+.idea/
+.vscode/
+
+# Env / secrets
+.env
+*.db
+mlflow.db
+
+# Claude / agent state (not project code)
+.claude-flow/
+.claude/
+.omc/
+.mcp.json
+.vibe/
+.humantokens/
+
+# Lock files managed by tools
+uv.lock
+
+# Pytest
+.pytest_cache/

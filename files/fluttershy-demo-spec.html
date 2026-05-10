@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fluttershy Agentic CDP Demo — Specification</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..900&family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --cream: #faf6f1;
+    --cream-deep: #f3ece2;
+    --paper: #ffffff;
+    --ink: #1a1410;
+    --ink-soft: #4a3f37;
+    --ink-mute: #8a7d72;
+    --line: rgba(26, 20, 16, 0.08);
+    --line-soft: rgba(26, 20, 16, 0.04);
+    --rose: #e8826f;
+    --rose-deep: #c45a47;
+    --rose-soft: #f8d4cb;
+    --rose-bg: #fce8e2;
+    --gold: #d4a574;
+    --leaf: #6b8e6b;
+    --leaf-bg: #e8efe5;
+    --navy: #0e1422;
+    --cyan: #4a9ba0;
+
+    --serif: "Fraunces", "Times New Roman", serif;
+    --sans: "Geist", system-ui, sans-serif;
+    --mono: "Geist Mono", ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--sans);
+    background: var(--cream);
+    color: var(--ink);
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.6;
+    font-size: 15px;
+  }
+  a { color: var(--rose-deep); text-decoration: none; }
+  a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+  /* Layout */
+  .layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    max-width: 1280px;
+    margin: 0 auto;
+    min-height: 100vh;
+  }
+
+  /* TOC sidebar */
+  .toc {
+    border-right: 1px solid var(--line);
+    padding: 56px 32px 56px 40px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    background: var(--cream);
+  }
+  .toc-brand {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+  .toc-brand .accent { color: var(--rose); }
+  .toc-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-mute);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+  .toc nav { display: flex; flex-direction: column; gap: 2px; }
+  .toc nav a {
+    color: var(--ink-soft);
+    font-size: 13px;
+    padding: 6px 0;
+    border-left: 2px solid transparent;
+    padding-left: 12px;
+    margin-left: -12px;
+    transition: all 0.2s ease;
+    line-height: 1.4;
+  }
+  .toc nav a:hover {
+    color: var(--ink);
+    border-left-color: var(--rose);
+    text-decoration: none;
+  }
+  .toc nav a.appendix {
+    margin-top: 12px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+  .toc-meta {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-mute);
+    line-height: 1.6;
+    letter-spacing: 0.02em;
+  }
+  .toc-meta strong { color: var(--ink); font-weight: 600; }
+
+  /* Main content */
+  .doc {
+    padding: 56px 56px 120px;
+    max-width: 880px;
+  }
+  .doc-header {
+    padding-bottom: 32px;
+    margin-bottom: 48px;
+    border-bottom: 1px solid var(--line);
+  }
+  .doc-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--rose-deep);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .doc-eyebrow .dot {
+    width: 6px; height: 6px;
+    background: var(--rose);
+    border-radius: 50%;
+  }
+  .doc-title {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(36px, 5vw, 56px);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 20px;
+  }
+  .doc-title .accent { color: var(--rose); }
+  .doc-status {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px 32px;
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-top: 24px;
+  }
+  .doc-status div span {
+    display: block;
+    color: var(--ink);
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 14px;
+    margin-top: 2px;
+  }
+  .doc-status div .label {
+    font-family: var(--mono);
+    font-style: normal;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+
+  /* Section */
+  section {
+    margin-bottom: 48px;
+    scroll-margin-top: 24px;
+  }
+  h2 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-style: italic;
+    font-size: 32px;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 6px;
+    color: var(--ink);
+  }
+  h2 .num {
+    font-family: var(--mono);
+    font-style: normal;
+    font-size: 13px;
+    color: var(--rose);
+    letter-spacing: 0.1em;
+    margin-right: 12px;
+    vertical-align: 6px;
+  }
+  h3 {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 17px;
+    margin-top: 28px;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+  h3 .num {
+    font-family: var(--mono);
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--ink-mute);
+    margin-right: 8px;
+    letter-spacing: 0.05em;
+  }
+  h4 {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 14px;
+    margin-top: 20px;
+    margin-bottom: 8px;
+    color: var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .section-rule {
+    height: 1px;
+    background: var(--line);
+    margin-bottom: 24px;
+    margin-top: 8px;
+  }
+
+  p {
+    margin-bottom: 16px;
+    color: var(--ink-soft);
+    line-height: 1.65;
+  }
+  p strong { color: var(--ink); font-weight: 600; }
+  p em { color: var(--ink); font-style: italic; }
+  p code, li code, td code {
+    font-family: var(--mono);
+    font-size: 0.9em;
+    background: var(--cream-deep);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--ink);
+  }
+  ul, ol {
+    margin: 0 0 16px 24px;
+    color: var(--ink-soft);
+  }
+  ul li, ol li {
+    margin-bottom: 6px;
+    line-height: 1.65;
+  }
+  ul li strong, ol li strong { color: var(--ink); }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 24px;
+    font-size: 13px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  th {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    text-align: left;
+    padding: 12px 14px;
+    background: var(--cream-deep);
+    border-bottom: 1px solid var(--line);
+  }
+  td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: top;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+  td:first-child {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  tr:last-child td { border-bottom: none; }
+  table.numbered td:first-child {
+    font-family: var(--mono);
+    color: var(--ink-mute);
+    width: 32px;
+    text-align: right;
+    font-weight: 500;
+  }
+  table strong { color: var(--ink); }
+  table em { font-style: italic; }
+  table code {
+    font-family: var(--mono);
+    font-size: 0.85em;
+    background: var(--cream-deep);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  /* Code blocks */
+  pre {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 18px 20px;
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.6;
+    overflow-x: auto;
+    margin: 16px 0 24px;
+    border-left: 3px solid var(--rose);
+  }
+  pre .key { color: var(--rose-soft); }
+  pre .val { color: #f1f56e; }
+  pre .comment { color: var(--ink-mute); font-style: italic; }
+
+  /* Callouts */
+  .callout {
+    background: var(--rose-bg);
+    border-left: 3px solid var(--rose);
+    padding: 14px 18px;
+    margin: 16px 0 24px;
+    border-radius: 0 4px 4px 0;
+    font-size: 13.5px;
+    color: var(--ink);
+    line-height: 1.55;
+  }
+  .callout.leaf {
+    background: var(--leaf-bg);
+    border-left-color: var(--leaf);
+  }
+  .callout.note {
+    background: var(--cream-deep);
+    border-left-color: var(--ink-mute);
+    color: var(--ink-soft);
+  }
+  .callout strong { color: var(--ink); }
+  .callout .label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--rose-deep);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .callout.leaf .label { color: var(--leaf); }
+  .callout.note .label { color: var(--ink-mute); }
+
+  /* Footer */
+  .doc-footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-mute);
+    letter-spacing: 0.05em;
+    text-align: center;
+  }
+
+  /* Badges */
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    vertical-align: 2px;
+    margin-left: 8px;
+  }
+  .badge.locked { background: var(--leaf); color: white; }
+  .badge.scoped { background: var(--gold); color: var(--ink); }
+  .badge.open { background: var(--rose-bg); color: var(--rose-deep); border: 1px solid var(--rose); }
+
+  /* TOC active highlight */
+  .toc nav a.active {
+    color: var(--ink);
+    border-left-color: var(--rose);
+    font-weight: 500;
+  }
+
+  @media (max-width: 1000px) {
+    .layout { grid-template-columns: 1fr; }
+    .toc {
+      position: relative;
+      height: auto;
+      border-right: none;
+      border-bottom: 1px solid var(--line);
+      padding: 32px;
+    }
+    .doc { padding: 32px 24px 80px; }
+  }
+
+  @media print {
+    body { background: white; }
+    .toc { display: none; }
+    .layout { display: block; max-width: 100%; }
+    .doc { padding: 24px; max-width: 100%; }
+    section { page-break-inside: avoid; }
+    h2 { page-break-after: avoid; }
+    pre { page-break-inside: avoid; }
+  }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <aside class="toc">
+    <div class="toc-brand">Fluttershy<span class="accent">.</span></div>
+    <div class="toc-tag">Specification</div>
+    <nav id="tocNav">
+      <a href="#summary">1. Executive Summary</a>
+      <a href="#objectives">2. Objectives</a>
+      <a href="#assumptions">3. Assumptions</a>
+      <a href="#outcomes">4. Outcomes &amp; Success</a>
+      <a href="#constraints">5. Constraints</a>
+      <a href="#tech">6. Tech Choices</a>
+      <a href="#tiering">7. Disposition Tiering</a>
+      <a href="#storyline">8. Storyline &amp; Beats</a>
+      <a href="#traceability">9. Storyline Traceability</a>
+      <a href="#economics">10. Cost &amp; Economics</a>
+      <a href="#build">11. Build Plan</a>
+      <a href="#open">12. Open Questions</a>
+      <a href="#data" class="appendix">A · Data Model</a>
+      <a href="#skills" class="appendix">B · Agent Skills</a>
+    </nav>
+    <div class="toc-meta">
+      <strong>Status</strong> Phase A locked<br/>
+      <strong>Owner</strong> AI Practice Lead<br/>
+      <strong>Build</strong> ~7 weeks<br/>
+      <strong>Audience</strong> Practice + field
+    </div>
+  </aside>
+
+  <main class="doc">
+
+    <header class="doc-header">
+      <div class="doc-eyebrow"><span class="dot"></span>Specification · Working document</div>
+      <h1 class="doc-title">Fluttershy <em class="accent">&amp;</em> the agentic CDP demo</h1>
+      <p style="font-family: var(--serif); font-style: italic; font-size: 19px; color: var(--ink-soft); max-width: 640px; margin-top: 8px;">
+        Phase A locked · Phase B/C scoped · Build sequencing committed. Companion to the design doc and animated storyboard.
+      </p>
+      <div class="doc-status">
+        <div><span class="label">Status</span><span>Phase A locked <span class="badge locked">locked</span></span></div>
+        <div><span class="label">Owner</span><span>AI Practice Lead, Databricks</span></div>
+        <div><span class="label">Posture</span><span>Replacement, not composable</span></div>
+        <div><span class="label">Companions</span><span>Design doc · Storyboard</span></div>
+      </div>
+    </header>
+
+    <!-- 1 -->
+    <section id="summary">
+      <h2><span class="num">01</span>Executive Summary</h2>
+      <div class="section-rule"></div>
+      <p>We are building a scripted, synthetic-data demo that proves Databricks is the <strong>agentic CDP</strong> — your customer data platform IS your data platform, your agents reason across every governed domain, and journey state is durable on the same platform as your analytical state. Phase A is a 15-minute "Land" demo for customers and field engineers. Phase B and C are 30 and 45-minute expansions. The thesis is replacement, not composable. The competition is Salesforce Data Cloud and Adobe RT-CDP.</p>
+      <p>The strongest single beat is the <strong>agentic disposition core</strong> — the moment a <code>cart_abandoned</code> event triggers an agent that reasons across profile, behavior, photo, production calendar, campaigns, support tickets, propensity, and consent — pauses durably for eleven hours via DBOS on Lakebase — then resumes and sends a multimodal segment-of-1 email through a partner ESP. <em>This is what no other CDP can structurally do.</em> Everything else in the demo exists to set up or pay off this beat.</p>
+    </section>
+
+    <!-- 2 -->
+    <section id="objectives">
+      <h2><span class="num">02</span>Objectives</h2>
+      <div class="section-rule"></div>
+
+      <h3><span class="num">2.1</span>Strategic objective</h3>
+      <p>Establish Databricks as the agentic CDP category leader, by demonstrating capabilities that are structurally outside what Adobe RT-CDP and Salesforce Data Cloud can deliver — not because our AI is better, but because <em>their walled gardens end at the marketing schema while ours covers the entire enterprise data estate under one governance plane.</em></p>
+
+      <h3><span class="num">2.2</span>Audience objectives</h3>
+      <ul>
+        <li><strong>Customers (primary for Phase A):</strong> marketing leaders see cross-campaign reasoning + multimodal + durability and recognize this as a generational change. Data/AI leaders see the architectural elegance and recognize it as future-proof.</li>
+        <li><strong>Field engineers (primary for Phase B/C):</strong> see a deployable Asset Bundle, deep architecture, full MLflow lineage. Can confidently sell, replicate, and extend the pattern in customer environments.</li>
+      </ul>
+
+      <h3><span class="num">2.3</span>Phasing objective</h3>
+      <ul>
+        <li><strong>Phase A (15 min, Land):</strong> open the door. Customer says "tell me more."</li>
+        <li><strong>Phase B (30 min, Expand 1):</strong> prove ML depth. Agent builds the propensity model itself.</li>
+        <li><strong>Phase C (45 min, Expand 2):</strong> prove agent-as-product. Agent talks to Cindy directly. Architecture deep-dive.</li>
+      </ul>
+
+      <h3><span class="num">2.4</span>Technical objective</h3>
+      <p>Ship the agentic disposition core as a reusable, well-contracted Databricks-native pattern. The surface (browser, ops dashboard, email preview) is configurable; the core is the moat.</p>
+    </section>
+
+    <!-- 3 -->
+    <section id="assumptions">
+      <h2><span class="num">03</span>Assumptions</h2>
+      <div class="section-rule"></div>
+      <table class="numbered">
+        <thead><tr><th>#</th><th>Assumption</th><th>Implication</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Identity resolution is out of scope — customer is known + authenticated at start</td><td>"Stitching" beat is covered by a separate Databricks demo</td></tr>
+          <tr><td>2</td><td>Synthetic data only — this is not a customer POC</td><td>Cost, IP risk, and data residency concerns are bounded</td></tr>
+          <tr><td>3</td><td>Print-on-demand business model — Fluttershy is Shutterfly-shaped</td><td>"Inventory" is replaced by <code>production_calendar</code></td></tr>
+          <tr><td>4</td><td>Activation is intentionally a partner — Braze, SendGrid, customer's ESP</td><td>We are not building an ESP; ESP-agnosticism is positioned as a feature</td></tr>
+          <tr><td>5</td><td>Foundation models accessed via AI Gateway — Claude, Llama, customer choice</td><td>Stack is provider-abstracted; per-customer preference does not break the demo</td></tr>
+          <tr><td>6</td><td>Demo is scripted with deterministic-replay fallback for any live model call</td><td>Network/auth failure during a customer meeting cannot collapse the demo</td></tr>
+          <tr><td>7</td><td>All durable agent state lives inside Databricks governance (Lakebase, not external Postgres)</td><td>The "one governance plane" thesis is structurally true, not just rhetorical</td></tr>
+          <tr><td>8</td><td>Customer brings their brand, catalog, customer data — Databricks is the platform</td><td>Demo is illustrative of what a brand can build <em>on Databricks</em>, not a Databricks consumer product</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 4 -->
+    <section id="outcomes">
+      <h2><span class="num">04</span>Outcomes &amp; Success Criteria</h2>
+      <div class="section-rule"></div>
+
+      <h3><span class="num">4.1</span>Demo reception (qualitative)</h3>
+      <table>
+        <thead><tr><th>Audience</th><th>Target reception</th><th>Signal</th></tr></thead>
+        <tbody>
+          <tr><td>Marketing leader</td><td>9/10</td><td>"How do we get this in our environment?" within 48h</td></tr>
+          <tr><td>Data/AI leader</td><td>9/10</td><td>Asks for Phase B and architectural deep-dive</td></tr>
+          <tr><td>Field engineer (Phase A alone)</td><td>7/10</td><td>Can articulate the thesis without slides</td></tr>
+          <tr><td>Field engineer (with B/C)</td><td>9/10</td><td>Replicates in a customer workspace within 1 hour</td></tr>
+          <tr><td>Adobe / Salesforce account team in the room</td><td>Visibly annoyed</td><td>They coach the customer harder afterward</td></tr>
+        </tbody>
+      </table>
+
+      <h3><span class="num">4.2</span>Demo reception (quantitative)</h3>
+      <ul>
+        <li>Pipeline created within 30 days of demo: track per delivery</li>
+        <li>Repeat customer requests for re-runs: track per delivery</li>
+        <li>Field-engineer self-serve replication time: target ≤ 1 hour from Asset Bundle deploy</li>
+      </ul>
+
+      <h3><span class="num">4.3</span>Business outcome</h3>
+      <p>Phase A becomes the standard top-of-funnel demo for Databricks AI Practice. Asset Bundle is replicated by field engineers across the global team within one quarter of GA.</p>
+    </section>
+
+    <!-- 5 -->
+    <section id="constraints">
+      <h2><span class="num">05</span>Constraints</h2>
+      <div class="section-rule"></div>
+      <table class="numbered">
+        <thead><tr><th>#</th><th>Constraint</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>15-minute Phase A runtime; hard ceiling 17:30</td><td>Customer attention; agenda budgets</td></tr>
+          <tr><td>2</td><td>Synthetic data only; no real customer data</td><td>Privacy, IP, reproducibility</td></tr>
+          <tr><td>3</td><td>No copyrighted brand imagery or stock without license</td><td>Legal and reputational</td></tr>
+          <tr><td>4</td><td>Tier 1 streaming hygiene must exist before agent disposition</td><td>Cost defensibility for technical buyers (see §7)</td></tr>
+          <tr><td>5</td><td>Beat 3 (Activation) limited to 3 visible UI elements; rest verbal</td><td>Pacing — six on-screen elements would rush</td></tr>
+          <tr><td>6</td><td>Live model calls require deterministic-replay fallback</td><td>Network/auth failures cannot collapse the narrative</td></tr>
+          <tr><td>7</td><td>All durable state inside the Databricks governance plane</td><td>Thesis fails if DBOS lands on external Postgres</td></tr>
+          <tr><td>8</td><td>Phase A does NOT show agent-built ML or live customer chat</td><td>Those are Phase B and C — don't leak the reveal</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 6 -->
+    <section id="tech">
+      <h2><span class="num">06</span>Tech Choices</h2>
+      <div class="section-rule"></div>
+      <table>
+        <thead><tr><th>Layer</th><th>Choice</th><th>Rationale</th></tr></thead>
+        <tbody>
+          <tr><td>Agent authoring</td><td><strong>Pydantic AI</strong></td><td>Mature support for skills, multi-agent, MCP tools. Customer choice of framework is itself part of the "open framework on Databricks" pitch.</td></tr>
+          <tr><td>Agent wrapping</td><td><strong>MLflow ResponsesAgent</strong></td><td>Gives AI Playground, Agent Eval, Agent Monitoring out of the box. Connects Pydantic AI to native observability.</td></tr>
+          <tr><td>Agent serving</td><td><strong>Mosaic AI + Databricks Apps</strong></td><td>Native serving surface; Apps gives UI hosting for free in Phase B/C.</td></tr>
+          <tr><td>Durability</td><td><strong>DBOS on Lakebase</strong></td><td>Workflow-level durability + Postgres-compatible OLTP in same governance plane as analytical state. <em>The structural moat.</em></td></tr>
+          <tr><td>Tools</td><td><strong>UC Functions + MCP servers</strong></td><td>UC Functions for typed business logic with native UC governance; MCP for partner integrations</td></tr>
+          <tr><td>Foundation models</td><td><strong>Claude / Llama via AI Gateway</strong></td><td>Provider-abstracted; customer selects. Gateway logs every call for audit.</td></tr>
+          <tr><td>Vector search</td><td><strong>Mosaic AI Vector Search</strong>, auto-synced from Delta</td><td>Multimodal magic for Beats 1 and 3 (cat photo embedding, visually-similar match)</td></tr>
+          <tr><td>ML</td><td><strong>AutoML → MLflow Registry → Model Serving</strong></td><td>Phase B reveals the agent built this in-flow</td></tr>
+          <tr><td>Observability</td><td><strong>MLflow Tracing</strong> (OpenTelemetry-compatible)</td><td>Single trace spans agent + tool calls + model inference + journey state</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout note">
+        <span class="label">Explicitly NOT chosen</span>
+        External Postgres (would fragment governance) · LangGraph as primary authoring framework (Pydantic AI ergonomics fit our story; LangGraph remains an "or this" option for customers) · Temporal/Airflow for workflow durability (DBOS on Lakebase is structurally tighter for the "one governance plane" thesis) · Building our own ESP (explicit non-goal — activation is the only function we let leave the platform).
+      </div>
+    </section>
+
+    <!-- 7 -->
+    <section id="tiering">
+      <h2><span class="num">07</span>Disposition Tiering — the core's design contract</h2>
+      <div class="section-rule"></div>
+      <p>The agent is the disposition engine — but every event hitting the agent is a real cost. To make the architecture defensible at customer scale, we layer dispositions in three tiers.</p>
+
+      <h3><span class="num">7.1</span>Tier 1 — Hygiene (microseconds, near-free)</h3>
+      <p>Streaming SQL at the Delta layer drops events that are not real or not actionable: bots, dupes, opt-outs, hard "do not contact" states, race conditions where the order has already completed, hard-cap breaches on frequency. <em>This is not deciding whether to act — it is deciding whether the event is real.</em></p>
+
+      <h3><span class="num">7.2</span>Tier 2 — Agent disposition (seconds, expensive)</h3>
+      <p>Everything that survives Tier 1 hits the agent. Propensity score, frequency caps, support tickets, production calendar, consent — all are <em>inputs to reasoning, not gates before it.</em> The agent is the disposition engine, not a downstream system that a rule engine deigns to invoke. <strong>This is the demo's hero capability.</strong></p>
+
+      <h3><span class="num">7.3</span>Tier 3 — Disposition intensity (the agent's actual decision)</h3>
+      <p>The agent does not decide "act / don't act." It decides intervention intensity calibrated to funnel depth and signal richness:</p>
+      <table>
+        <thead><tr><th>Funnel depth</th><th>Disposition intensity (typical)</th></tr></thead>
+        <tbody>
+          <tr><td>Add-to-cart bounce</td><td>In-app personalization next visit (zero send cost)</td></tr>
+          <tr><td>Cart abandon mid-checkout</td><td>Email at optimal send time</td></tr>
+          <tr><td>Payment-page abandon</td><td>Email + offer + possible discount unlock</td></tr>
+          <tr><td>Multi-day no-engagement after cart</td><td>Channel escalation per consent; agent reconsiders entirely</td></tr>
+        </tbody>
+      </table>
+
+      <h3><span class="num">7.4</span>Why this matters for the demo (and beyond)</h3>
+      <p>The Beat 2 reasoning trace IS the magic. A pre-filter for "recoverability" before the agent recreates the Salesforce/Adobe rule-engine-gates-AI pattern and undermines our thesis. Tier 1 catches noise; Tier 3 calibrates intensity. <em>Both are visible in the trace; neither pre-empts the agent.</em></p>
+
+      <div class="callout">
+        <span class="label">Inoculation against the cost question</span>
+        We will show one inline trace line in Beat 2: <code>tier1_hygiene: passed (2,847 events dropped this min · 312 to agent)</code>. Invisible to non-technical viewers; signals to technical buyers that we are not naive about cost. ~30 seconds of build effort, removes a category of pushback.
+      </div>
+    </section>
+
+    <!-- 8 -->
+    <section id="storyline">
+      <h2><span class="num">08</span>Storyline &amp; Beat Structure</h2>
+      <div class="section-rule"></div>
+
+      <h3><span class="num">8.1</span>Phase A — The 15-minute Land</h3>
+      <table>
+        <thead><tr><th>Beat</th><th>Length</th><th>Hero capability</th></tr></thead>
+        <tbody>
+          <tr><td>Setup</td><td>1:00</td><td>Audience meets Cindy + Whiskers; architecture flash</td></tr>
+          <tr><td>1. Browser</td><td>3:00</td><td>Real-time multimodal personalization (photo → embedding → re-rank)</td></tr>
+          <tr><td>2. Reason</td><td>5:45</td><td>Cross-campaign agentic reasoning over data outside the marketing stack</td></tr>
+          <tr><td>2.5. Durability</td><td>0:45</td><td>Journey paused 11h 42m on DBOS/Lakebase, agent rehydrated context</td></tr>
+          <tr><td>3. Activate</td><td>3:30</td><td>Segment-of-1 multimodal email composed, vector-search visual match, partner ESP send</td></tr>
+          <tr><td>Close</td><td>1:00</td><td>Architecture replacement chart + Phase B tease</td></tr>
+          <tr><td><strong>Total</strong></td><td><strong>15:00</strong></td><td><strong>Hard ceiling 17:30</strong></td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout">
+        <span class="label">The differentiation lives in Beats 2 and 2.5</span>
+        Beats 1, 3, and Close are setup and payoff. The other beats can be redesigned, re-skinned, or re-paced without breaking the thesis. Beats 2 and 2.5 <em>are</em> the thesis. <strong>Build them first; gate everything else on them.</strong> See §11.2 and the Beat 2 build brief.
+      </div>
+
+      <h3><span class="num">8.2</span>The narrative spine (one sentence per beat)</h3>
+      <ol>
+        <li><strong>Browser</strong> — multimodal personalization happens live.</li>
+        <li><strong>Reason</strong> — the agent reaches into domains no other CDP can touch.</li>
+        <li><strong>Durability</strong> — and holds the journey across time without leaving the platform.</li>
+        <li><strong>Activate</strong> — to deliver a segment of one.</li>
+        <li><strong>Close</strong> — that's seven CDP functions replaced, one kept by choice.</li>
+      </ol>
+
+      <h3><span class="num">8.3</span>Phase B — Expand 1 (30 min, +15) <span class="badge scoped">scoped</span></h3>
+      <ul>
+        <li>Agent invokes AutoML on a Delta feature set, registers the model in MLflow, deploys to Model Serving, then uses it. The "score 0.81" from Beat 2 retroactively becomes <em>"the agent built this an hour ago."</em></li>
+        <li>Journey complications: Cindy doesn't open the 8 AM email. DBOS wakes the journey 24h later; the agent re-reasons with current context — switches creative, drops 10% off, escalates to SMS only if consent permits.</li>
+      </ul>
+
+      <h3><span class="num">8.4</span>Phase C — Expand 2 (45 min, +15) <span class="badge scoped">scoped</span></h3>
+      <ul>
+        <li>Cindy opens a chat in the order-status surface. The same agent (different surface) talks to her, knows her full context, can update the order, schedule a redo, write back to her profile — all governed.</li>
+        <li>Architecture deep-dive for field engineers: MLflow trace walk, AI Gateway logs, UC audit logs, Asset Bundle deploy.</li>
+      </ul>
+    </section>
+
+    <!-- 9 -->
+    <section id="traceability">
+      <h2><span class="num">09</span>Storyline Traceability — Original Notes vs. Current Spec</h2>
+      <div class="section-rule"></div>
+      <p>The original IMG_1083 notes specified a Shutterfly-flavored agentic personalization demo. Below is a faithful trace of how each original element maps to the current Phase A and beyond.</p>
+
+      <h3><span class="num">9.1</span>Direct matches</h3>
+      <table>
+        <thead><tr><th>Original element</th><th>Current beat</th><th>Match quality</th></tr></thead>
+        <tbody>
+          <tr><td>Part 1 / 1a — "identified who Cindy is"</td><td>Setup + Beat 1</td><td>Direct</td></tr>
+          <tr><td>Part 1 / 1b — "NBA / recommendations while browsing"</td><td>Beat 1 — NBA panel + product re-rank</td><td>Direct</td></tr>
+          <tr><td>Part 1 / 1b — "Cindy's browsing cat options / uploaded cat photo"</td><td>Beat 1 — photo upload triggers embedding + re-rank</td><td>Direct, deepened with Vector Search auto-sync</td></tr>
+          <tr><td>Part 1 — "Cindy abandoned cart"</td><td>Beat 1 → Beat 2 transition</td><td>Direct</td></tr>
+          <tr><td>Part 2 / 2a — "agent grab everything about Cindy and recommend cross-campaign prioritization"</td><td>Beat 2 — full reasoning trace</td><td>Direct, deepened with production calendar, frequency cap, support tickets, propensity, send time</td></tr>
+          <tr><td>Part 2 — "decided to target Cindy for abandoned cart over seasonal promotion"</td><td>Beat 2 — Spring Seasonal suppressed, Abandoned Cart prioritized</td><td>Direct</td></tr>
+          <tr><td>Part 2 — "remove Cindy from seasonal promotion campaign"</td><td>Beat 2 — campaign panel animates the suppression</td><td>Direct</td></tr>
+          <tr><td>Part 3 — "agent triggered send email (segment = 1) via partner send email API"</td><td>Beat 3 — agent composes + sends via Braze MCP</td><td>Direct</td></tr>
+          <tr><td>Part 3 — "personalize email with cat stock photos of the same kind of cat"</td><td>Beat 3 — Vector Search returns top-3 visually-similar tabby kittens</td><td>Direct, deepened with explicit Vector Search story</td></tr>
+        </tbody>
+      </table>
+
+      <h3><span class="num">9.2</span>Original "TBD" elements — now placed</h3>
+      <table>
+        <thead><tr><th>Original TBD</th><th>Current placement</th></tr></thead>
+        <tbody>
+          <tr><td>Part A — "agent decided we need a propensity model? Or agent builds the model"</td><td><strong>Phase B</strong> — fully exercised: feature engineering, AutoML, MLflow registration, Model Serving deploy, in-flow use</td></tr>
+          <tr><td>Part B — "talk to my customer via the agent. Talk to Cindy"</td><td><strong>Phase C</strong> — agent-as-product on order-status surface</td></tr>
+        </tbody>
+      </table>
+
+      <h3><span class="num">9.3</span>Additions to the original storyline</h3>
+      <p>These were not in the original notes but emerged from working sessions and are now part of the spec:</p>
+      <table>
+        <thead><tr><th>Addition</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Cindy/Whiskers character arc</strong> — kitten name in profile, kitten reference photo new, builds "Welcome Home" book</td><td>Narrative spine. One sentence in setup, paid off three times. Makes the demo emotionally resonant rather than only technically impressive.</td></tr>
+          <tr><td><strong>Beat 2.5 — Durability Bridge</strong> (DBOS on Lakebase)</td><td>The hero structural moat. Beat 2's "send at 8 AM" creates tension; resolving it with durable journey state makes Salesforce/Adobe journey-builder stories sound dated.</td></tr>
+          <tr><td><strong>Tier 1/2/3 disposition layering</strong></td><td>Cost defensibility for technical buyers. Without it, the architecture is naive at customer scale.</td></tr>
+          <tr><td><strong>Production calendar</strong> (replacing "inventory")</td><td>Print-on-demand fit. Anyone from POD/marketplace would have spotted "inventory" as wrong.</td></tr>
+          <tr><td><strong>Specific tech stack lock</strong></td><td>Original notes did not specify framework or runtime. Pydantic AI + MLflow ResponsesAgent + DBOS-on-Lakebase + Mosaic AI Vector Search are now committed.</td></tr>
+          <tr><td><strong>MLflow trace UI as a hero asset</strong></td><td>The trace IS the magic of Beat 2. Must be invested in heavily. Highest single execution risk.</td></tr>
+          <tr><td><strong>Replacement-not-composable framing</strong></td><td>Original did not frame posture vs. competitors. We now own 7 of 8 CDP functions; activation is partner-by-choice.</td></tr>
+        </tbody>
+      </table>
+
+      <h3><span class="num">9.4</span>Refinements / sharpenings</h3>
+      <table>
+        <thead><tr><th>Original phrasing</th><th>Refinement</th></tr></thead>
+        <tbody>
+          <tr><td>"abandoned cart"</td><td>All add-to-cart bounce events post-Tier-1 hygiene flow to the agent. The agent disposes them at calibrated intensity per Tier 3.</td></tr>
+          <tr><td>"stock cat photos of the same kind of cat"</td><td>Mosaic AI Vector Search returns top-3 visually-similar stock kittens from an 8.4k image catalog. Agent selects the highest similarity score.</td></tr>
+          <tr><td>"send email API"</td><td>MCP tool call to Braze (or whichever ESP). Partner-agnostic. AI Gateway logs the model call; UC audits data access; activation is governed end-to-end even though the send leaves the platform.</td></tr>
+          <tr><td>"Part A: agent... do feature engineering / build model"</td><td>Phase A scopes this to "agent calls a pre-existing serving endpoint." Phase B reveals the agent built that model itself.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout leaf">
+        <span class="label">Match assessment</span>
+        The current Phase A is a faithful, deepened, and de-risked rendering of the original storyline. Every original beat has a direct corresponding beat in the current script. The two original TBD items are correctly deferred to Phase B and C. The additions strengthen the narrative without contradicting any original element.
+      </div>
+    </section>
+
+    <!-- 10 -->
+    <section id="economics">
+      <h2><span class="num">10</span>Cost &amp; Economics — back-of-envelope</h2>
+      <div class="section-rule"></div>
+      <p>For a customer-the-size-of-Fluttershy with ~10M end users:</p>
+      <table>
+        <thead><tr><th>Variable</th><th>Order-of-magnitude estimate</th></tr></thead>
+        <tbody>
+          <tr><td>Daily active users with carts</td><td>~3-5% of total = 300k–500k</td></tr>
+          <tr><td>Daily abandon events</td><td>~70% of carts created = ~210k–350k</td></tr>
+          <tr><td>Tier 1 hygiene retention rate</td><td>~60-80% of events flow to Tier 2</td></tr>
+          <tr><td>Tier 2 agent dispositions/day</td><td>~125k–280k</td></tr>
+          <tr><td>Cost per disposition (multi-step reasoning, ~3-5k input tokens, ~500 output, plus tool calls)</td><td>~$0.005–$0.02</td></tr>
+          <tr><td><strong>Daily agent compute cost for the brand</strong></td><td><strong>~$625–$5,600/day</strong></td></tr>
+          <tr><td>Annualized</td><td>~$230k–$2M/year</td></tr>
+        </tbody>
+      </table>
+
+      <h3><span class="num">10.1</span>What this number means</h3>
+      <ul>
+        <li><strong>Per end user, this is $0.0001–$0.001 per shopper per year</strong> — economically trivial for a brand with cart-recovery uplift in the percentage points.</li>
+        <li>This is <em>just</em> agent compute. Tool calls (Vector Search, Model Serving), storage, and Lakebase OLTP are additional but materially smaller.</li>
+        <li><strong>Tier 1 hygiene is what makes this defensible.</strong> Without it, costs scale linearly with raw event volume rather than with actionable events.</li>
+      </ul>
+
+      <h3><span class="num">10.2</span>What we will NOT do in the demo</h3>
+      <p>Quote a specific dollar number. Customer traffic profiles vary by 10x. We will instead build a <strong>calculator</strong> the field can use in deal motion, taking the customer's actual <code>daily_active_users</code>, <code>cart_creation_rate</code>, and <code>abandon_rate</code> as inputs.</p>
+
+      <h3><span class="num">10.3</span>Calculator inputs (to be built)</h3>
+      <ul>
+        <li><code>daily_active_users</code></li>
+        <li><code>cart_creation_rate</code> — % of DAU who create a cart</li>
+        <li><code>abandon_rate</code> — % of carts that abandon</li>
+        <li><code>tier1_drop_rate</code> — default 30%</li>
+        <li><code>cost_per_disposition_low</code> — default $0.005</li>
+        <li><code>cost_per_disposition_high</code> — default $0.02</li>
+        <li><code>model_used</code> — selects token cost defaults</li>
+      </ul>
+      <p>Output: low/high daily, monthly, annual cost per brand. Cost-per-shopper. Comparison to incremental revenue from a 5% cart-recovery uplift.</p>
+    </section>
+
+    <!-- 11 -->
+    <section id="build">
+      <h2><span class="num">11</span>Build Plan &amp; Sequencing</h2>
+      <div class="section-rule"></div>
+
+      <h3><span class="num">11.1</span>Sequencing principle</h3>
+      <p><strong>Build the agentic disposition core first.</strong> The surface (browser, ops dashboard, email preview) is configurable; the core is the moat. Define output contracts up front so a UI — any UI — can render the core's outputs human-legibly later.</p>
+
+      <h3><span class="num">11.2</span>Build phases</h3>
+      <table>
+        <thead><tr><th>Phase</th><th>Deliverable</th><th>Duration</th><th>Parallel with</th></tr></thead>
+        <tbody>
+          <tr><td>1. Synthetic data</td><td>UC tables populated, Vector Search index built, journey_state schema in Lakebase</td><td>1 wk</td><td>—</td></tr>
+          <tr><td><strong>2. Beat 2 + Beat 2.5 — the differentiation core</strong></td><td>Pydantic AI authoring, MLflow ResponsesAgent wrapping, tool implementations, DBOS persistence + resumption, full output contracts. <strong>This is the build's gate. Phase 4 does not start until Beat 2 acceptance criteria pass.</strong></td><td>2-3 wk</td><td>Phase 3</td></tr>
+          <tr><td>3. Trace rendering</td><td>The MLflow trace UI — annotated, drillable, narratable. Highest-risk single component.</td><td>1 wk</td><td>Phase 2</td></tr>
+          <tr><td>4. Surface layer (Beats 1, 3)</td><td>Browser + ops dashboard + email preview, all reading from real agent outputs</td><td>2 wk</td><td>—</td></tr>
+          <tr><td>5. Polish &amp; rehearse</td><td>Pre-warm endpoints, deterministic-replay fallback, scripted execution, asset bundle</td><td>1 wk</td><td>—</td></tr>
+          <tr><td><strong>Total</strong></td><td></td><td><strong>~7 wk</strong></td><td></td></tr>
+        </tbody>
+      </table>
+
+      <h3><span class="num">11.3</span>Output contracts the core MUST emit</h3>
+      <p>These contracts make the surface a thin rendering layer.</p>
+
+      <h4>Tool call trace event</h4>
+<pre><span class="comment">// Emitted by every UC Function or MCP tool call</span>
+{
+  <span class="key">trace_id</span>, <span class="key">span_id</span>, <span class="key">parent_span_id</span>,
+  <span class="key">tool_name</span>, <span class="key">tool_inputs</span>, <span class="key">tool_outputs</span>,
+  <span class="key">latency_ms</span>, <span class="key">tokens_in</span>, <span class="key">tokens_out</span>, <span class="key">cost_usd</span>,
+  <span class="key">uc_lineage_refs</span>, <span class="key">mlflow_run_id</span>, <span class="key">timestamp</span>
+}</pre>
+
+      <h4>Decision artifact</h4>
+<pre>{
+  <span class="key">decision_id</span>, <span class="key">customer_id</span>, <span class="key">journey_id</span>,
+  <span class="key">verdict</span>: <span class="val">"re-prioritize"</span>,
+  <span class="key">decisions</span>: [{type: <span class="val">"suppress_from"</span>, target: <span class="val">"Spring Seasonal"</span>}, ...],
+  <span class="key">contributing_signals</span>: [{signal, value, weight}, ...],
+  <span class="key">optimal_send_time</span>, <span class="key">channel</span>, <span class="key">tone</span>,
+  <span class="key">trace_id</span> <span class="comment">// link to reasoning</span>
+}</pre>
+
+      <h4>Journey state row (Lakebase)</h4>
+<pre><span class="key">journey_state</span> (
+  <span class="key">journey_id</span> PK, <span class="key">customer_id</span>, <span class="key">current_step</span>,
+  <span class="key">next_action_due_ts</span>, <span class="key">state_blob</span> JSONB,
+  <span class="key">status</span> (pending, in_progress, completed, failed),
+  <span class="key">created_at</span>, <span class="key">updated_at</span>, <span class="key">last_resumed_at</span>
+)</pre>
+
+      <h4>Composed output (pre-render)</h4>
+<pre>{
+  <span class="key">output_id</span>, <span class="key">customer_id</span>, <span class="key">decision_id</span>,
+  <span class="key">channel</span>: <span class="val">"email"</span>,
+  <span class="key">payload</span>: {subject, body, image_refs: [...], cta_url},
+  <span class="key">send_time</span>, <span class="key">esp</span>: <span class="val">"braze"</span>,
+  <span class="key">approved_at</span>, <span class="key">sent_at</span>, <span class="key">send_receipt</span>
+}</pre>
+      <p><em>Email skin renders from this. SMS skin renders from this. In-app card renders from this. The agent does not bake HTML.</em></p>
+
+      <h3><span class="num">11.4</span>What to start writing this week (Beat 2 substrate)</h3>
+      <p>These three deliverables are the substrate for Beat 2's reasoning loop. Everything else builds on them. <em>The agent's reasoning loop itself — which tools to call, in what order, and how to combine — is the actual Beat 2 build, but it cannot start until these are in place.</em></p>
+      <ol>
+        <li>The <code>journey_state</code> table schema in Lakebase, with one example row hand-inserted, and a notebook that queries it.</li>
+        <li>The agent's tool contract definitions in Pydantic — typed inputs, typed outputs, MLflow-traced. Even before the agent exists, the tools should be callable and produce trace events.</li>
+        <li>The DBOS workflow definition — <code>persist_journey_state</code> and <code>resume_journey</code> as proper DBOS-decorated functions, with a unit test that proves a state survives a process restart.</li>
+      </ol>
+
+      <h3><span class="num">11.5</span>Placeholder browser surface during phase 2</h3>
+      <p>Even while the polished surface is deferred, a stripped-down placeholder browser fires real events into the event stream when a button is clicked. This makes <code>cart_abandoned</code> <em>real</em> and <em>traceable</em> end-to-end during phase 2 development. Doesn't need to be beautiful. Needs to fire real telemetry into Delta.</p>
+
+      <h3><span class="num">11.6</span>Beat 2 acceptance gate (must pass before Phase 4)</h3>
+      <p>The Beat 2 build is gated by an explicit acceptance review. <strong>Phase 4 (surface layer) does not start until these criteria pass.</strong> Full criteria are in <code>beat-2-build-brief.md</code> §11. Summary:</p>
+
+      <h4>Concrete (testable)</h4>
+      <ul>
+        <li>All tool calls emit structured trace events matching the §11.3 contract</li>
+        <li>Decision artifact JSON validates against schema and persists to Lakebase</li>
+        <li>Total reasoning latency ≤ 1.5s (target), ≤ 2.0s (ceiling) on warm path</li>
+        <li>Trace shows at least one branching decision (agent decides tool order based on prior outputs, not as fixed sequence)</li>
+        <li>Trace shows at least one signal contradiction reconciled</li>
+        <li>DBOS <code>persist_journey_state</code> confirmed via Lakebase row inspection</li>
+        <li>Trace replays deterministically from recorded run</li>
+      </ul>
+
+      <h4>Qualitative (review by practice lead + 2 reviewers)</h4>
+      <ul>
+        <li>Non-technical viewer reads the trace and articulates the agent's reasoning without technical guidance</li>
+        <li>Reasoning reads as judgment, not as a script</li>
+        <li>At least one viewer in user testing says some version of "that's actually thinking"</li>
+      </ul>
+
+      <div class="callout note">
+        <span class="label">Auto-block conditions</span>
+        Trace looks like a fixed script of tool calls (no branching, no judgment visible) · Decision artifact reads as a templated output, not a reasoned conclusion · Latency exceeds 2.5s on warm path.
+      </div>
+    </section>
+
+    <!-- 12 -->
+    <section id="open">
+      <h2><span class="num">12</span>Open Questions</h2>
+      <div class="section-rule"></div>
+      <table class="numbered">
+        <thead><tr><th>#</th><th>Question</th><th>Owner</th><th>Resolve by</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Activation partner: name Braze explicitly in script, or stay generic?</td><td>Practice Lead</td><td>Phase 4 build</td></tr>
+          <tr><td>2</td><td>Synthetic dataset: build new vs fork existing demo dataset?</td><td>TBD</td><td>Phase 1 build</td></tr>
+          <tr><td>3</td><td>Foundation model for live demo: Claude or Llama? (Gateway abstracts but the demo may call it out)</td><td>TBD</td><td>Phase 5 polish</td></tr>
+          <tr><td>4</td><td>Cindy's reference cat photo — generate AI-synthetic or license stock?</td><td>TBD</td><td>Phase 1 build</td></tr>
+          <tr><td>5</td><td>Demo environment: shared workspace or per-rep?</td><td>Field ops</td><td>Phase 5</td></tr>
+          <tr><td>6</td><td>Cost calculator: standalone tool, embedded in Asset Bundle, or sales-engineering spreadsheet?</td><td>Practice Lead + Field</td><td>Post-Phase A GA</td></tr>
+          <tr><td>7</td><td>Phase B AutoML: real training run on synthetic data, or pre-trained for demo determinism?</td><td>TBD</td><td>Phase B planning</td></tr>
+          <tr><td>8</td><td>Asset Bundle structure: one bundle for Phase A, one per phase, or modular?</td><td>Field engineering</td><td>Phase 5</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Appendix A -->
+    <section id="data">
+      <h2><span class="num">A</span>Appendix · Synthetic Data Model</h2>
+      <div class="section-rule"></div>
+      <p>All tables in Unity Catalog under <code>fluttershy_demo.cdp</code>.</p>
+      <table>
+        <thead><tr><th>Table</th><th>Purpose</th><th>Phase</th></tr></thead>
+        <tbody>
+          <tr><td><code>customers</code></td><td>Profile (incl. <code>pet_name</code>, <code>pet_type</code>, <code>consent_status</code>, <code>preferred_channel</code>, <code>quiet_hours_tz</code>)</td><td>A</td></tr>
+          <tr><td><code>events</code></td><td>Streaming behavioral events (page views, uploads, cart actions, abandons)</td><td>A</td></tr>
+          <tr><td><code>orders</code>, <code>order_items</code></td><td>Transaction history + open carts</td><td>A</td></tr>
+          <tr><td><code>products</code>, <code>product_images</code></td><td>Catalog + image refs for embedding</td><td>A</td></tr>
+          <tr><td><code>product_image_embeddings</code></td><td>Mosaic AI Vector Search index, auto-synced from Delta</td><td>A</td></tr>
+          <tr><td><code>campaigns</code>, <code>campaign_membership</code>, <code>campaign_priority</code></td><td>Active campaigns, segment membership, frequency caps</td><td>A</td></tr>
+          <tr><td><code>production_calendar</code></td><td>Lead times by product type and shipping option</td><td>A</td></tr>
+          <tr><td><code>support_tickets</code></td><td>Open + recent tickets per customer</td><td>A</td></tr>
+          <tr><td><code>consent</code></td><td>Opt-ins, channel prefs, quiet hours, GDPR/CPRA flags</td><td>A</td></tr>
+          <tr><td><code>propensity_scores</code></td><td>Model serving endpoint output cache</td><td>A</td></tr>
+          <tr><td><code>journey_state</code> <strong>★</strong></td><td>DBOS-backed durable state. Written in Beat 2, read on resume in Beat 3.</td><td>A</td></tr>
+          <tr><td><code>feedback_labels</code></td><td>Agent eval / human review labels</td><td>B</td></tr>
+          <tr><td><code>feature_store_*</code></td><td>Feature engineering artifacts produced by Phase B AutoML</td><td>B</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Appendix B -->
+    <section id="skills">
+      <h2><span class="num">B</span>Appendix · Agent Tools and Skills</h2>
+      <div class="section-rule"></div>
+
+      <div class="callout">
+        <span class="label">Architectural distinction</span>
+        Most entries below are <strong>tools</strong> — typed, deterministic function calls that read from UC, hit a serving endpoint, or invoke an MCP server. They have no agency. A handful are <strong>skills</strong> — composite paths that involve agent reasoning (prompt construction, context assembly, output validation). The reasoning <em>loop itself</em> — which tools to call, in what order, and how to combine — is the most important "skill" and is not enumerated below because it <em>is</em> the agent.
+        <br/><br/>
+        This distinction matters: tools are weeks-of-engineering, skills are months-of-prompt-and-eval-design. Don't conflate the build effort.
+      </div>
+
+      <h3><span class="num">B.1</span>Tools — deterministic substrate</h3>
+      <p>Typed function calls, MLflow-traced, governed under UC. No LLM in the loop.</p>
+      <table>
+        <thead><tr><th>Tool</th><th>Signature</th><th>Storage / source</th></tr></thead>
+        <tbody>
+          <tr><td><code>read_profile</code></td><td><code>(customer_id) → Profile</code></td><td>UC <code>customers</code></td></tr>
+          <tr><td><code>read_cart</code></td><td><code>(customer_id) → Cart</code></td><td>UC <code>orders</code> (open) + <code>order_items</code></td></tr>
+          <tr><td><code>check_production_feasibility</code></td><td><code>(product_id, ship_by) → Feasibility</code></td><td>UC <code>production_calendar</code></td></tr>
+          <tr><td><code>list_active_campaigns</code></td><td><code>(customer_id) → [Campaign]</code></td><td>UC <code>campaigns</code> + <code>campaign_membership</code></td></tr>
+          <tr><td><code>check_frequency_cap</code></td><td><code>(customer_id, channel, window_days) → CapStatus</code></td><td>UC <code>campaigns</code> aggregation</td></tr>
+          <tr><td><code>read_support_tickets</code></td><td><code>(customer_id, lookback_days) → [Ticket]</code></td><td>UC <code>support_tickets</code></td></tr>
+          <tr><td><code>score_propensity</code></td><td><code>(customer_id, intent) → Score</code></td><td>Model Serving endpoint</td></tr>
+          <tr><td><code>find_visually_similar_images</code></td><td><code>(image_uri, top_k) → [ImageMatch]</code></td><td>Mosaic AI Vector Search</td></tr>
+          <tr><td><code>send_via_partner</code></td><td><code>(esp, draft) → SendReceipt</code></td><td>MCP tool to Braze/SendGrid/etc</td></tr>
+        </tbody>
+      </table>
+
+      <h3><span class="num">B.2</span>Skills — agent reasoning paths (Phase A)</h3>
+      <p>Wrap LLM reasoning around tool calls. Prompt engineering and eval loop are part of the build.</p>
+      <table>
+        <thead><tr><th>Skill</th><th>Signature</th><th>Reasoning involved</th></tr></thead>
+        <tbody>
+          <tr><td><code>compose_email</code></td><td><code>(template, context) → EmailDraft</code></td><td>Foundation Model API call. Prompt construction, brand voice, output validation, retry logic.</td></tr>
+          <tr><td><code>persist_journey_state</code></td><td><code>(customer_id, step, due_ts, blob) → JourneyHandle</code></td><td>Decides which subset of state to serialize, formats for DBOS, writes to Lakebase.</td></tr>
+          <tr><td><code>resume_journey</code></td><td><code>(journey_id) → RehydratedContext</code></td><td>DBOS-triggered. Reads Lakebase, decides which fields to rehydrate, re-establishes context.</td></tr>
+        </tbody>
+      </table>
+
+      <h3><span class="num">B.3</span>The unenumerated skill — the reasoning loop</h3>
+      <p>Not a tool. Not in any table. The agent's system prompt, working memory, tool-selection logic, and output structuring is <strong>the demo's actual differentiation.</strong> Acceptance criteria are in <code>beat-2-build-brief.md</code> §11.</p>
+
+      <h3><span class="num">B.4</span>Phase B additional skills/tools</h3>
+      <ul>
+        <li><code>engineer_features(spec) → FeatureSet</code> <em>(skill — feature design + prompt construction)</em></li>
+        <li><code>train_with_automl(features, target, time_budget) → ModelCandidate</code> <em>(tool — wraps AutoML API)</em></li>
+        <li><code>register_model(candidate) → ModelVersion</code> <em>(tool — MLflow Registry write)</em></li>
+        <li><code>deploy_model(version, endpoint) → ServingEndpoint</code> <em>(tool — Model Serving API)</em></li>
+        <li><code>decide_intervention_intensity(funnel_depth, signals) → Intensity</code> <em>(skill — Tier 3 reasoning)</em></li>
+      </ul>
+
+      <h3><span class="num">B.5</span>Phase C additional skills/tools</h3>
+      <ul>
+        <li><code>respond_to_customer(channel, message_thread) → AgentReply</code> <em>(skill — full conversational reasoning)</em></li>
+        <li><code>update_order(order_id, mutation) → OrderHandle</code> <em>(tool — UC + transactional write)</em></li>
+        <li><code>write_back_profile(customer_id, attributes) → WriteAck</code> <em>(tool — UC write with consent check)</em></li>
+      </ul>
+    </section>
+
+    <footer class="doc-footer">
+      Fluttershy Agentic CDP Demo · Specification · v1 · End of document
+    </footer>
+
+  </main>
+
+</div>
+
+<script>
+  // TOC active state on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const tocLinks = document.querySelectorAll('.toc nav a');
+
+  function updateActive() {
+    let current = '';
+    const scrollY = window.scrollY;
+    sections.forEach(sec => {
+      const top = sec.offsetTop - 80;
+      if (scrollY >= top) current = sec.id;
+    });
+    tocLinks.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+    });
+  }
+
+  window.addEventListener('scroll', updateActive, { passive: true });
+  updateActive();
+</script>
+
+</body>
+</html>

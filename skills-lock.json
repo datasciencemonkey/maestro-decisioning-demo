@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "skills": {
+    "dbos-golang": {
+      "source": "dbos-inc/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dbos-golang/SKILL.md",
+      "computedHash": "a85444bc900a9c3353e9dca85e8d8929648f840dd9f6af064d519e6e197067cb"
+    },
+    "dbos-python": {
+      "source": "dbos-inc/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dbos-python/SKILL.md",
+      "computedHash": "9fb47e701085050c3826ef46f8b64323363633751f81ac8c29aa3bfcfeae4930"
+    },
+    "dbos-typescript": {
+      "source": "dbos-inc/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dbos-typescript/SKILL.md",
+      "computedHash": "0ea184b3ade54eedfd7109e041ec44803b12f7abc89116d9fab21a47ef40f295"
+    },
+    "generate-synthetic-data": {
+      "source": "hamelsmu/evals-skills",
+      "sourceType": "github",
+      "skillPath": "skills/generate-synthetic-data/SKILL.md",
+      "computedHash": "253b26dc898c4e47e77e8c2939072212f86290a92f06565f8a70505bb49469ae"
+    }
+  }
+}

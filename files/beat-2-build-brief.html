@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Beat 2 — Build Brief · Fluttershy Agentic CDP Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..900&family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --cream: #faf6f1;
+    --cream-deep: #f3ece2;
+    --paper: #ffffff;
+    --ink: #1a1410;
+    --ink-soft: #4a3f37;
+    --ink-mute: #8a7d72;
+    --line: rgba(26, 20, 16, 0.08);
+    --line-soft: rgba(26, 20, 16, 0.04);
+    --rose: #e8826f;
+    --rose-deep: #c45a47;
+    --rose-soft: #f8d4cb;
+    --rose-bg: #fce8e2;
+    --gold: #d4a574;
+    --leaf: #6b8e6b;
+    --leaf-bg: #e8efe5;
+    --warn: #f5a26e;
+    --warn-bg: #fdebd9;
+    --sale: #c93a3a;
+
+    --serif: "Fraunces", "Times New Roman", serif;
+    --sans: "Geist", system-ui, sans-serif;
+    --mono: "Geist Mono", ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--sans);
+    background: var(--cream);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.6;
+    font-size: 15px;
+  }
+  a { color: var(--rose-deep); text-decoration: none; }
+  a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    max-width: 1280px;
+    margin: 0 auto;
+    min-height: 100vh;
+  }
+
+  .toc {
+    border-right: 1px solid var(--line);
+    padding: 56px 32px 56px 40px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    background: var(--cream);
+  }
+  .toc-brand {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+  .toc-brand .accent { color: var(--rose); }
+  .toc-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-mute);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+  .toc nav { display: flex; flex-direction: column; gap: 2px; }
+  .toc nav a {
+    color: var(--ink-soft);
+    font-size: 13px;
+    padding: 6px 0;
+    border-left: 2px solid transparent;
+    padding-left: 12px;
+    margin-left: -12px;
+    transition: all 0.2s ease;
+    line-height: 1.4;
+  }
+  .toc nav a:hover {
+    color: var(--ink);
+    border-left-color: var(--rose);
+    text-decoration: none;
+  }
+  .toc nav a.active {
+    color: var(--ink);
+    border-left-color: var(--rose);
+    font-weight: 500;
+  }
+  .toc-meta {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-mute);
+    line-height: 1.6;
+    letter-spacing: 0.02em;
+  }
+  .toc-meta strong { color: var(--ink); font-weight: 600; }
+  .toc-meta a { color: var(--rose-deep); }
+
+  .doc {
+    padding: 56px 56px 120px;
+    max-width: 880px;
+  }
+  .doc-header {
+    padding-bottom: 32px;
+    margin-bottom: 48px;
+    border-bottom: 1px solid var(--line);
+  }
+  .doc-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--rose-deep);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .doc-eyebrow .dot {
+    width: 6px; height: 6px;
+    background: var(--rose);
+    border-radius: 50%;
+  }
+  .doc-title {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(36px, 5vw, 56px);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 20px;
+  }
+  .doc-title .accent { color: var(--rose); }
+  .doc-status {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px 32px;
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-top: 24px;
+  }
+  .doc-status div .label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+  .doc-status div span {
+    display: block;
+    color: var(--ink);
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 14px;
+    margin-top: 2px;
+  }
+
+  section {
+    margin-bottom: 48px;
+    scroll-margin-top: 24px;
+  }
+  h2 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-style: italic;
+    font-size: 32px;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 6px;
+    color: var(--ink);
+  }
+  h2 .num {
+    font-family: var(--mono);
+    font-style: normal;
+    font-size: 13px;
+    color: var(--rose);
+    letter-spacing: 0.1em;
+    margin-right: 12px;
+    vertical-align: 6px;
+  }
+  h3 {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 17px;
+    margin-top: 28px;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+  h3 .num {
+    font-family: var(--mono);
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--ink-mute);
+    margin-right: 8px;
+    letter-spacing: 0.05em;
+  }
+  h4 {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 14px;
+    margin-top: 20px;
+    margin-bottom: 8px;
+    color: var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .section-rule {
+    height: 1px;
+    background: var(--line);
+    margin-bottom: 24px;
+    margin-top: 8px;
+  }
+
+  p { margin-bottom: 16px; color: var(--ink-soft); line-height: 1.65; }
+  p strong { color: var(--ink); font-weight: 600; }
+  p em { color: var(--ink); font-style: italic; }
+  p code, li code, td code {
+    font-family: var(--mono);
+    font-size: 0.9em;
+    background: var(--cream-deep);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--ink);
+  }
+  ul, ol {
+    margin: 0 0 16px 24px;
+    color: var(--ink-soft);
+  }
+  ul li, ol li {
+    margin-bottom: 6px;
+    line-height: 1.65;
+  }
+  ul li strong, ol li strong { color: var(--ink); }
+
+  /* Checklist */
+  ul.checklist { list-style: none; margin-left: 0; }
+  ul.checklist li {
+    padding: 8px 0 8px 28px;
+    position: relative;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  ul.checklist li:last-child { border-bottom: none; }
+  ul.checklist li::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 13px;
+    width: 14px; height: 14px;
+    border: 1.5px solid var(--ink-mute);
+    border-radius: 3px;
+    background: white;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 24px;
+    font-size: 13px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  th {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    text-align: left;
+    padding: 12px 14px;
+    background: var(--cream-deep);
+    border-bottom: 1px solid var(--line);
+  }
+  td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: top;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+  td:first-child {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  tr:last-child td { border-bottom: none; }
+  table.numbered td:first-child {
+    font-family: var(--mono);
+    color: var(--ink-mute);
+    width: 32px;
+    text-align: right;
+    font-weight: 500;
+  }
+  table strong { color: var(--ink); }
+  table em { font-style: italic; }
+  table code {
+    font-family: var(--mono);
+    font-size: 0.85em;
+    background: var(--cream-deep);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  pre {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 18px 20px;
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.6;
+    overflow-x: auto;
+    margin: 16px 0 24px;
+    border-left: 3px solid var(--rose);
+  }
+  pre .key { color: var(--rose-soft); }
+  pre .val { color: #f1f56e; }
+  pre .comment { color: var(--ink-mute); font-style: italic; }
+  pre .str { color: #c4e1a8; }
+
+  .callout {
+    background: var(--rose-bg);
+    border-left: 3px solid var(--rose);
+    padding: 14px 18px;
+    margin: 16px 0 24px;
+    border-radius: 0 4px 4px 0;
+    font-size: 13.5px;
+    color: var(--ink);
+    line-height: 1.55;
+  }
+  .callout.leaf { background: var(--leaf-bg); border-left-color: var(--leaf); }
+  .callout.warn { background: var(--warn-bg); border-left-color: var(--warn); }
+  .callout.note { background: var(--cream-deep); border-left-color: var(--ink-mute); color: var(--ink-soft); }
+  .callout strong { color: var(--ink); }
+  .callout .label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--rose-deep);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .callout.leaf .label { color: var(--leaf); }
+  .callout.warn .label { color: var(--warn); }
+  .callout.note .label { color: var(--ink-mute); }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    vertical-align: 2px;
+    margin-left: 8px;
+  }
+  .badge.gate { background: var(--rose); color: white; }
+  .badge.start { background: var(--leaf); color: white; }
+
+  .doc-footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-mute);
+    letter-spacing: 0.05em;
+    text-align: center;
+  }
+
+  @media (max-width: 1000px) {
+    .layout { grid-template-columns: 1fr; }
+    .toc {
+      position: relative;
+      height: auto;
+      border-right: none;
+      border-bottom: 1px solid var(--line);
+      padding: 32px;
+    }
+    .doc { padding: 32px 24px 80px; }
+  }
+
+  @media print {
+    body { background: white; }
+    .toc { display: none; }
+    .layout { display: block; max-width: 100%; }
+    .doc { padding: 24px; max-width: 100%; }
+    section { page-break-inside: avoid; }
+    h2 { page-break-after: avoid; }
+    pre { page-break-inside: avoid; }
+  }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <aside class="toc">
+    <div class="toc-brand">Beat 2<span class="accent">.</span></div>
+    <div class="toc-tag">Build Brief</div>
+    <nav id="tocNav">
+      <a href="#glance">1. At a Glance</a>
+      <a href="#objective">2. Objective</a>
+      <a href="#scope">3. Scope</a>
+      <a href="#inputs">4. Inputs</a>
+      <a href="#tools">5. Tool Calls</a>
+      <a href="#reasoning">6. Reasoning Loop</a>
+      <a href="#ui">7. UI Elements</a>
+      <a href="#trace">8. Trace Event Spec</a>
+      <a href="#decision">9. Decision Artifact</a>
+      <a href="#execution">10. Live Execution</a>
+      <a href="#acceptance">11. Acceptance Criteria</a>
+      <a href="#open">12. Open Questions</a>
+    </nav>
+    <div class="toc-meta">
+      <strong>Status</strong> Build target #1<br/>
+      <strong>Owner</strong> Build squad lead<br/>
+      <strong>Gate</strong> Phase 4 blocked on this<br/>
+      <br/>
+      <strong>Companions</strong><br/>
+      <a href="fluttershy-demo-spec.html">Spec doc</a><br/>
+      Design doc · Storyboard
+    </div>
+  </aside>
+
+  <main class="doc">
+
+    <header class="doc-header">
+      <div class="doc-eyebrow"><span class="dot"></span>Build brief · Phase A · Beat 2</div>
+      <h1 class="doc-title">Beat 2 <em class="accent">—</em> the differentiation core</h1>
+      <p style="font-family: var(--serif); font-style: italic; font-size: 19px; color: var(--ink-soft); max-width: 640px; margin-top: 8px;">
+        Cross-campaign agent reasoning. The only beat in the demo that competitors structurally cannot replicate. Build first, gate everything on it.
+      </p>
+      <div class="doc-status">
+        <div><span class="label">Status</span><span>Build target #1 <span class="badge start">start here</span></span></div>
+        <div><span class="label">Phase</span><span>2 of 5 <span class="badge gate">gates phase 4</span></span></div>
+        <div><span class="label">Duration</span><span>2-3 weeks</span></div>
+        <div><span class="label">Output</span><span>Trace + decision + journey row</span></div>
+      </div>
+    </header>
+
+    <!-- 1 -->
+    <section id="glance">
+      <h2><span class="num">01</span>Beat at a Glance</h2>
+      <div class="section-rule"></div>
+      <p>When a <code>cart_abandoned</code> event clears Tier 1 hygiene, the agent reasons across nine domains — profile, cart, production calendar, active campaigns, frequency caps, support tickets, propensity, consent, optimal send time — then renders a structured decision (suppress from Spring Seasonal; prioritize Abandoned Cart Recovery; warm tone with Whiskers context; send 8 AM CT; email channel). Total runtime ≤ 1.5s target / 2.0s ceiling. Reasoning is rendered to a viewer-readable trace in the marketing ops UI.</p>
+      <div class="callout">
+        <span class="label">Why this beat is the build's gate</span>
+        This is the demo's <strong>only differentiation moment.</strong> Every other beat sets it up or pays it off. If the reasoning trace doesn't read as intelligent decision-making, the entire thesis collapses — no amount of polish on Beats 1, 2.5, or 3 saves the demo. Acceptance gate is strict.
+      </div>
+    </section>
+
+    <!-- 2 -->
+    <section id="objective">
+      <h2><span class="num">02</span>Objective</h2>
+      <div class="section-rule"></div>
+      <p>Build an agent that, given a <code>cart_abandoned</code> event, reasons across the nine domains above and produces:</p>
+      <ol>
+        <li>A complete MLflow trace readable by a non-technical viewer as intelligent decision-making</li>
+        <li>A structured decision artifact persisted to Lakebase</li>
+        <li>A <code>journey_state</code> row that DBOS can resume on schedule</li>
+      </ol>
+      <p>The reasoning loop must demonstrably:</p>
+      <ul>
+        <li><strong>Branch</strong> based on tool outputs (not run as a fixed script)</li>
+        <li><strong>Reconcile</strong> contradicting signals</li>
+        <li><strong>Justify</strong> its decisions in human-legible form</li>
+      </ul>
+      <p><em>If the trace reads as a sequential list of tool calls with no judgment, this beat fails review.</em></p>
+    </section>
+
+    <!-- 3 -->
+    <section id="scope">
+      <h2><span class="num">03</span>Scope</h2>
+      <div class="section-rule"></div>
+
+      <h3><span class="num">3.1</span>In scope</h3>
+      <ul>
+        <li>Single supervisor agent (Pydantic AI), single-turn reasoning loop</li>
+        <li>All Phase A tools (see §5)</li>
+        <li>MLflow trace emission for every tool call</li>
+        <li>Decision artifact persistence to Lakebase + Delta mirror</li>
+        <li>Marketing ops UI panel (campaigns left / trace center / decision right)</li>
+        <li>Deterministic-replay capability for live demo</li>
+        <li>DBOS <code>persist_journey_state</code> only — Beat 2 ends with the row written; Beat 2.5 handles resumption</li>
+      </ul>
+
+      <h3><span class="num">3.2</span>Out of scope (deferred)</h3>
+      <ul>
+        <li>Multi-agent / sub-agent decomposition → Phase B</li>
+        <li>Agent-built propensity model → Phase B (Phase A calls a pre-existing endpoint)</li>
+        <li>Human-in-the-loop approval → Phase B</li>
+        <li>A/B testing variants → Phase B</li>
+        <li>SMS / push channel → Phase B</li>
+        <li>Browser surface (cart_abandoned event source) → Beat 1 build brief</li>
+        <li>DBOS resumption + clock advance → Beat 2.5 build brief</li>
+        <li>Email composition + send → Beat 3 build brief</li>
+        <li>Tier 1 streaming hygiene → infrastructure-level, separate work item</li>
+      </ul>
+    </section>
+
+    <!-- 4 -->
+    <section id="inputs">
+      <h2><span class="num">04</span>Inputs</h2>
+      <div class="section-rule"></div>
+
+      <h3><span class="num">4.1</span>Triggering event</h3>
+<pre>{
+  <span class="key">"event_type"</span>: <span class="str">"cart_abandoned"</span>,
+  <span class="key">"customer_id"</span>: <span class="str">"cust_88241"</span>,
+  <span class="key">"cart_id"</span>: <span class="str">"cart_77a3f"</span>,
+  <span class="key">"abandoned_at"</span>: <span class="str">"2026-05-09T20:18:00-05:00"</span>,
+  <span class="key">"cart_total"</span>: <span class="val">42.00</span>,
+  <span class="key">"items"</span>: [
+    {<span class="key">"product_id"</span>: <span class="str">"pb_welcome_home_24pp"</span>, <span class="key">"qty"</span>: <span class="val">1</span>, <span class="key">"price"</span>: <span class="val">42.00</span>}
+  ],
+  <span class="key">"source_session_id"</span>: <span class="str">"sess_..."</span>,
+  <span class="key">"tier1_clearance"</span>: <span class="val">true</span>
+}</pre>
+      <p><code>tier1_clearance: true</code> confirms Tier 1 hygiene already filtered bots/dupes/opt-outs/race conditions. Agent does not re-validate.</p>
+
+      <h3><span class="num">4.2</span>Reference data (UC tables read via tools)</h3>
+      <ul>
+        <li><code>customers</code> — Cindy's profile (incl. <code>pet_name=Whiskers</code>, <code>pet_type=tabby</code>, <code>tz=America/Chicago</code>)</li>
+        <li><code>orders</code> + <code>order_items</code> — open cart contents</li>
+        <li><code>production_calendar</code> — lead times by product</li>
+        <li><code>campaigns</code> + <code>campaign_membership</code> — active campaigns + segment membership</li>
+        <li><code>support_tickets</code> — last 30 days</li>
+        <li><code>consent</code> — channel prefs, quiet hours</li>
+      </ul>
+      <p>All accessed via tool calls (§5), never pre-loaded into agent context.</p>
+
+      <h3><span class="num">4.3</span>External services</h3>
+      <ul>
+        <li>Model Serving endpoint <code>cindy_abandon_recover_v3</code> (propensity)</li>
+        <li>Optimal-send-time service (TBD: tool call vs. inline calculation — see §12)</li>
+        <li>Foundation Model API via AI Gateway (for the reasoning loop itself)</li>
+      </ul>
+    </section>
+
+    <!-- 5 -->
+    <section id="tools">
+      <h2><span class="num">05</span>Tool Calls</h2>
+      <div class="section-rule"></div>
+      <p>All tools typed (Pydantic), MLflow-traced, governed under UC. Full signatures in spec Appendix B.1.</p>
+
+      <h3><span class="num">5.1</span>Tools the agent has access to</h3>
+      <table>
+        <thead><tr><th>#</th><th>Tool</th><th>Purpose in Beat 2</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td><code>read_profile</code></td><td>Establish customer context</td></tr>
+          <tr><td>2</td><td><code>read_cart</code></td><td>What's in the abandoned cart</td></tr>
+          <tr><td>3</td><td><code>check_production_feasibility</code></td><td>Can it still ship in time?</td></tr>
+          <tr><td>4</td><td><code>list_active_campaigns</code></td><td>What's queued for this customer?</td></tr>
+          <tr><td>5</td><td><code>check_frequency_cap</code></td><td>Would another send breach?</td></tr>
+          <tr><td>6</td><td><code>read_support_tickets</code></td><td>Any open friction?</td></tr>
+          <tr><td>7</td><td><code>score_propensity</code></td><td>Likelihood of recovery</td></tr>
+          <tr><td>8</td><td><code>optimal_send_time</code></td><td>When to send</td></tr>
+          <tr><td>9</td><td><code>persist_journey_state</code></td><td>Hand off to Beat 2.5</td></tr>
+        </tbody>
+      </table>
+
+      <h3><span class="num">5.2</span>Typical call sequence (illustrative; agent decides)</h3>
+<pre><span class="comment">// The agent decides which tools to call and in what order.</span>
+<span class="comment">// This is a typical sequence, not an enforced one.</span>
+
++0.000s  trigger received
++0.041s  read_profile
++0.083s  read_cart
++0.142s  check_production_feasibility
++0.198s  list_active_campaigns
++0.221s  check_frequency_cap          <span class="comment">// BREACH detected on Spring Seasonal</span>
++0.245s  read_support_tickets         <span class="comment">// clean</span>
++0.401s  score_propensity             <span class="comment">// 0.81</span>
++0.512s  optimal_send_time            <span class="comment">// T+3.5h → 8:00 AM CT (quiet-hours-adjusted)</span>
++0.643s  persist_journey_state        <span class="comment">// jrn_88241_a3f committed</span>
++0.687s  decision rendered</pre>
+
+      <div class="callout warn">
+        <span class="label">Critical</span>
+        The agent decides which tools to call and in what order. The system prompt must <em>guide</em> reasoning, not <em>enforce</em> a script. Enforced ordering kills the differentiation.
+      </div>
+    </section>
+
+    <!-- 6 -->
+    <section id="reasoning">
+      <h2><span class="num">06</span>The Reasoning Loop — the actual differentiation</h2>
+      <div class="section-rule"></div>
+
+      <h3><span class="num">6.1</span>What the agent must demonstrate</h3>
+      <p>The reasoning loop is the only thing in Beat 2 that competitors structurally cannot replicate. The acceptance gate (§11) is built around demonstrable reasoning, not tool-call enumeration. Specifically the agent must:</p>
+      <ul>
+        <li><strong>Choose tool order based on prior outputs.</strong> Example: call <code>check_frequency_cap</code> before <code>score_propensity</code> — because if the cap is already breached, the propensity score is moot for this channel.</li>
+        <li><strong>Reconcile contradicting signals.</strong> Example: Cindy is in Spring Seasonal AND frequency cap breach is imminent → suppress, don't add. The reconciliation must appear in the trace.</li>
+        <li><strong>Apply judgment-based shortcuts.</strong> Example: skip support tickets if cart total is below a recoverability threshold; expand lookback when propensity is low.</li>
+        <li><strong>Justify its decisions.</strong> Decision artifact must include a <code>rationale</code> field with a human-legible summary.</li>
+      </ul>
+
+      <h3><span class="num">6.2</span>System prompt structure (sketch — to be eval-tuned)</h3>
+<pre><span class="comment">// To be tuned with eval loop on 20-30 abandoned-cart scenarios</span>
+
+You are an agentic CDP disposition engine for Fluttershy, a print-on-demand
+photo product brand. A cart_abandoned event has fired for {customer_id}.
+
+Your goal: decide how to engage this customer for cart recovery, balancing:
+  - Their context (profile, cart, support history)
+  - Operational constraints (production calendar, frequency caps, consent)
+  - Likelihood of conversion (propensity)
+  - Optimal timing (send-time model + quiet-hours policy)
+
+You have access to the following tools:
+  read_profile, read_cart, check_production_feasibility,
+  list_active_campaigns, check_frequency_cap, read_support_tickets,
+  score_propensity, optimal_send_time, persist_journey_state
+
+Reason step by step. Call tools as needed; you decide the order. When a
+tool's output makes a subsequent tool unnecessary, skip it and explain why
+in your reasoning trace. When two signals contradict, reconcile them
+explicitly.
+
+When you have enough information to decide, output a structured
+DecisionArtifact (see schema) with verdict, decisions, contributing_signals,
+and rationale. Then call persist_journey_state with the decided send_time
+as due_ts.</pre>
+
+      <h3><span class="num">6.3</span>Implementation notes</h3>
+      <ul>
+        <li>Pydantic AI <code>@agent.tool</code> registration for all tools</li>
+        <li>All tool functions async; agent loop async</li>
+        <li>Response format = structured <code>DecisionArtifact</code> (Pydantic model — see §9)</li>
+        <li>Max iterations: 12 (safety cap; should typically converge in 6-8)</li>
+        <li>Foundation model: see §12 open questions</li>
+      </ul>
+
+      <h3><span class="num">6.4</span>What this is NOT</h3>
+      <ul>
+        <li>A LangChain-style sequential chain</li>
+        <li>A fixed pipeline with conditional branches</li>
+        <li>A rules engine wrapped in an LLM call</li>
+      </ul>
+      <p><em>If any of those are easier to build, they are also easier to dismiss in customer review. Build the agent.</em></p>
+    </section>
+
+    <!-- 7 -->
+    <section id="ui">
+      <h2><span class="num">07</span>UI Elements (Marketing Ops Panel)</h2>
+      <div class="section-rule"></div>
+      <p>Three regions, all reading from real agent outputs (no mocks). Visual reference in <code>fluttershy-demo-storyboard.html</code> Scene 2.</p>
+
+      <h3><span class="num">7.1</span>Active campaigns panel (left, ~240px)</h3>
+      <ul>
+        <li>List of campaigns Cindy is in: Spring Seasonal Promo, Abandoned Cart Recovery, VIP Loyalty Reload, Reactivation 90d</li>
+        <li>Per-campaign states: <code>default</code> / <code>flagged</code> / <code>suppressed</code> / <code>prioritized</code></li>
+        <li>Animations driven by trace events:
+          <ul>
+            <li>Spring Seasonal → <code>flagged</code> when <code>check_frequency_cap</code> returns BREACH</li>
+            <li>Spring Seasonal → <code>suppressed</code> when decision artifact lands</li>
+            <li>Abandoned Cart → <code>prioritized</code> when decision artifact lands</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3><span class="num">7.2</span>Reasoning trace (center, flexible)</h3>
+      <ul>
+        <li>Customer summary card at top: name, customer_id, profile snippet</li>
+        <li>"Thinking..." indicator while agent is mid-reasoning (cyan pulse)</li>
+        <li>Trace lines stream in as tool calls fire — timestamp, tool icon, tool name, key inputs, key outputs</li>
+        <li>Each line expandable to show full input/output JSON (Phase A: collapsed only is acceptable)</li>
+        <li>After completion: "Decision rendered · {latency}ms · {N} tool calls" status (green)</li>
+      </ul>
+
+      <h3><span class="num">7.3</span>Decision panel (right, ~320px)</h3>
+      <ul>
+        <li>Verdict header: e.g. "Re-prioritize Cindy"</li>
+        <li>Decision rows (5): Suppress from / Prioritize / Tone / Send time / Channel</li>
+        <li>Each row: label + value, animated in 200ms intervals after trace completes</li>
+        <li>Persistence card at bottom: <code>journey_id</code>, <code>due_ts</code>, <code>storage: DBOS · Lakebase</code></li>
+      </ul>
+
+      <h3><span class="num">7.4</span>Pacing</h3>
+      <ul>
+        <li>Trace lines stream at ~950ms intervals to match real reasoning latency</li>
+        <li>In replay mode, identical pacing</li>
+        <li>Total Beat 2 runtime: 5:45 target, 6:30 ceiling</li>
+        <li>Beat 2.5 (durability bridge) takes over after Beat 2 closes</li>
+      </ul>
+    </section>
+
+    <!-- 8 -->
+    <section id="trace">
+      <h2><span class="num">08</span>Trace Event Spec</h2>
+      <div class="section-rule"></div>
+      <p>Every tool call emits one trace event to MLflow. Schema:</p>
+<pre>{
+  <span class="key">"trace_id"</span>: <span class="str">"tr_abc123"</span>,
+  <span class="key">"span_id"</span>: <span class="str">"sp_def456"</span>,
+  <span class="key">"parent_span_id"</span>: <span class="str">"sp_root"</span>,
+  <span class="key">"tool_name"</span>: <span class="str">"check_frequency_cap"</span>,
+  <span class="key">"tool_inputs"</span>: {
+    <span class="key">"customer_id"</span>: <span class="str">"cust_88241"</span>,
+    <span class="key">"channel"</span>: <span class="str">"email"</span>,
+    <span class="key">"window_days"</span>: <span class="val">7</span>
+  },
+  <span class="key">"tool_outputs"</span>: {
+    <span class="key">"cap"</span>: <span class="val">2</span>,
+    <span class="key">"current"</span>: <span class="val">1</span>,
+    <span class="key">"queued"</span>: <span class="val">1</span>,
+    <span class="key">"status"</span>: <span class="str">"breach"</span>
+  },
+  <span class="key">"latency_ms"</span>: <span class="val">23</span>,
+  <span class="key">"tokens_in"</span>: <span class="val">null</span>,
+  <span class="key">"tokens_out"</span>: <span class="val">null</span>,
+  <span class="key">"cost_usd"</span>: <span class="val">0.0</span>,
+  <span class="key">"uc_lineage_refs"</span>: [<span class="str">"fluttershy_demo.cdp.campaigns@v37"</span>],
+  <span class="key">"mlflow_run_id"</span>: <span class="str">"run_xyz"</span>,
+  <span class="key">"timestamp"</span>: <span class="str">"2026-05-09T20:18:01.245-05:00"</span>
+}</pre>
+      <p>For Foundation Model API calls within the reasoning loop itself, additionally populate <code>tokens_in</code>, <code>tokens_out</code>, <code>cost_usd</code>.</p>
+      <p>For <code>persist_journey_state</code>, additionally include the <code>journey_id</code> and <code>due_ts</code> in <code>tool_outputs</code> so the trace UI can render the persistence card.</p>
+    </section>
+
+    <!-- 9 -->
+    <section id="decision">
+      <h2><span class="num">09</span>Decision Artifact Spec</h2>
+      <div class="section-rule"></div>
+      <p>Persisted to UC <code>decisions</code> table (Delta) and mirrored to Lakebase for operational reads. Schema:</p>
+<pre>{
+  <span class="key">"decision_id"</span>: <span class="str">"dec_a3f88241"</span>,
+  <span class="key">"customer_id"</span>: <span class="str">"cust_88241"</span>,
+  <span class="key">"journey_id"</span>: <span class="str">"jrn_88241_a3f"</span>,
+  <span class="key">"trigger_event_id"</span>: <span class="str">"evt_cart_abandoned_77a3f"</span>,
+  <span class="key">"verdict"</span>: <span class="str">"re-prioritize"</span>,
+  <span class="key">"decisions"</span>: [
+    {
+      <span class="key">"type"</span>: <span class="str">"suppress_from"</span>,
+      <span class="key">"target"</span>: <span class="str">"Spring Seasonal Promo"</span>,
+      <span class="key">"reason"</span>: <span class="str">"frequency_cap_breach"</span>
+    },
+    {
+      <span class="key">"type"</span>: <span class="str">"prioritize_in"</span>,
+      <span class="key">"target"</span>: <span class="str">"Abandoned Cart Recovery"</span>,
+      <span class="key">"weight"</span>: <span class="val">0.81</span>
+    },
+    {
+      <span class="key">"type"</span>: <span class="str">"tone"</span>,
+      <span class="key">"value"</span>: <span class="str">"warm, personal, Whiskers context"</span>
+    },
+    {
+      <span class="key">"type"</span>: <span class="str">"send_time"</span>,
+      <span class="key">"value"</span>: <span class="str">"2026-05-10T08:00:00-05:00"</span>,
+      <span class="key">"reason"</span>: <span class="str">"T+3.5h adjusted for quiet hours"</span>
+    },
+    {
+      <span class="key">"type"</span>: <span class="str">"channel"</span>,
+      <span class="key">"value"</span>: <span class="str">"email"</span>,
+      <span class="key">"reason"</span>: <span class="str">"consent + preferred"</span>
+    }
+  ],
+  <span class="key">"contributing_signals"</span>: [
+    {<span class="key">"signal"</span>: <span class="str">"frequency_cap"</span>, <span class="key">"value"</span>: <span class="str">"breach"</span>, <span class="key">"weight"</span>: <span class="val">1.0</span>},
+    {<span class="key">"signal"</span>: <span class="str">"propensity"</span>, <span class="key">"value"</span>: <span class="val">0.81</span>, <span class="key">"weight"</span>: <span class="val">0.7</span>},
+    {<span class="key">"signal"</span>: <span class="str">"support_tickets"</span>, <span class="key">"value"</span>: <span class="str">"none"</span>, <span class="key">"weight"</span>: <span class="val">0.3</span>},
+    {<span class="key">"signal"</span>: <span class="str">"production_feasibility"</span>, <span class="key">"value"</span>: <span class="str">"feasible"</span>, <span class="key">"weight"</span>: <span class="val">0.4</span>}
+  ],
+  <span class="key">"rationale"</span>: <span class="str">"Frequency cap breach blocks Spring Seasonal. Propensity high (0.81), support clean, production feasible. Optimal send is T+3.5h, adjusted to 8 AM CT for quiet hours. Channel email per consent."</span>,
+  <span class="key">"trace_id"</span>: <span class="str">"tr_abc123"</span>,
+  <span class="key">"created_at"</span>: <span class="str">"2026-05-09T20:18:01.687-05:00"</span>
+}</pre>
+      <p>The <code>rationale</code> field is what the decision panel renders verbatim (or summarized) for the audience. Quality of this field is part of the acceptance review.</p>
+    </section>
+
+    <!-- 10 -->
+    <section id="execution">
+      <h2><span class="num">10</span>Live Execution &amp; Failure Modes</h2>
+      <div class="section-rule"></div>
+
+      <h3><span class="num">10.1</span>Pre-warm checklist (run before every live demo)</h3>
+      <ul class="checklist">
+        <li>Model Serving endpoint (propensity) — health-check 30s before start</li>
+        <li>Mosaic AI Vector Search endpoint — pre-warm (used in Beat 3)</li>
+        <li>Foundation Model API gateway — send no-op prompt to pay cold-start</li>
+        <li>DBOS worker — confirm running and connected to Lakebase</li>
+        <li>UC connection — confirm authenticated session</li>
+      </ul>
+
+      <h3><span class="num">10.2</span>Deterministic-replay fallback</h3>
+      <ul>
+        <li>Maintain a recorded "golden" trace from a successful run, stored alongside the asset bundle</li>
+        <li>If any of the following triggers, switch to replay mode automatically:
+          <ul>
+            <li>Live run latency exceeds 3s</li>
+            <li>Tool call returns error</li>
+            <li>Foundation Model API rate-limited</li>
+          </ul>
+        </li>
+        <li>Switch must be invisible to the audience — UI animates the recorded trace at the same pace as the live run would</li>
+        <li>Practice lead can also force replay mode via a hotkey before the demo (for high-stakes meetings)</li>
+      </ul>
+
+      <h3><span class="num">10.3</span>Failure modes (graceful degradation)</h3>
+      <table>
+        <thead><tr><th>Failure</th><th>Behavior</th></tr></thead>
+        <tbody>
+          <tr><td>Model Serving propensity unavailable</td><td>Use cached score from <code>propensity_scores</code> table; flag in trace</td></tr>
+          <tr><td>Foundation Model API rate-limited</td><td>Fall back to deterministic replay</td></tr>
+          <tr><td>UC tool returns no rows</td><td>Log warning, continue (don't crash agent)</td></tr>
+          <tr><td>DBOS persist failure</td><td>Log + alert; emit decision_artifact without journey_id; Beat 2.5 surfaces the failure</td></tr>
+          <tr><td>Reasoning loop exceeds 12 iterations</td><td>Return partial decision with <code>verdict: "incomplete"</code>, flag for review</td></tr>
+          <tr><td>Latency exceeds 2.5s warm path</td><td>Log to monitoring; if happens twice in rehearsal, fail acceptance</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 11 -->
+    <section id="acceptance">
+      <h2><span class="num">11</span>Acceptance Criteria <span class="badge gate">gate</span></h2>
+      <div class="section-rule"></div>
+      <p><strong>Phase 4 (surface layer build) does not start until all criteria below pass.</strong> Practice lead + 2 reviewers must sign off.</p>
+
+      <h3><span class="num">11.1</span>Concrete (testable, automatable)</h3>
+      <ul class="checklist">
+        <li>All 9 tool calls emit structured trace events matching the §8 contract</li>
+        <li>Trace renders in the MLflow trace UI without raw JSON visible to a non-technical viewer</li>
+        <li>Decision artifact JSON validates against the §9 schema</li>
+        <li>Decision artifact persists to UC <code>decisions</code> table AND mirrors to Lakebase</li>
+        <li>Total agent reasoning latency ≤ 1.5s target / 2.0s ceiling on warm path, measured over 20 runs</li>
+        <li><strong>Frequency cap breach test case:</strong> given a cart_abandoned event for a customer at email cap=2/2 with a queued seasonal send, the decision artifact MUST include <code>{"type": "suppress_from", "target": "Spring Seasonal"}</code>. Hard requirement.</li>
+        <li><strong>Branching decision visible in trace:</strong> the agent decides tool order based on prior outputs in at least one observable case. Document at least one such case in the build review.</li>
+        <li><strong>Signal contradiction reconciled in trace:</strong> the agent surfaces and resolves at least one conflict. The reconciliation must be visible in the trace, not buried in the rationale.</li>
+        <li>DBOS <code>persist_journey_state</code> confirmed via Lakebase row inspection — query the row by <code>journey_id</code></li>
+        <li>Trace replays deterministically from recorded run (replay mode parity with live)</li>
+        <li>All UC reads logged to UC audit log</li>
+        <li>All Foundation Model calls logged to AI Gateway</li>
+      </ul>
+
+      <h3><span class="num">11.2</span>Qualitative (review gate)</h3>
+      <ul class="checklist">
+        <li>A non-technical viewer (PM or marketer who hasn't seen the demo) reads the trace and articulates the agent's reasoning in their own words, without technical guidance</li>
+        <li>The reasoning reads as judgment, not as a script. Reviewers can identify at least one moment that "looks like thinking"</li>
+        <li>The decision panel summarizes the rationale clearly enough to defend in a customer Q&amp;A</li>
+        <li>At least one reviewer in user testing says some version of <em>"that's actually thinking"</em> unprompted</li>
+        <li>A reviewer with Salesforce or Adobe RT-CDP experience confirms this is structurally outside what those platforms do</li>
+      </ul>
+
+      <h3><span class="num">11.3</span>Auto-block conditions</h3>
+      <div class="callout warn">
+        <span class="label">FAIL — do not pass review</span>
+        <ul style="margin: 4px 0 0 16px;">
+          <li>Trace looks like a fixed script of tool calls (no branching, no judgment visible in any run)</li>
+          <li>Decision artifact reads as a templated output with values filled in, not a reasoned conclusion</li>
+          <li>Latency exceeds 2.5s on warm path more than once in rehearsal</li>
+          <li>Replay mode is visibly different from live mode</li>
+          <li>Customer-architect-grade reviewer dismisses it as "function-calling LLM with extra steps"</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 12 -->
+    <section id="open">
+      <h2><span class="num">12</span>Open Questions for Beat 2</h2>
+      <div class="section-rule"></div>
+      <table class="numbered">
+        <thead><tr><th>#</th><th>Question</th><th>Recommendation</th><th>Resolve by</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Foundation model: Claude or Llama?</td><td>Claude for live demo (reasoning quality); Llama as documented alternative</td><td>Build week 2</td></tr>
+          <tr><td>2</td><td>System prompt: hand-tuned or eval-loop-driven?</td><td>Eval-loop-driven. Build a small eval set of 20-30 abandoned-cart scenarios with expected verdicts</td><td>Build week 1</td></tr>
+          <tr><td>3</td><td>Tool call ordering: enforced via prompt, or fully agent-decided?</td><td>Fully agent-decided with system-prompt <em>guidance.</em> Enforced ordering kills the differentiation</td><td>Build week 1</td></tr>
+          <tr><td>4</td><td>Failed tool call recovery: retry, skip, or abort?</td><td>Skip + flag in trace. Retry adds latency; abort kills the demo</td><td>Build week 2</td></tr>
+          <tr><td>5</td><td>Trace UI: build custom, or use MLflow native?</td><td>Build custom for the demo surface. MLflow native is for engineers</td><td>Build week 1</td></tr>
+          <tr><td>6</td><td>Decision storage: only Lakebase, or also Delta?</td><td>Both. DBOS writes to Lakebase (operational), mirror to Delta for analytics</td><td>Build week 1</td></tr>
+          <tr><td>7</td><td><code>optimal_send_time</code> — separate tool or inline calculation?</td><td>Tool. Easier to swap algorithms; cleaner trace event</td><td>Build week 1</td></tr>
+          <tr><td>8</td><td>Synthetic test scenarios — how many for eval set?</td><td>20-30 covering: clean cart-recovery happy path, frequency cap breach, support ticket open, low-propensity skip, payment-page abandon, multi-day no-engagement</td><td>Build week 1</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <footer class="doc-footer">
+      Beat 2 Build Brief · Fluttershy Agentic CDP Demo · v1
+    </footer>
+
+  </main>
+
+</div>
+
+<script>
+  const sections = document.querySelectorAll('section[id]');
+  const tocLinks = document.querySelectorAll('.toc nav a');
+
+  function updateActive() {
+    let current = '';
+    const scrollY = window.scrollY;
+    sections.forEach(sec => {
+      const top = sec.offsetTop - 80;
+      if (scrollY >= top) current = sec.id;
+    });
+    tocLinks.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+    });
+  }
+
+  window.addEventListener('scroll', updateActive, { passive: true });
+  updateActive();
+</script>
+
+</body>
+</html>
