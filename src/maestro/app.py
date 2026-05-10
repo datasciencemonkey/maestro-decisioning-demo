@@ -53,22 +53,17 @@ def _bootstrap_for_app():
         if key.startswith("OTEL_"):
             del os.environ[key]
 
-    # In Databricks Apps, WorkspaceClient() picks up service principal auth automatically.
-    # Locally, it falls back to the profile.
+    # Fix DATABRICKS_HOST if platform injected it without scheme
+    db_host = os.environ.get("DATABRICKS_HOST", "")
+    if db_host and not db_host.startswith("http"):
+        os.environ["DATABRICKS_HOST"] = f"https://{db_host}"
+
+    # In Databricks Apps, WorkspaceClient() picks up service principal auth.
+    # Locally, falls back to profile.
     try:
         w = WorkspaceClient()
     except Exception:
         w = WorkspaceClient(profile="9cefok")
-
-    host = w.config.host
-    if host and not host.startswith("http"):
-        host = f"https://{host}"
-    os.environ.setdefault("DATABRICKS_HOST", host)
-    auth = w.config.authenticate()
-    if isinstance(auth, dict):
-        token = auth.get("Authorization", "").replace("Bearer ", "")
-        if token:
-            os.environ.setdefault("DATABRICKS_TOKEN", token)
 
     mlflow.set_tracking_uri("databricks")
     mlflow.set_experiment("/Users/sathish.gangichetty@databricks.com/maestro-cdp")
