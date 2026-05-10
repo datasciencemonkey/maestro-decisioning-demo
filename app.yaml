@@ -1,0 +1,13 @@
+command:
+  - uv
+  - run
+  - uvicorn
+  - maestro.app:app
+  - --host
+  - 0.0.0.0
+  - --port
+  - 8000
+
+env:
+  - name: DATABRICKS_HOST
+    valueFrom: "DATABRICKS_HOST"
