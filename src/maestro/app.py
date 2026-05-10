@@ -66,7 +66,11 @@ def _bootstrap_for_app():
         w = WorkspaceClient(profile="9cefok")
 
     mlflow.set_tracking_uri("databricks")
-    mlflow.set_experiment("/Users/sathish.gangichetty@databricks.com/maestro-cdp")
+    # Use shared experiment path (service principal can't write to user dirs)
+    try:
+        mlflow.set_experiment("/Shared/maestro-cdp")
+    except Exception:
+        pass  # Non-fatal — traces still work without experiment
     mlflow.pydantic_ai.autolog()
 
     # LLM via AI Gateway (custom endpoint at /ai-gateway/mlflow/v1)
