@@ -23,7 +23,7 @@ CT = ZoneInfo("America/Chicago")
 
 
 @DBOS.step()
-def run_agent_step(event_json: str, model_name: str = "databricks-claude-sonnet-4-6") -> str:
+def run_agent_step(event_json: str, model_name: str = "maestro-endpoint") -> str:
     """Run the Maestro agent. Checkpointed because LLM calls are non-deterministic.
 
     Takes and returns JSON strings to avoid DBOS serialization issues
