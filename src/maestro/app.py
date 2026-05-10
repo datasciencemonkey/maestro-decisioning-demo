@@ -80,7 +80,11 @@ def _bootstrap_for_app():
     host = os.environ.get("DATABRICKS_HOST", w.config.host).rstrip("/")
     if not host.startswith("http"):
         host = f"https://{host}"
-    token = os.environ.get("DATABRICKS_TOKEN", "")
+    # Get token from WorkspaceClient auth (works for both user and service principal)
+    auth = w.config.authenticate()
+    token = auth.get("Authorization", "").replace("Bearer ", "") if isinstance(auth, dict) else ""
+    if not token:
+        token = os.environ.get("DATABRICKS_TOKEN", "")
     client = AsyncOpenAI(api_key=token, base_url=f"{host}/ai-gateway/mlflow/v1")
     provider = OpenAIProvider(openai_client=client)
     profile = OpenAIModelProfile(openai_supports_strict_tool_definition=False)
