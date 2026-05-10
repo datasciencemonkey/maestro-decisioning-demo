@@ -36,9 +36,44 @@ _db_url = None
 def _get_model():
     global _model, _db_url
     if _model is None:
-        from maestro.bootstrap import bootstrap
-        _model, _db_url = bootstrap()
+        _model, _db_url = _bootstrap_for_app()
     return _model, _db_url
+
+
+def _bootstrap_for_app():
+    """Bootstrap that works both locally (CLI profile) and in Databricks Apps (service principal)."""
+    import mlflow
+    from databricks.sdk import WorkspaceClient
+    from databricks_openai import AsyncDatabricksOpenAI
+    from pydantic_ai.models.openai import OpenAIChatModel
+    from pydantic_ai.providers.openai import OpenAIProvider
+
+    # Clear stale OTEL env vars
+    for key in list(os.environ):
+        if key.startswith("OTEL_"):
+            del os.environ[key]
+
+    # In Databricks Apps, WorkspaceClient() picks up service principal auth automatically.
+    # Locally, it falls back to the profile.
+    try:
+        w = WorkspaceClient()
+    except Exception:
+        w = WorkspaceClient(profile="9cefok")
+
+    os.environ.setdefault("DATABRICKS_HOST", w.config.host)
+    token = w.config.authenticate().get("Authorization", "").replace("Bearer ", "")
+    if token:
+        os.environ.setdefault("DATABRICKS_TOKEN", token)
+
+    mlflow.set_tracking_uri("databricks")
+    mlflow.set_experiment("/Users/sathish.gangichetty@databricks.com/maestro-cdp")
+    mlflow.pydantic_ai.autolog()
+
+    client = AsyncDatabricksOpenAI(workspace_client=w)
+    provider = OpenAIProvider(openai_client=client)
+    model = OpenAIChatModel("databricks-claude-sonnet-4-6", provider=provider)
+
+    return model, None  # db_url not needed for agent-only mode
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -158,13 +193,25 @@ async function runDemo() {
 @app.post("/api/run")
 async def run_agent():
     """Run the Beat 2 agent for Cindy's cart abandonment."""
+    import traceback
+
     from maestro.agent import run_maestro
     from maestro.synthetic import CINDY_CAMPAIGNS, CINDY_EVENT
 
-    model, db_url = _get_model()
+    try:
+        model, db_url = _get_model()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Bootstrap failed: {e}")
 
     start = time.perf_counter()
-    result = await run_maestro(CINDY_EVENT, model, db_url)
+    try:
+        result = await run_maestro(CINDY_EVENT, model, db_url)
+    except Exception as e:
+        elapsed = time.perf_counter() - start
+        raise HTTPException(
+            status_code=500,
+            detail=f"Agent failed after {elapsed:.1f}s: {e}\n{traceback.format_exc()[-500:]}",
+        )
     elapsed = time.perf_counter() - start
 
     # Annotate campaigns with agent's disposition
