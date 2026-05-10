@@ -71,7 +71,7 @@ def _bootstrap_for_app():
 
     client = AsyncDatabricksOpenAI(workspace_client=w)
     provider = OpenAIProvider(openai_client=client)
-    model = OpenAIChatModel("maestro-endpoint", provider=provider)
+    model = OpenAIChatModel("databricks-claude-sonnet-4-6", provider=provider)
 
     return model, None  # db_url not needed for agent-only mode
 

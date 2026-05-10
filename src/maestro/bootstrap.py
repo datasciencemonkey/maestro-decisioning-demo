@@ -102,7 +102,7 @@ def bootstrap(profile: str = "9cefok"):
     # LLM via AI Gateway
     client = AsyncDatabricksOpenAI(workspace_client=w)
     provider = OpenAIProvider(openai_client=client)
-    model = OpenAIChatModel("maestro-endpoint", provider=provider)
+    model = OpenAIChatModel("databricks-claude-sonnet-4-6", provider=provider)
 
     # Lakebase URL
     db_url = get_lakebase_url(profile=profile)
