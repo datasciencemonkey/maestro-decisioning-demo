@@ -53,7 +53,7 @@ class _ProductCardState extends ConsumerState<ProductCard> {
                   top: Radius.circular(AppTheme.radiusCard),
                 ),
                 child: AspectRatio(
-                  aspectRatio: 1,
+                  aspectRatio: 4 / 3,
                   child: Stack(
                     fit: StackFit.expand,
                     children: [

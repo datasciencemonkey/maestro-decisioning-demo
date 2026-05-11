@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../theme/app_colors.dart';
 import 'scene.dart';
+import 'demo_controller.dart';
 import '../providers/orchestrator_provider.dart';
 
 class NarratorStrip extends ConsumerWidget {
@@ -68,14 +69,22 @@ class NarratorStrip extends ConsumerWidget {
           // Right: Mode toggle
           _ModeToggle(
             currentMode: orchestrator.mode,
-            onModeChanged: notifier.setMode,
+            onModeChanged: (mode) {
+              notifier.setMode(mode);
+              // If switching to autopilot, start the full run
+              if (mode == DemoMode.autopilot) {
+                DemoController.runAutopilot(context, ref);
+              }
+            },
           ),
           const SizedBox(width: 12),
 
           // Right: Next button (guided mode only, not on last scene)
           if (orchestrator.mode == DemoMode.guided &&
               !orchestrator.isLastScene)
-            _NextButton(onPressed: notifier.nextScene),
+            _NextButton(
+              onPressed: () => DemoController.advanceScene(context, ref),
+            ),
         ],
       ),
     );
@@ -164,21 +173,24 @@ class _ModeButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: isActive ? AppColors.brushedGold : Colors.transparent,
-          borderRadius: BorderRadius.circular(6),
-          border: isActive
-              ? null
-              : Border.all(color: Colors.white24, width: 1),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isActive ? const Color(0xFF1A1A2E) : Colors.white70,
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: isActive ? AppColors.brushedGold : Colors.transparent,
+            borderRadius: BorderRadius.circular(6),
+            border: isActive
+                ? null
+                : Border.all(color: Colors.white24, width: 1),
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: isActive ? const Color(0xFF1A1A2E) : Colors.white70,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ),
@@ -195,18 +207,21 @@ class _NextButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onPressed,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-        decoration: BoxDecoration(
-          gradient: AppColors.goldGradient,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: const Text(
-          'Next \u2192',
-          style: TextStyle(
-            color: Color(0xFF1A1A2E),
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+          decoration: BoxDecoration(
+            gradient: AppColors.goldGradient,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: const Text(
+            'Next \u2192',
+            style: TextStyle(
+              color: Color(0xFF1A1A2E),
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       ),
