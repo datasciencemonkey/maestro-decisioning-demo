@@ -12,11 +12,11 @@ export default function NbaPanel({ recommendations }: NbaPanelProps) {
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5, delay: 0.3 }}
-      className="hidden lg:block w-64 shrink-0 bg-card border border-[#C4A87A]/20 rounded-xl p-5 space-y-4 self-start"
+      className="hidden lg:block w-64 shrink-0 bg-gradient-to-b from-[#C4A87A]/5 to-transparent border border-[#C4A87A]/20 rounded-xl p-5 space-y-4 self-start"
     >
       {/* Header */}
       <div className="flex items-center gap-2">
-        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse ring-2 ring-green-500/20" />
         <span className="text-[10px] font-bold tracking-widest text-muted-foreground">
           AI RECOMMENDATIONS
         </span>

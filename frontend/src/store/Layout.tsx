@@ -20,6 +20,7 @@ function StoreShell() {
   const { pathname } = useLocation()
   const cart = useCart()
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const [narratorMode, setNarratorMode] = useState<'Free' | 'Guided' | 'Auto'>('Free')
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
@@ -156,13 +157,14 @@ function StoreShell() {
             Meet Cindy &mdash; back on Fluttershy for her kitten Whiskers
           </p>
         </div>
-        <div className="hidden md:flex items-center gap-1 shrink-0">
+        <div className="flex items-center gap-1 shrink-0">
           {narratorModes.map(mode => (
             <button
               key={mode}
+              onClick={() => setNarratorMode(mode as 'Free' | 'Guided' | 'Auto')}
               className={cn(
                 'px-3 py-1 rounded-full text-[10px] font-semibold tracking-wider transition-colors cursor-pointer',
-                mode === 'Guided'
+                mode === narratorMode
                   ? 'bg-gold/20 text-gold border border-gold/30'
                   : 'text-white/30 hover:text-white/50 hover:bg-white/5'
               )}
@@ -170,6 +172,17 @@ function StoreShell() {
               {mode}
             </button>
           ))}
+          {narratorMode === 'Guided' && (
+            <button className="ml-2 px-3 py-1 rounded-full bg-gradient-to-r from-[#C4A87A] to-[#DBC09E] text-[#2C1810] text-[10px] font-bold tracking-wider cursor-pointer hover:opacity-90 transition-opacity">
+              Next →
+            </button>
+          )}
+          {narratorMode === 'Auto' && (
+            <span className="ml-2 flex items-center gap-1.5 text-[10px] text-green-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+              Playing...
+            </span>
+          )}
         </div>
       </div>
 

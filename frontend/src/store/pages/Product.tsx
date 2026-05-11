@@ -173,13 +173,15 @@ export default function Product() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="rounded-2xl overflow-hidden shadow-lg bg-cream dark:bg-muted">
+          <div className="relative rounded-2xl overflow-hidden shadow-lg bg-cream dark:bg-muted">
             <img
               src={product.imageUrl}
               alt={product.title}
               onError={handleImgError}
               className="w-full h-full object-cover aspect-[4/3]"
             />
+            {/* Soft vignette inset */}
+            <div className="absolute inset-0 rounded-2xl shadow-[inset_0_0_60px_rgba(0,0,0,0.08)] pointer-events-none" />
           </div>
         </motion.div>
 
@@ -208,7 +210,8 @@ export default function Product() {
           </motion.div>
 
           {/* Price */}
-          <motion.p {...stagger(5)} className="text-3xl font-bold mt-2 text-foreground">
+          <motion.p {...stagger(5)} className="flex items-center gap-2 text-3xl font-bold mt-2 text-foreground">
+            <span className="w-2 h-2 rounded-full bg-[#C4A87A] shrink-0" />
             ${product.price.toFixed(2)}
           </motion.p>
 

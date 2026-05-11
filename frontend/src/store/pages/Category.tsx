@@ -20,7 +20,9 @@ export default function Category() {
   const [filtersOpen, setFiltersOpen] = useState(false)
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-8 py-6">
+    <div className="relative max-w-7xl mx-auto px-4 md:px-8 py-6">
+      {/* Decorative gradient orb */}
+      <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-[radial-gradient(circle,rgba(196,168,122,0.05),transparent_70%)] pointer-events-none" />
       {/* Breadcrumb */}
       <nav className="text-xs md:text-sm text-muted-foreground mb-4">
         <span>Home</span>

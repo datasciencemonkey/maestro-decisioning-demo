@@ -55,6 +55,8 @@ export default function ProductCard({ product }: { product: Product }) {
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         )}
+        {/* Hover gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
         {product.badge && (
           <span
             className={`absolute top-3 left-3 ${badgeStyles[product.badge]}`}
@@ -106,7 +108,7 @@ export default function ProductCard({ product }: { product: Product }) {
               })
               setAdded(true)
             }}
-            className="flex-1 inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-[#7C6353] to-[#A08468] text-white rounded-lg py-2.5 text-sm font-semibold hover:opacity-90 transition-opacity"
+            className="relative overflow-hidden flex-1 inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-[#7C6353] to-[#A08468] text-white rounded-lg py-2.5 text-sm font-semibold hover:opacity-90 transition-opacity after:absolute after:inset-0 after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent after:-translate-x-full hover:after:translate-x-full after:transition-transform after:duration-500"
           >
             {added ? <Check size={14} /> : <ShoppingCart size={14} />}
             {added ? 'Added!' : 'Add to Cart'}

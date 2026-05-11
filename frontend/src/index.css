@@ -59,6 +59,10 @@
     @apply bg-background text-foreground font-sans antialiased;
     scroll-behavior: smooth;
   }
+  a, button {
+    transition-property: color, background-color, border-color, opacity, box-shadow, transform;
+    transition-duration: 200ms;
+  }
 }
 
 /* Text selection */

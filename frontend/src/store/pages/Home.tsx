@@ -47,12 +47,12 @@ export default function Home() {
     <div className="min-h-screen bg-background text-foreground">
       {/* ── Hero Banner ── */}
       <section className="relative h-[300px] md:h-[420px] flex items-center justify-center overflow-hidden bg-gradient-to-br from-cream to-linen dark:from-[#1A1612] dark:to-[#0D0B09]">
-        {/* Background image overlay */}
+        {/* Background image overlay — slow ken-burns zoom */}
         <img
           src="https://images.unsplash.com/photo-1615497001839-b0a0eac3274c?w=1400&h=800&fit=crop"
           alt=""
           loading="lazy"
-          className="absolute inset-0 w-full h-full object-cover opacity-[0.30] dark:opacity-[0.20]"
+          className="absolute inset-0 w-full h-full object-cover opacity-[0.30] dark:opacity-[0.20] scale-105 transition-transform duration-[20000ms] hover:scale-100"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
 
@@ -89,7 +89,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.65, duration: 0.6 }}
             onClick={() => navigate('/store/photo-books')}
-            className="inline-flex items-center gap-2 px-8 py-3 rounded-lg bg-gradient-to-r from-gold to-gold-light text-espresso font-semibold text-sm hover:shadow-lg hover:shadow-gold/25 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+            className="inline-flex items-center gap-2 px-8 py-3 rounded-lg bg-gradient-to-r from-gold to-gold-light text-espresso font-semibold text-sm shadow-lg shadow-[#7C6353]/20 hover:shadow-xl hover:shadow-[#7C6353]/30 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
           >
             Start Creating
             <ArrowRight size={16} />
@@ -121,7 +121,7 @@ export default function Home() {
                   whileHover={{ y: -3 }}
                   transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                   onClick={() => navigate(cat.href!)}
-                  className="cursor-pointer rounded-lg border border-border bg-card p-8 text-center hover:border-gold/40 hover:shadow-md transition-all duration-200 dark:bg-card dark:border-border"
+                  className="cursor-pointer rounded-lg border border-border bg-card p-8 text-center hover:border-[#C4A87A]/30 hover:shadow-md transition-all duration-200 dark:bg-card dark:border-border"
                 >
                   <span className="text-4xl block mb-3">{cat.icon}</span>
                   <span className="text-base font-medium text-card-foreground">
