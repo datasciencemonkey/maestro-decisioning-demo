@@ -152,15 +152,18 @@ class HomeScreen extends StatelessWidget {
         children: [
           Text('Featured', style: AppTheme.headlineMedium),
           const SizedBox(height: 24),
-          Row(
-            children: featured.map((p) {
-              return Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: ProductCard(product: p),
-                ),
-              );
-            }).toList(),
+          SizedBox(
+            height: 400,
+            child: Row(
+              children: featured.map((p) {
+                return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: ProductCard(product: p),
+                  ),
+                );
+              }).toList(),
+            ),
           ),
         ],
       ),

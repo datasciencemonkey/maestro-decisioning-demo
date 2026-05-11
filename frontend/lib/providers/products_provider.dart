@@ -85,7 +85,12 @@ class ProductsNotifier extends StateNotifier<ProductsState> {
       }
       return p;
     }).toList();
-    state = state.copyWith(products: updated);
+    // Switch to Cats filter and Recommended sort so re-ranked results are visible
+    state = state.copyWith(
+      products: updated,
+      filter: PetFilter.cat,
+      sort: SortOption.recommended,
+    );
   }
 }
 
