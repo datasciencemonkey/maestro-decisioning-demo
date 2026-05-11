@@ -3,39 +3,43 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  /* Soft Modern palette */
+  /* Brand palette */
   --color-espresso: #2C1810;
   --color-mocha: #7C6353;
   --color-gold: #C4A87A;
   --color-gold-light: #DBC09E;
   --color-cream: #EDE4D8;
   --color-linen: #FAF8F6;
+  --color-databricks-red: #EB1600;
+  --color-databricks-navy: #0B2026;
+  --color-databricks-cyan: #40D1F5;
 
-  --color-background: var(--color-linen);
-  --color-foreground: var(--color-espresso);
+  /* Light mode: Databricks branding */
+  --color-background: #F9F7F4;
+  --color-foreground: #0B2026;
   --color-card: #FFFFFF;
-  --color-card-foreground: var(--color-espresso);
-  --color-primary: var(--color-mocha);
+  --color-card-foreground: #0B2026;
+  --color-primary: #EB1600;
   --color-primary-foreground: #FFFFFF;
-  --color-secondary: var(--color-cream);
-  --color-secondary-foreground: var(--color-mocha);
+  --color-secondary: #F1F5FA;
+  --color-secondary-foreground: #4A4A4A;
   --color-accent: var(--color-gold);
-  --color-accent-foreground: var(--color-espresso);
-  --color-muted: var(--color-cream);
-  --color-muted-foreground: #A89880;
-  --color-border: var(--color-cream);
-  --color-ring: var(--color-gold);
+  --color-accent-foreground: #0B2026;
+  --color-muted: #F1F5FA;
+  --color-muted-foreground: #5A6F77;
+  --color-border: #DCE0E2;
+  --color-ring: #EB1600;
   --color-destructive: #EF4444;
 
-  --radius-sm: 8px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  --radius-sm: 4px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
 
   --font-sans: 'DM Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-serif: 'DM Serif Display', ui-serif, Georgia, serif;
 }
 
-/* Dark mode overrides */
+/* Dark mode: cinematic gold */
 .dark {
   --color-background: #0D0B09;
   --color-foreground: #FAF8F6;
@@ -45,6 +49,8 @@
   --color-primary-foreground: #0D0B09;
   --color-secondary: #2A2420;
   --color-secondary-foreground: var(--color-cream);
+  --color-accent: var(--color-gold);
+  --color-accent-foreground: #FAF8F6;
   --color-muted: #2A2420;
   --color-muted-foreground: #8A7A68;
   --color-border: #2A2420;
