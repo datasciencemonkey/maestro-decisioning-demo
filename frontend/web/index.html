@@ -1,38 +1,528 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
-
   <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
-
-  <!-- iOS meta tags & icons -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Fluttershy — The Agentic CDP Demo on Databricks">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="fluttershy">
+  <meta name="apple-mobile-web-app-title" content="Fluttershy">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
-
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
-
-  <title>fluttershy</title>
+  <title>Fluttershy — Agentic CDP Demo</title>
   <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --espresso: #2C1810;
+      --mocha: #7C6353;
+      --gold: #C4A87A;
+      --gold-light: #DBC09E;
+      --cream: #EDE4D8;
+      --linen: #FAF8F6;
+      --white: #FFFFFF;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--linen);
+      color: var(--espresso);
+      overflow-x: hidden;
+    }
+
+    /* ---- Landing Page ---- */
+    #landing {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    #landing.hidden {
+      opacity: 0;
+      transform: translateY(-20px);
+      pointer-events: none;
+      position: absolute;
+    }
+
+    /* Nav */
+    .landing-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 60px;
+      background: var(--white);
+      border-bottom: 1px solid var(--cream);
+    }
+    .landing-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .landing-logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--mocha), var(--gold));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .landing-logo-text {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px;
+      color: var(--espresso);
+    }
+    .landing-nav-badge {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      color: var(--gold);
+      background: linear-gradient(135deg, rgba(196,168,122,0.12), rgba(196,168,122,0.04));
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(196,168,122,0.25);
+    }
+
+    /* Hero */
+    .hero {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 60px;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(160deg, var(--linen) 0%, var(--cream) 40%, #E0D4C4 100%);
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -100px; right: -100px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(196,168,122,0.12) 0%, transparent 70%);
+      border-radius: 50%;
+      animation: float 8s ease-in-out infinite;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; left: -80px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(124,99,83,0.08) 0%, transparent 70%);
+      border-radius: 50%;
+      animation: float 10s ease-in-out infinite reverse;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-30px) scale(1.05); }
+    }
+
+    .hero-content {
+      max-width: 800px;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-eyebrow {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.2s;
+    }
+    .hero-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 56px;
+      font-weight: 400;
+      line-height: 1.15;
+      color: var(--espresso);
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.4s;
+    }
+    .hero-title .highlight {
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-subtitle {
+      font-size: 18px;
+      line-height: 1.7;
+      color: var(--mocha);
+      max-width: 600px;
+      margin: 0 auto 40px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.6s;
+    }
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 40px;
+      background: linear-gradient(135deg, var(--mocha), #A08468);
+      color: var(--white);
+      border: none;
+      border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.8s;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-cta::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      animation: shimmer 3s ease-in-out infinite;
+    }
+    .hero-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(124,99,83,0.3);
+    }
+    .hero-cta:active { transform: translateY(0); }
+    .hero-cta .arrow {
+      transition: transform 0.2s ease;
+    }
+    .hero-cta:hover .arrow { transform: translateX(4px); }
+
+    @keyframes shimmer {
+      0% { left: -100%; }
+      50% { left: 100%; }
+      100% { left: 100%; }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Beats Section */
+    .beats {
+      padding: 80px 60px;
+      background: var(--white);
+      position: relative;
+    }
+    .beats-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    .beats-header h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 32px;
+      font-weight: 400;
+      margin-bottom: 12px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 1s;
+    }
+    .beats-header p {
+      color: var(--mocha);
+      font-size: 15px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 1.1s;
+    }
+    .beats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .beat-card {
+      padding: 36px 28px;
+      border-radius: 16px;
+      background: var(--linen);
+      border: 1px solid var(--cream);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      opacity: 0;
+      animation: fadeUp 0.6s ease forwards;
+    }
+    .beat-card:nth-child(1) { animation-delay: 1.2s; }
+    .beat-card:nth-child(2) { animation-delay: 1.35s; }
+    .beat-card:nth-child(3) { animation-delay: 1.5s; }
+    .beat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(44,24,16,0.08);
+    }
+    .beat-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+    .beat-card:nth-child(1) .beat-number {
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: var(--espresso);
+    }
+    .beat-card:nth-child(2) .beat-number {
+      background: var(--espresso);
+      color: var(--white);
+    }
+    .beat-card:nth-child(3) .beat-number {
+      background: linear-gradient(135deg, var(--mocha), #A08468);
+      color: var(--white);
+    }
+    .beat-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    .beat-desc {
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--mocha);
+    }
+    .beat-tag {
+      display: inline-block;
+      margin-top: 16px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: rgba(196,168,122,0.1);
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    /* Tech strip */
+    .tech-strip {
+      padding: 40px 60px;
+      background: var(--espresso);
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 1.6s;
+    }
+    .tech-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: rgba(255,255,255,0.5);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 1px;
+    }
+    .tech-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+    }
+
+    /* Footer */
+    .landing-footer {
+      padding: 24px 60px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--mocha);
+      background: var(--linen);
+      border-top: 1px solid var(--cream);
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 1.8s;
+    }
+    .landing-footer a {
+      color: var(--gold);
+      text-decoration: none;
+    }
+
+    /* ---- Flutter App Container ---- */
+    #flutter-app {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+    }
+    #flutter-app.active {
+      display: block;
+    }
+
+    /* Loading screen */
+    #loading {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--espresso);
+      z-index: 9999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+    #loading.active {
+      display: flex;
+    }
+    .loading-logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 28px;
+      color: var(--gold);
+    }
+    .loading-bar {
+      width: 200px;
+      height: 3px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .loading-bar-inner {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--gold-light));
+      border-radius: 2px;
+      animation: loadProgress 2s ease-in-out infinite;
+    }
+    @keyframes loadProgress {
+      0% { width: 0%; transform: translateX(0); }
+      50% { width: 60%; }
+      100% { width: 100%; transform: translateX(0); }
+    }
+    .loading-text {
+      font-size: 12px;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 1px;
+    }
+  </style>
 </head>
 <body>
-  <script src="flutter_bootstrap.js" async></script>
+  <!-- Landing Page -->
+  <div id="landing">
+    <nav class="landing-nav">
+      <div class="landing-logo">
+        <div class="landing-logo-icon">&#129419;</div>
+        <span class="landing-logo-text">Fluttershy</span>
+      </div>
+      <div class="landing-nav-badge">AGENTIC CDP DEMO</div>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-eyebrow">Databricks AI Practice</div>
+        <h1 class="hero-title">
+          The <span class="highlight">Agentic CDP</span><br>
+          Lives on Your Data Platform
+        </h1>
+        <p class="hero-subtitle">
+          Watch a single AI agent reason across campaigns, production schedules, support tickets, and ML models &mdash; then make a governed, multimodal decision in under 2 seconds.
+          <br><br>
+          Follow <strong>Cindy</strong> as she shops for a photo book for her kitten <strong>Whiskers</strong>.
+        </p>
+        <button class="hero-cta" onclick="launchDemo()">
+          Launch Demo <span class="arrow">&rarr;</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="beats">
+      <div class="beats-header">
+        <h2>Three Beats, One Agent</h2>
+        <p>A 15-minute scripted demo proving Databricks is the agentic CDP</p>
+      </div>
+      <div class="beats-grid">
+        <div class="beat-card">
+          <div class="beat-number">1</div>
+          <div class="beat-title">Browse &amp; Discover</div>
+          <div class="beat-desc">
+            Cindy uploads a photo of Whiskers. The platform matches her kitten against the product catalog in real-time using Vector Search &mdash; tabby-pattern templates surface to the top.
+          </div>
+          <div class="beat-tag">Real-time Multimodal</div>
+        </div>
+        <div class="beat-card">
+          <div class="beat-number">2</div>
+          <div class="beat-title">Reason &amp; Decide</div>
+          <div class="beat-desc">
+            Cart abandoned. The agent reasons across 9 domains &mdash; profile, campaigns, frequency caps, support tickets, propensity, production calendar &mdash; and suppresses a conflicting promo.
+          </div>
+          <div class="beat-tag">Cross-Campaign Reasoning</div>
+        </div>
+        <div class="beat-card">
+          <div class="beat-number">3</div>
+          <div class="beat-title">Activate &amp; Send</div>
+          <div class="beat-desc">
+            The agent composes a segment-of-one email with Whiskers-matched stock photos, personalized copy, and sends via partner ESP &mdash; all governed, all traced.
+          </div>
+          <div class="beat-tag">Segment of One</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="tech-strip">
+      <div class="tech-item"><div class="tech-dot"></div>Pydantic AI</div>
+      <div class="tech-item"><div class="tech-dot"></div>MLflow Tracing</div>
+      <div class="tech-item"><div class="tech-dot"></div>DBOS on Lakebase</div>
+      <div class="tech-item"><div class="tech-dot"></div>Unity Catalog</div>
+      <div class="tech-item"><div class="tech-dot"></div>Mosaic AI</div>
+      <div class="tech-item"><div class="tech-dot"></div>Vector Search</div>
+      <div class="tech-item"><div class="tech-dot"></div>AI Gateway</div>
+    </div>
+
+    <footer class="landing-footer">
+      Built with <a href="#">Databricks</a> &mdash; One platform, one governance plane, one agent.
+    </footer>
+  </div>
+
+  <!-- Loading screen -->
+  <div id="loading">
+    <div class="loading-logo">&#129419; Fluttershy</div>
+    <div class="loading-bar"><div class="loading-bar-inner"></div></div>
+    <div class="loading-text">Loading Cindy's shopping experience...</div>
+  </div>
+
+  <!-- Flutter App (hidden until launched) -->
+  <div id="flutter-app"></div>
+
+  <script>
+    function launchDemo() {
+      // Hide landing, show loading
+      document.getElementById('landing').classList.add('hidden');
+      document.getElementById('loading').classList.add('active');
+
+      // Load Flutter
+      const script = document.createElement('script');
+      script.src = 'flutter_bootstrap.js';
+      script.async = true;
+      document.head.appendChild(script);
+
+      // After Flutter loads, hide loading and show app
+      // Flutter signals ready via a custom event or we use a timeout fallback
+      let flutterReady = false;
+
+      window.addEventListener('flutter-first-frame', () => {
+        flutterReady = true;
+        showApp();
+      });
+
+      // Fallback: show after 4s if event doesn't fire
+      setTimeout(() => {
+        if (!flutterReady) showApp();
+      }, 4000);
+    }
+
+    function showApp() {
+      document.getElementById('loading').classList.remove('active');
+      document.getElementById('flutter-app').classList.add('active');
+      // Remove landing from DOM to free memory
+      setTimeout(() => {
+        const landing = document.getElementById('landing');
+        if (landing) landing.remove();
+      }, 1000);
+    }
+  </script>
 </body>
 </html>
