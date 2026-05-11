@@ -47,13 +47,12 @@ class _ProductCardState extends ConsumerState<ProductCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Image with badge overlay
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(AppTheme.radiusCard),
-                ),
-                child: AspectRatio(
-                  aspectRatio: 4 / 3,
+              // Image with badge overlay — Expanded so it fills remaining space
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(AppTheme.radiusCard),
+                  ),
                   child: Stack(
                     fit: StackFit.expand,
                     children: [

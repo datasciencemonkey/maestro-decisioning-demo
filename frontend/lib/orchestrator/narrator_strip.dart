@@ -73,7 +73,7 @@ class NarratorStrip extends ConsumerWidget {
               notifier.setMode(mode);
               // If switching to autopilot, start the full run
               if (mode == DemoMode.autopilot) {
-                DemoController.runAutopilot(context, ref);
+                DemoController.runAutopilot(ref);
               }
             },
           ),
@@ -83,7 +83,7 @@ class NarratorStrip extends ConsumerWidget {
           if (orchestrator.mode == DemoMode.guided &&
               !orchestrator.isLastScene)
             _NextButton(
-              onPressed: () => DemoController.advanceScene(context, ref),
+              onPressed: () => DemoController.advanceScene(ref),
             ),
         ],
       ),
