@@ -1,0 +1,150 @@
+import { Outlet, Link, useLocation } from 'react-router-dom'
+import { Search, ShoppingCart, Sun, Moon } from 'lucide-react'
+import { useTheme } from '@/hooks/use-theme'
+import { useCart, CartProvider } from '@/store/hooks/use-cart'
+import CartDrawer from '@/store/components/CartDrawer'
+import { cn } from '@/lib/utils'
+
+const navLinks = [
+  { label: 'Photo Books', to: '/store/photo-books' },
+  { label: 'Cards', to: '/store/cards' },
+  { label: 'Prints', to: '/store/prints' },
+  { label: 'Gifts', to: '/store/gifts' },
+]
+
+const narratorModes = ['Free', 'Guided', 'Auto'] as const
+
+function StoreShell() {
+  const { theme, toggle } = useTheme()
+  const { pathname } = useLocation()
+  const cart = useCart()
+
+  return (
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
+      {/* Promo bar */}
+      <div
+        className="py-2 text-center text-white text-xs tracking-wider"
+        style={{ background: 'linear-gradient(90deg, #7C6353, #A08468)' }}
+      >
+        🐾 Free shipping on pet photo books this week
+      </div>
+
+      {/* Nav bar */}
+      <header className="bg-white dark:bg-card border-b border-border sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto flex items-center gap-6 px-6 py-3">
+          {/* Logo */}
+          <Link to="/store" className="flex items-center gap-2 shrink-0 cursor-pointer group">
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-base transition-transform group-hover:scale-110"
+              style={{ background: 'linear-gradient(135deg, #C4A87A, #DBC09E)' }}
+            >
+              🦋
+            </div>
+            <span className="font-serif text-xl text-foreground">Fluttershy</span>
+          </Link>
+
+          {/* Nav links */}
+          <nav className="hidden md:flex items-center gap-1 ml-4">
+            {navLinks.map(link => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={cn(
+                  'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer',
+                  pathname === link.to
+                    ? 'bg-secondary text-foreground'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
+                )}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Spacer */}
+          <div className="flex-1" />
+
+          {/* Search */}
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary/60 border border-border w-52">
+            <Search size={14} className="text-muted-foreground shrink-0" />
+            <input
+              type="text"
+              placeholder="Search..."
+              className="bg-transparent text-sm outline-none w-full placeholder:text-muted-foreground"
+            />
+          </div>
+
+          {/* Theme toggle */}
+          <button
+            onClick={toggle}
+            className="p-2 rounded-lg hover:bg-secondary transition-colors cursor-pointer"
+            aria-label="Toggle theme"
+          >
+            {theme === 'dark'
+              ? <Sun size={18} className="text-gold" />
+              : <Moon size={18} className="text-mocha" />
+            }
+          </button>
+
+          {/* Cart icon */}
+          <button
+            onClick={cart.toggle}
+            className="relative p-2 rounded-lg hover:bg-secondary transition-colors cursor-pointer"
+            aria-label="Open cart"
+          >
+            <ShoppingCart size={18} className="text-foreground" />
+            {cart.itemCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 rounded-full bg-gold text-espresso text-[10px] font-bold flex items-center justify-center leading-none">
+                {cart.itemCount}
+              </span>
+            )}
+          </button>
+        </div>
+      </header>
+
+      {/* Page content */}
+      <main className="flex-1">
+        <Outlet />
+      </main>
+
+      {/* Narrator strip */}
+      <div className="h-[52px] bg-espresso dark:bg-black/80 border-t border-white/10 flex items-center justify-between px-6">
+        <p className="text-white/50 text-xs truncate">
+          Welcome &middot; Meet Cindy &mdash; back on Fluttershy for her kitten Whiskers
+        </p>
+        <div className="flex items-center gap-1 shrink-0">
+          {narratorModes.map(mode => (
+            <button
+              key={mode}
+              className={cn(
+                'px-3 py-1 rounded-md text-[10px] font-semibold tracking-wider transition-colors cursor-pointer',
+                mode === 'Guided'
+                  ? 'bg-gold/20 text-gold border border-gold/30'
+                  : 'text-white/30 hover:text-white/50 hover:bg-white/5'
+              )}
+            >
+              {mode}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Cart drawer */}
+      <CartDrawer
+        isOpen={cart.isOpen}
+        onClose={cart.close}
+        items={cart.items}
+        total={cart.total}
+        onRemoveItem={cart.removeItem}
+      />
+    </div>
+  )
+}
+
+export default function Layout() {
+  return (
+    <CartProvider>
+      <StoreShell />
+    </CartProvider>
+  )
+}
