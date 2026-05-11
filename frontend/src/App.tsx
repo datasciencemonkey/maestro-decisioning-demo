@@ -4,6 +4,7 @@ import Layout from './store/Layout'
 import Home from './store/pages/Home'
 import Category from './store/pages/Category'
 import Product from './store/pages/Product'
+import Beat2Page from './beat2/Beat2Page'
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
         <Route path="photo-books" element={<Category />} />
         <Route path="product/:id" element={<Product />} />
       </Route>
+      <Route path="/beat2" element={<Beat2Page />} />
     </Routes>
   )
 }
