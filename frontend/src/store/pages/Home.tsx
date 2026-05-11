@@ -54,6 +54,7 @@ export default function Home() {
           loading="lazy"
           className="absolute inset-0 w-full h-full object-cover opacity-[0.30] dark:opacity-[0.20] scale-105 transition-transform duration-[20000ms] hover:scale-100"
         />
+        <div className="absolute inset-0 bg-white/50 dark:bg-[#0D0B09]/50" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
 
         <div className="relative z-10 text-center px-6 max-w-2xl">
@@ -89,7 +90,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.65, duration: 0.6 }}
             onClick={() => navigate('/store/photo-books')}
-            className="inline-flex items-center gap-2 px-8 py-3 rounded-lg bg-gradient-to-r from-gold to-gold-light text-espresso font-semibold text-sm shadow-lg shadow-[#7C6353]/20 hover:shadow-xl hover:shadow-[#7C6353]/30 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+            className="inline-flex items-center gap-2 px-8 py-3 rounded-lg bg-[#EB1600] text-white dark:bg-gradient-to-r dark:from-gold dark:to-gold-light dark:text-espresso font-semibold text-sm shadow-lg shadow-[#7C6353]/20 hover:shadow-xl hover:shadow-[#7C6353]/30 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
           >
             Start Creating
             <ArrowRight size={16} />

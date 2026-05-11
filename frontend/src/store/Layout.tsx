@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Outlet, Link, useLocation } from 'react-router-dom'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import { Search, ShoppingCart, Sun, Moon, Menu, X } from 'lucide-react'
 import { useTheme } from '@/hooks/use-theme'
 import { useCart, CartProvider } from '@/store/hooks/use-cart'
@@ -15,12 +15,81 @@ const navLinks = [
 
 const narratorModes = ['Free', 'Guided', 'Auto'] as const
 
+const demoScenes = [
+  { label: 'SCENE 1', text: 'Meet Cindy \u2014 back on Fluttershy for her kitten Whiskers', route: '/store' },
+  { label: 'SCENE 2', text: 'Cindy browses cat-themed photo book templates', route: '/store/photo-books' },
+  { label: 'SCENE 3', text: 'She uploads a reference photo of Whiskers', route: '/store/photo-books' },
+  { label: 'SCENE 4', text: 'Tabby-pattern templates surface to the top', route: '/store/product/pb_welcome_home_24pp' },
+  { label: 'SCENE 5', text: 'She adds the Welcome Home template to cart', route: '/store/product/pb_welcome_home_24pp' },
+  { label: 'SCENE 6', text: 'She abandons cart \u2014 triggering the agent...', route: '/store/photo-books' },
+]
+
+function pageNameFromPath(pathname: string): string {
+  if (pathname === '/store') return 'Home'
+  if (pathname === '/store/photo-books') return 'Photo Books'
+  if (pathname.startsWith('/store/product/')) return 'Product Detail'
+  if (pathname === '/store/cards') return 'Cards'
+  if (pathname === '/store/prints') return 'Prints'
+  if (pathname === '/store/gifts') return 'Gifts'
+  return 'Store'
+}
+
 function StoreShell() {
   const { theme, toggle } = useTheme()
   const { pathname } = useLocation()
+  const navigate = useNavigate()
   const cart = useCart()
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [narratorMode, setNarratorMode] = useState<'Free' | 'Guided' | 'Auto'>('Free')
+  const [sceneIndex, setSceneIndex] = useState(0)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const clearAutoInterval = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
+    }
+  }, [])
+
+  // Auto mode: advance scenes every 4 seconds
+  useEffect(() => {
+    if (narratorMode !== 'Auto') {
+      clearAutoInterval()
+      return
+    }
+    // Start from scene 0 when entering auto mode
+    setSceneIndex(0)
+    navigate(demoScenes[0].route)
+
+    let idx = 0
+    intervalRef.current = setInterval(() => {
+      idx += 1
+      if (idx >= demoScenes.length) {
+        clearAutoInterval()
+        return
+      }
+      setSceneIndex(idx)
+      navigate(demoScenes[idx].route)
+    }, 4000)
+
+    return clearAutoInterval
+  }, [narratorMode, navigate, clearAutoInterval])
+
+  const handleNextScene = useCallback(() => {
+    setSceneIndex(prev => {
+      const next = Math.min(prev + 1, demoScenes.length - 1)
+      navigate(demoScenes[next].route)
+      return next
+    })
+  }, [navigate])
+
+  // Derive narrator display values
+  const narratorLabel = narratorMode === 'Free'
+    ? pageNameFromPath(pathname).toUpperCase()
+    : `${demoScenes[sceneIndex].label} / ${demoScenes.length}`
+  const narratorText = narratorMode === 'Free'
+    ? 'Browse freely'
+    : demoScenes[sceneIndex].text
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
@@ -151,10 +220,10 @@ function StoreShell() {
       <div className="h-[52px] bg-espresso dark:bg-[#0D0B09]/80 border-t border-white/10 flex items-center justify-between px-6">
         <div className="flex items-center gap-3 min-w-0">
           <span className="shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full bg-gold/20 text-gold text-[10px] font-bold tracking-wider border border-gold/30">
-            SCENE 1
+            {narratorLabel}
           </span>
           <p className="text-white/50 text-xs truncate">
-            Meet Cindy &mdash; back on Fluttershy for her kitten Whiskers
+            {narratorText}
           </p>
         </div>
         <div className="flex items-center gap-1 shrink-0">
@@ -173,7 +242,11 @@ function StoreShell() {
             </button>
           ))}
           {narratorMode === 'Guided' && (
-            <button className="ml-2 px-3 py-1 rounded-full bg-gradient-to-r from-[#C4A87A] to-[#DBC09E] text-[#2C1810] text-[10px] font-bold tracking-wider cursor-pointer hover:opacity-90 transition-opacity">
+            <button
+              onClick={handleNextScene}
+              disabled={sceneIndex >= demoScenes.length - 1}
+              className="ml-2 px-3 py-1 rounded-full bg-gradient-to-r from-[#C4A87A] to-[#DBC09E] text-[#2C1810] text-[10px] font-bold tracking-wider cursor-pointer hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+            >
               Next →
             </button>
           )}
