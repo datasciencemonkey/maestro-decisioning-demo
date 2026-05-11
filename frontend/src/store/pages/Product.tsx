@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { type SyntheticEvent, useMemo, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Star, ChevronRight } from 'lucide-react'
@@ -18,6 +18,13 @@ function stagger(i: number) {
   return { ...fadeUp, transition: { ...fadeUp.transition, delay: 0.08 * i } }
 }
 
+function handleImgError(e: SyntheticEvent<HTMLImageElement>) {
+  const el = e.currentTarget
+  el.onerror = null
+  el.src = ''
+  el.style.background = '#EDE4D8'
+}
+
 function StarRating({ rating, count }: { rating: number; count: number }) {
   return (
     <div className="flex items-center gap-2">
@@ -28,7 +35,7 @@ function StarRating({ rating, count }: { rating: number; count: number }) {
             <Star
               key={i}
               size={16}
-              className={filled ? 'text-gold fill-gold' : 'text-gold/30'}
+              className={filled ? 'text-[#C4A87A] fill-[#C4A87A]' : 'text-muted fill-none'}
             />
           )
         })}
@@ -40,18 +47,27 @@ function StarRating({ rating, count }: { rating: number; count: number }) {
   )
 }
 
+const badgeStyles: Record<string, string> = {
+  bestseller: 'bg-gradient-to-r from-gold to-gold-light text-espresso',
+  tabbyMatch: 'bg-gradient-to-r from-gold to-gold-light text-espresso',
+  new: 'bg-destructive text-white',
+}
+
+const badgeLabels: Record<string, string> = {
+  bestseller: 'BESTSELLER',
+  tabbyMatch: 'TABBY MATCH',
+  new: 'NEW',
+}
+
 function BadgePill({ badge }: { badge: NonNullable<ProductType['badge']> }) {
-  const isNew = badge === 'new'
   return (
     <span
       className={cn(
-        'inline-block px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase',
-        isNew
-          ? 'bg-red-500/15 text-red-500 dark:bg-red-500/20 dark:text-red-400'
-          : 'bg-gradient-to-r from-gold to-gold-light text-espresso'
+        'inline-block rounded-full px-3 py-1 text-[10px] font-bold tracking-wider uppercase',
+        badgeStyles[badge]
       )}
     >
-      {badge === 'bestseller' ? 'Bestseller' : badge === 'tabbyMatch' ? 'Tabby Match' : 'New'}
+      {badgeLabels[badge]}
     </span>
   )
 }
@@ -66,12 +82,12 @@ function SuggestionCard({ product }: { product: ProductType }) {
         <img
           src={product.imageUrl}
           alt={product.title}
+          onError={handleImgError}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
       </div>
       <div className="p-3">
         <p className="text-sm font-medium truncate">{product.title}</p>
-        <p className="text-xs text-muted-foreground mt-0.5">{product.subtitle}</p>
         <p className="text-sm font-bold text-mocha dark:text-gold mt-1">
           ${product.price.toFixed(2)}
         </p>
@@ -109,7 +125,6 @@ export default function Product() {
 
   function handleAddToCart() {
     if (!product) return
-    console.log('Add to cart:', product.id, selectedSize)
     cart.addItem({
       id: product.id,
       name: product.title,
@@ -122,15 +137,15 @@ export default function Product() {
   return (
     <div className="max-w-7xl mx-auto px-12 py-8">
       {/* Breadcrumb */}
-      <motion.nav {...stagger(0)} className="flex items-center gap-1.5 text-sm text-muted-foreground mb-8">
+      <motion.nav {...stagger(0)} className="flex items-center gap-2 text-sm text-muted-foreground mb-8">
         <Link to="/store" className="hover:text-foreground transition-colors">
           Home
         </Link>
-        <ChevronRight size={14} />
+        <ChevronRight size={14} className="text-[#C4A87A]" />
         <Link to="/store/photo-books" className="hover:text-foreground transition-colors">
           Photo Books
         </Link>
-        <ChevronRight size={14} />
+        <ChevronRight size={14} className="text-[#C4A87A]" />
         <span className="text-foreground font-medium">{product.title}</span>
       </motion.nav>
 
@@ -143,11 +158,12 @@ export default function Product() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="rounded-lg overflow-hidden bg-cream dark:bg-muted">
+          <div className="rounded-2xl overflow-hidden shadow-lg bg-cream dark:bg-muted">
             <img
               src={product.imageUrl}
               alt={product.title}
-              className="w-full aspect-[4/3] object-cover"
+              onError={handleImgError}
+              className="w-full h-full object-cover aspect-[4/3]"
             />
           </div>
         </motion.div>
@@ -162,7 +178,7 @@ export default function Product() {
           )}
 
           {/* Title */}
-          <motion.h1 {...stagger(2)} className="font-serif text-3xl text-foreground">
+          <motion.h1 {...stagger(2)} className="font-serif text-4xl text-foreground">
             {product.title}
           </motion.h1>
 
@@ -177,13 +193,13 @@ export default function Product() {
           </motion.div>
 
           {/* Price */}
-          <motion.p {...stagger(5)} className="text-2xl font-bold text-foreground">
+          <motion.p {...stagger(5)} className="text-3xl font-bold mt-2 text-foreground">
             ${product.price.toFixed(2)}
           </motion.p>
 
           {/* Size selector */}
           <motion.div {...stagger(6)}>
-            <p className="text-xs font-bold tracking-widest uppercase text-muted-foreground mb-2">
+            <p className="text-[10px] font-bold tracking-[2px] text-muted-foreground uppercase mb-2">
               Size
             </p>
             <div className="flex gap-2">
@@ -192,10 +208,10 @@ export default function Product() {
                   key={size}
                   onClick={() => setSelectedSize(size)}
                   className={cn(
-                    'px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer',
+                    'px-6 py-2.5 rounded-full border-2 text-sm font-medium transition-all cursor-pointer',
                     selectedSize === size
-                      ? 'bg-espresso text-white dark:bg-gold dark:text-espresso'
-                      : 'bg-cream text-espresso dark:bg-muted dark:text-foreground hover:bg-cream/80 dark:hover:bg-muted/80'
+                      ? 'border-[#2C1810] bg-[#2C1810] text-white dark:border-[#C4A87A] dark:bg-[#C4A87A] dark:text-[#0D0B09]'
+                      : 'border-border hover:border-[#C4A87A]/50'
                   )}
                 >
                   {size}
@@ -209,11 +225,10 @@ export default function Product() {
             <button
               onClick={handleAddToCart}
               className={cn(
-                'w-full py-3.5 rounded-xl font-semibold text-base tracking-wide cursor-pointer',
-                'text-white',
-                'bg-gradient-to-br from-mocha to-[#A08468]',
-                'hover:shadow-lg hover:shadow-mocha/25 hover:-translate-y-0.5',
-                'active:translate-y-0 transition-all duration-200'
+                'w-full py-4 rounded-xl text-lg font-semibold cursor-pointer',
+                'bg-gradient-to-r from-[#7C6353] to-[#A08468] text-white',
+                'hover:shadow-lg hover:shadow-[#7C6353]/25 transition-all',
+                'active:translate-y-0'
               )}
             >
               Add to Cart &mdash; ${product.price.toFixed(2)}
@@ -230,11 +245,9 @@ export default function Product() {
           )}
 
           {/* You might also like */}
-          <motion.div {...stagger(9)} className="border-t border-border pt-5 mt-2">
-            <p className="text-xs font-bold tracking-widest uppercase text-muted-foreground mb-4">
-              You might also like
-            </p>
-            <div className="grid grid-cols-3 gap-3">
+          <motion.div {...stagger(9)} className="mt-12 mb-6">
+            <h2 className="font-serif text-xl mb-6">You Might Also Like</h2>
+            <div className="grid grid-cols-3 gap-4">
               {suggestions.map(s => (
                 <SuggestionCard key={s.id} product={s} />
               ))}

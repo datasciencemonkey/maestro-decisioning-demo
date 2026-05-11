@@ -11,7 +11,16 @@ export default function Category() {
   const [modalOpen, setModalOpen] = useState(false)
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-6">
+    <div className="max-w-7xl mx-auto px-8 py-6">
+      {/* Breadcrumb */}
+      <nav className="text-sm text-muted-foreground mb-4">
+        <span>Home</span>
+        <span className="mx-1.5 text-[#C4A87A]">&gt;</span>
+        <span>Photo Books</span>
+        <span className="mx-1.5 text-[#C4A87A]">&gt;</span>
+        <span className="text-foreground font-medium">Pet Photo Books</span>
+      </nav>
+
       {/* Page heading */}
       <div className="mb-6">
         <h1 className="font-serif text-2xl mb-1">Pet Photo Books</h1>
@@ -21,7 +30,7 @@ export default function Category() {
       </div>
 
       {/* 3-column layout */}
-      <div className="flex flex-col lg:flex-row gap-6">
+      <div className="flex gap-8">
         {/* Left: Filters */}
         <FilterSidebar
           filter={filter}

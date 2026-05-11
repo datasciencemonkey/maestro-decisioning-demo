@@ -1,4 +1,3 @@
-import { cn } from '@/lib/utils'
 import type { Recommendation } from '@/store/hooks/use-products'
 
 interface NbaPanelProps {
@@ -7,12 +6,7 @@ interface NbaPanelProps {
 
 export default function NbaPanel({ recommendations }: NbaPanelProps) {
   return (
-    <aside
-      className={cn(
-        'w-60 shrink-0 rounded-lg border border-gold/20',
-        'bg-card dark:bg-card p-4 space-y-4 self-start'
-      )}
-    >
+    <aside className="w-64 shrink-0 bg-card border border-[#C4A87A]/20 rounded-xl p-5 space-y-4 self-start">
       {/* Header */}
       <div className="flex items-center gap-2">
         <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
@@ -22,7 +16,7 @@ export default function NbaPanel({ recommendations }: NbaPanelProps) {
       </div>
 
       {/* Customer card */}
-      <div className="rounded-lg bg-secondary/50 dark:bg-secondary/30 p-3 space-y-1.5">
+      <div className="bg-secondary/50 rounded-lg p-4 mb-4 space-y-1.5">
         <p className="font-serif text-sm">Welcome, Cindy</p>
         <div className="space-y-0.5">
           <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
@@ -51,7 +45,7 @@ export default function NbaPanel({ recommendations }: NbaPanelProps) {
               key={rec.id}
               className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-secondary/40 transition-colors cursor-pointer"
             >
-              <div className="w-10 h-10 rounded-md bg-cream dark:bg-muted overflow-hidden shrink-0">
+              <div className="w-8 h-8 rounded-md bg-cream dark:bg-muted overflow-hidden shrink-0">
                 <img
                   src={rec.image}
                   alt={rec.title}
@@ -60,7 +54,7 @@ export default function NbaPanel({ recommendations }: NbaPanelProps) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-medium truncate">{rec.title}</p>
-                <p className="text-[11px] text-gold font-semibold">{rec.matchPercent}% match</p>
+                <p className="text-[11px] text-[#C4A87A] font-semibold">{rec.matchPercent}% match</p>
               </div>
             </div>
           ))}
@@ -68,7 +62,7 @@ export default function NbaPanel({ recommendations }: NbaPanelProps) {
       </div>
 
       {/* Footer */}
-      <p className="text-[9px] text-muted-foreground/60 text-center pt-2 border-t border-border">
+      <p className="text-[10px] text-muted-foreground text-center pt-3 border-t border-border">
         Powered by Agent Bricks &middot; Real-time
       </p>
     </aside>

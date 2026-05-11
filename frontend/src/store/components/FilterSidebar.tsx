@@ -27,7 +27,7 @@ export default function FilterSidebar({ filter, onFilterChange, onMatchClick }: 
 
       {/* Pet type */}
       <div>
-        <p className="text-[10px] font-bold tracking-[2px] text-muted-foreground mb-2.5">
+        <p className="text-[10px] font-bold tracking-[2px] text-muted-foreground uppercase mb-3">
           PET TYPE
         </p>
         <div className="flex flex-wrap gap-2">
@@ -38,8 +38,8 @@ export default function FilterSidebar({ filter, onFilterChange, onMatchClick }: 
               className={cn(
                 'px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer',
                 filter.pet === chip.value
-                  ? 'bg-espresso text-white dark:bg-gold dark:text-espresso'
-                  : 'bg-cream text-mocha dark:bg-secondary dark:text-secondary-foreground hover:bg-cream/80 dark:hover:bg-secondary/80'
+                  ? 'bg-[#2C1810] text-white dark:bg-[#C4A87A] dark:text-[#0D0B09]'
+                  : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
               )}
             >
               {chip.label}
@@ -50,7 +50,7 @@ export default function FilterSidebar({ filter, onFilterChange, onMatchClick }: 
 
       {/* Book size */}
       <div>
-        <p className="text-[10px] font-bold tracking-[2px] text-muted-foreground mb-2.5">
+        <p className="text-[10px] font-bold tracking-[2px] text-muted-foreground uppercase mb-3">
           BOOK SIZE
         </p>
         <div className="space-y-2">
@@ -75,16 +75,13 @@ export default function FilterSidebar({ filter, onFilterChange, onMatchClick }: 
       {/* Match My Pet card */}
       <button
         onClick={onMatchClick}
-        className={cn(
-          'w-full p-4 rounded-xl border-2 border-dashed border-gold/40',
-          'bg-gold/[0.04] dark:bg-gold/[0.06]',
-          'flex flex-col items-center gap-2 text-center',
-          'hover:border-gold/70 hover:bg-gold/[0.08] transition-all cursor-pointer'
-        )}
+        className="w-full border-2 border-dashed border-[#C4A87A]/40 hover:border-[#C4A87A] transition-colors rounded-xl p-5 text-center cursor-pointer"
       >
-        <Camera size={24} className="text-gold" />
-        <span className="text-sm font-semibold text-gold">Match My Pet</span>
-        <span className="text-[11px] text-muted-foreground">AI-powered photo matching</span>
+        <div className="flex flex-col items-center gap-2">
+          <Camera size={24} className="text-[#C4A87A]" />
+          <span className="text-sm font-semibold text-[#C4A87A]">Match My Pet</span>
+          <span className="text-[11px] text-muted-foreground">AI-powered photo matching</span>
+        </div>
       </button>
     </aside>
   )

@@ -1,49 +1,62 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Star, ShoppingCart } from 'lucide-react'
 import type { Product } from '@/store/data/products'
 
 const badgeStyles: Record<string, string> = {
-  bestseller: 'bg-gradient-to-r from-gold to-gold-light text-espresso',
-  tabbyMatch: 'bg-gradient-to-r from-gold to-gold-light text-espresso',
-  new: 'bg-destructive text-white',
+  bestseller:
+    'bg-gradient-to-r from-[#C4A87A] to-[#DBC09E] text-[#2C1810] text-[10px] font-bold tracking-wider px-3 py-1 rounded-full',
+  tabbyMatch:
+    'bg-gradient-to-r from-[#C4A87A] to-[#DBC09E] text-[#2C1810] text-[10px] font-bold tracking-wider px-3 py-1 rounded-full',
+  new: 'bg-red-500 text-white text-[10px] font-bold tracking-wider px-3 py-1 rounded-full',
 }
 
-const badgeLabels: Record<string, string> = {
-  bestseller: 'BESTSELLER',
-  tabbyMatch: 'TABBY MATCH',
-  new: 'NEW',
+function badgeLabel(product: Product): string {
+  if (product.badge === 'bestseller') return 'BESTSELLER'
+  if (product.badge === 'tabbyMatch')
+    return product.matchPercent
+      ? `TABBY MATCH ${product.matchPercent}%`
+      : 'TABBY MATCH'
+  if (product.badge === 'new') return 'NEW'
+  return ''
 }
 
 export default function ProductCard({ product }: { product: Product }) {
   const navigate = useNavigate()
+  const [imgError, setImgError] = useState(false)
 
   return (
     <motion.div
       whileHover={{ y: -4 }}
       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
       onClick={() => navigate(`/store/product/${product.id}`)}
-      className="group cursor-pointer rounded-lg overflow-hidden bg-card border border-border shadow-sm hover:shadow-lg transition-shadow duration-300 dark:border-border"
+      className="group flex flex-col cursor-pointer rounded-xl bg-card border border-border shadow-sm hover:shadow-xl transition-all duration-300"
     >
       {/* Image */}
-      <div className="relative aspect-[4/3] overflow-hidden">
-        <img
-          src={product.imageUrl}
-          alt={product.title}
-          loading="lazy"
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
+      <div className="relative aspect-[4/3] overflow-hidden rounded-t-xl">
+        {imgError ? (
+          <div className="w-full h-full bg-[#FFF8F0]" />
+        ) : (
+          <img
+            src={product.imageUrl}
+            alt={product.title}
+            loading="lazy"
+            onError={() => setImgError(true)}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        )}
         {product.badge && (
           <span
-            className={`absolute top-3 left-3 px-2.5 py-1 text-[10px] font-bold tracking-widest rounded-md ${badgeStyles[product.badge]}`}
+            className={`absolute top-3 left-3 ${badgeStyles[product.badge]}`}
           >
-            {badgeLabels[product.badge]}
+            {badgeLabel(product)}
           </span>
         )}
       </div>
 
       {/* Content */}
-      <div className="p-4">
+      <div className="flex flex-col flex-1 p-4">
         <h3 className="font-serif text-lg text-card-foreground leading-tight mb-0.5">
           {product.title}
         </h3>
@@ -54,32 +67,32 @@ export default function ProductCard({ product }: { product: Product }) {
           {Array.from({ length: 5 }, (_, i) => (
             <Star
               key={i}
-              size={13}
+              size={14}
               className={
                 i < Math.round(product.rating)
-                  ? 'fill-gold text-gold'
+                  ? 'fill-[#C4A87A] text-[#C4A87A]'
                   : 'fill-none text-muted-foreground/40'
               }
             />
           ))}
-          <span className="text-[11px] text-muted-foreground ml-1">
+          <span className="text-xs text-muted-foreground ml-1">
             ({product.reviewCount})
           </span>
         </div>
 
         {/* Price + Add to Cart */}
-        <div className="flex items-center justify-between">
+        <div className="mt-auto flex items-center justify-between gap-2">
           <span className="text-lg font-semibold text-card-foreground">
-            ${product.price}
+            ${product.price.toFixed(2)}
           </span>
           <button
             onClick={(e) => {
               e.stopPropagation()
               // Cart integration handled by parent/context
             }}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md bg-gradient-to-r from-gold to-gold-light text-espresso hover:from-gold-light hover:to-gold transition-all duration-200 hover:shadow-md"
+            className="flex-1 inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-[#7C6353] to-[#A08468] text-white rounded-lg py-2.5 text-sm font-semibold hover:opacity-90 transition-opacity"
           >
-            <ShoppingCart size={13} />
+            <ShoppingCart size={14} />
             Add to Cart
           </button>
         </div>

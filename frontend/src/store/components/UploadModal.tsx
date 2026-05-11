@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X, Loader2 } from 'lucide-react'
-import { cn } from '@/lib/utils'
 
 const presetPhotos = [
   'https://images.unsplash.com/photo-1574158622682-e40e69881006?w=400&h=400&fit=crop',
@@ -48,12 +47,7 @@ export default function UploadModal({ isOpen, onClose, onMatch }: UploadModalPro
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: 20 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className={cn(
-              'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50',
-              'w-[420px] max-w-[90vw] rounded-2xl',
-              'bg-card dark:bg-card border border-border',
-              'shadow-2xl p-6'
-            )}
+            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-card rounded-2xl p-8 shadow-2xl max-w-md w-full"
           >
             {/* Header */}
             <div className="flex items-center justify-between mb-5">
@@ -84,12 +78,7 @@ export default function UploadModal({ isOpen, onClose, onMatch }: UploadModalPro
                     <button
                       key={i}
                       onClick={handleSelect}
-                      className={cn(
-                        'aspect-square rounded-xl overflow-hidden',
-                        'ring-2 ring-transparent hover:ring-gold/60',
-                        'transition-all duration-200 cursor-pointer',
-                        'hover:scale-[1.02] active:scale-[0.98]'
-                      )}
+                      className="aspect-square rounded-xl overflow-hidden cursor-pointer ring-2 ring-transparent hover:ring-[#C4A87A] transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
                     >
                       <img
                         src={url}

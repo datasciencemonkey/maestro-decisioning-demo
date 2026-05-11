@@ -1,6 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import ProductCard from '@/store/components/ProductCard'
 import type { Product } from '@/store/data/products'
 import type { SortOption } from '@/store/hooks/use-products'
@@ -22,20 +21,15 @@ export default function ProductGrid({ products, sort, onSortChange }: ProductGri
   return (
     <div className="flex-1 min-w-0">
       {/* Sort bar */}
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex justify-between items-center mb-6">
         <p className="text-sm text-muted-foreground">
-          Showing <span className="font-semibold text-foreground">{products.length}</span> pet photo books
+          Showing <span className="font-semibold text-foreground">{products.length}</span> products
         </p>
         <div className="relative">
           <select
             value={sort}
             onChange={e => onSortChange(e.target.value as SortOption)}
-            className={cn(
-              'appearance-none pr-8 pl-3 py-1.5 rounded-lg text-sm',
-              'bg-secondary/60 border border-border',
-              'text-foreground cursor-pointer',
-              'focus:outline-none focus:ring-1 focus:ring-gold/40'
-            )}
+            className="appearance-none bg-card border border-border rounded-lg px-3 py-1.5 text-sm pr-8 text-foreground cursor-pointer focus:outline-none focus:ring-1 focus:ring-gold/40"
           >
             {sortOptions.map(opt => (
               <option key={opt.value} value={opt.value}>
@@ -51,7 +45,7 @@ export default function ProductGrid({ products, sort, onSortChange }: ProductGri
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-2 xl:grid-cols-3 gap-6">
         <AnimatePresence mode="popLayout">
           {products.map(product => (
             <motion.div

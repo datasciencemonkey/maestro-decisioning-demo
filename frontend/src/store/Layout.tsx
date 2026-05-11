@@ -23,7 +23,7 @@ function StoreShell() {
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       {/* Promo bar */}
       <div
-        className="py-2 text-center text-white text-xs tracking-wider"
+        className="py-2 text-center text-white text-xs tracking-widest"
         style={{ background: 'linear-gradient(90deg, #7C6353, #A08468)' }}
       >
         🐾 Free shipping on pet photo books this week
@@ -34,10 +34,7 @@ function StoreShell() {
         <div className="max-w-7xl mx-auto flex items-center gap-6 px-6 py-3">
           {/* Logo */}
           <Link to="/store" className="flex items-center gap-2 shrink-0 cursor-pointer group">
-            <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-base transition-transform group-hover:scale-110"
-              style={{ background: 'linear-gradient(135deg, #C4A87A, #DBC09E)' }}
-            >
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#7C6353] to-[#C4A87A] flex items-center justify-center text-base transition-transform group-hover:scale-110">
               🦋
             </div>
             <span className="font-serif text-xl text-foreground">Fluttershy</span>
@@ -53,7 +50,7 @@ function StoreShell() {
                   'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer',
                   pathname === link.to
                     ? 'bg-secondary text-foreground'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
+                    : 'text-muted-foreground hover:text-[#C4A87A]'
                 )}
               >
                 {link.label}
@@ -94,7 +91,7 @@ function StoreShell() {
           >
             <ShoppingCart size={18} className="text-foreground" />
             {cart.itemCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 rounded-full bg-gold text-espresso text-[10px] font-bold flex items-center justify-center leading-none">
+              <span className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 rounded-full bg-gradient-to-br from-[#C4A87A] to-[#DBC09E] text-espresso text-[10px] font-bold flex items-center justify-center leading-none">
                 {cart.itemCount}
               </span>
             )}
@@ -109,15 +106,20 @@ function StoreShell() {
 
       {/* Narrator strip */}
       <div className="h-[52px] bg-espresso dark:bg-black/80 border-t border-white/10 flex items-center justify-between px-6">
-        <p className="text-white/50 text-xs truncate">
-          Welcome &middot; Meet Cindy &mdash; back on Fluttershy for her kitten Whiskers
-        </p>
+        <div className="flex items-center gap-3 min-w-0">
+          <span className="shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full bg-gold/20 text-gold text-[10px] font-bold tracking-wider border border-gold/30">
+            SCENE 1
+          </span>
+          <p className="text-white/50 text-xs truncate">
+            Meet Cindy &mdash; back on Fluttershy for her kitten Whiskers
+          </p>
+        </div>
         <div className="flex items-center gap-1 shrink-0">
           {narratorModes.map(mode => (
             <button
               key={mode}
               className={cn(
-                'px-3 py-1 rounded-md text-[10px] font-semibold tracking-wider transition-colors cursor-pointer',
+                'px-3 py-1 rounded-full text-[10px] font-semibold tracking-wider transition-colors cursor-pointer',
                 mode === 'Guided'
                   ? 'bg-gold/20 text-gold border border-gold/30'
                   : 'text-white/30 hover:text-white/50 hover:bg-white/5'
