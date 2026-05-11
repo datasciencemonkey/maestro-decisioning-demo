@@ -28,3 +28,6 @@ uv.lock
 
 # Pytest
 .pytest_cache/
+
+# Frontend (WIP)
+frontend/
