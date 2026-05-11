@@ -38,7 +38,7 @@ export default function UploadModal({ isOpen, onClose, onMatch }: UploadModalPro
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 cursor-pointer"
+            className="fixed inset-0 bg-[#0D0B09]/50 backdrop-blur-sm z-50 cursor-pointer"
           />
 
           {/* Modal */}

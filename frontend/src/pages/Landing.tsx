@@ -115,7 +115,7 @@ export default function Landing() {
       <CursorGlow />
 
       {/* ── Hero ── */}
-      <section className="relative z-2 min-h-screen flex flex-col items-center justify-center text-center px-8 overflow-hidden">
+      <section className="relative z-10 min-h-screen flex flex-col items-center justify-center text-center px-8 overflow-hidden">
         {/* Concentric rings */}
         {[600, 900, 1200].map((size, i) => (
           <div
@@ -199,7 +199,7 @@ export default function Landing() {
       </section>
 
       {/* ── Flow section ── */}
-      <section className="relative z-2 px-8 py-28 bg-gradient-to-b from-[#0D0B09] to-[#1A1612]">
+      <section className="relative z-10 px-8 py-28 bg-gradient-to-b from-[#0D0B09] to-[#1A1612]">
         <Reveal className="text-center mb-16">
           <h2 className="font-serif text-4xl mb-3">Three Beats. One Agent.</h2>
           <p className="text-white/40 text-sm">A 15-minute live demo proving Databricks is the agentic CDP</p>
@@ -232,7 +232,7 @@ export default function Landing() {
       </section>
 
       {/* ── Tech marquee ── */}
-      <div className="relative z-2 py-10 bg-gold/[0.03] border-y border-gold/[0.06] overflow-hidden">
+      <div className="relative z-10 py-10 bg-gold/[0.03] border-y border-gold/[0.06] overflow-hidden">
         <div className="flex gap-12 animate-[techMarquee_20s_linear_infinite] w-max hover:[animation-play-state:paused]">
           {[...techItems, ...techItems].map((item, i) => (
             <span key={i} className="flex items-center gap-2 text-xs font-medium tracking-wider text-white/30 whitespace-nowrap hover:text-gold transition-colors">
@@ -244,7 +244,7 @@ export default function Landing() {
       </div>
 
       {/* ── Bottom CTA ── */}
-      <section className="relative z-2 py-24 text-center bg-gradient-to-b from-[#1A1612] to-[#0D0B09] overflow-hidden">
+      <section className="relative z-10 py-24 text-center bg-gradient-to-b from-[#1A1612] to-[#0D0B09] overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgba(196,168,122,0.06),transparent_70%)]" />
         <Reveal>
           <h2 className="font-serif text-[32px] mb-3 relative">Ready to see the agent think?</h2>
@@ -265,7 +265,7 @@ export default function Landing() {
       </section>
 
       {/* ── Footer ── */}
-      <footer className="relative z-2 py-5 text-center text-[11px] text-white/20 border-t border-white/[0.04]">
+      <footer className="relative z-10 py-5 text-center text-[11px] text-white/20 border-t border-white/[0.04]">
         Built on Databricks &mdash; one platform, one governance plane, one agent.
       </footer>
 

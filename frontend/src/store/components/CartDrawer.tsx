@@ -60,7 +60,7 @@ export default function CartDrawer({ isOpen, onClose, items, total, onRemoveItem
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/40 z-40 cursor-pointer"
+            className="fixed inset-0 bg-[#0D0B09]/40 z-40 cursor-pointer"
           />
 
           {/* Drawer */}
@@ -160,7 +160,7 @@ export default function CartDrawer({ isOpen, onClose, items, total, onRemoveItem
             )}
 
             {/* Demo control */}
-            <div className="px-6 py-4 bg-espresso dark:bg-black/60 border-t border-white/10">
+            <div className="px-6 py-4 bg-espresso dark:bg-[#0D0B09]/60 border-t border-white/10">
               <p className="text-[10px] font-bold tracking-[2px] text-white/40 mb-3">DEMO CONTROL</p>
               <button
                 onClick={handleAbandonCart}

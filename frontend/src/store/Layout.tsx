@@ -26,7 +26,7 @@ function StoreShell() {
         className="py-2 text-center text-white text-xs tracking-widest"
         style={{ background: 'linear-gradient(90deg, #7C6353, #A08468)' }}
       >
-        🐾 Free shipping on pet photo books this week
+        <span className="inline-block w-1.5 h-1.5 rounded-full bg-white/60 mr-2" />Free shipping on pet photo books this week
       </div>
 
       {/* Nav bar */}
@@ -117,7 +117,7 @@ function StoreShell() {
       </footer>
 
       {/* Narrator strip */}
-      <div className="h-[52px] bg-espresso dark:bg-black/80 border-t border-white/10 flex items-center justify-between px-6">
+      <div className="h-[52px] bg-espresso dark:bg-[#0D0B09]/80 border-t border-white/10 flex items-center justify-between px-6">
         <div className="flex items-center gap-3 min-w-0">
           <span className="shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full bg-gold/20 text-gold text-[10px] font-bold tracking-wider border border-gold/30">
             SCENE 1

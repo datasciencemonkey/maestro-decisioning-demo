@@ -108,9 +108,8 @@ export default function Product() {
     return () => clearTimeout(t)
   }, [added])
 
-  const product = products.find(p => p.id === id)
-
   const suggestions = useMemo(() => {
+    const product = products.find(p => p.id === id)
     if (!product) return []
     const others = products.filter(p => p.id !== product.id)
     // Deterministic shuffle based on product id
@@ -121,7 +120,9 @@ export default function Product() {
       return ha - hb
     })
     return shuffled.slice(0, 3)
-  }, [product.id])
+  }, [id])
+
+  const product = products.find(p => p.id === id)
 
   if (!product) {
     return (
@@ -259,17 +260,22 @@ export default function Product() {
             </motion.div>
           )}
 
-          {/* You might also like */}
-          <motion.div {...stagger(9)} className="mt-12 mb-6">
+        </div>
+      </div>
+
+      {/* You might also like — full width */}
+      {suggestions.length > 0 && (
+        <section className="max-w-7xl mx-auto px-12 pb-12">
+          <motion.div {...stagger(9)}>
             <h2 className="font-serif text-xl mb-6">You Might Also Like</h2>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-4 gap-4">
               {suggestions.map(s => (
                 <SuggestionCard key={s.id} product={s} />
               ))}
             </div>
           </motion.div>
-        </div>
-      </div>
+        </section>
+      )}
     </div>
   )
 }

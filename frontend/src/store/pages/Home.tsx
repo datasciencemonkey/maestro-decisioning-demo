@@ -32,10 +32,10 @@ function Reveal({
 
 // ─── Category tiles ─────────────────────────────────────────────
 const categories = [
-  { label: 'Photo Books', icon: '\uD83D\uDCDA', href: '/store/photo-books' },
-  { label: 'Cards', icon: '\uD83D\uDC8C', href: '/store/photo-books' },
-  { label: 'Prints', icon: '\uD83D\uDDBC\uFE0F', href: '/store/photo-books' },
-  { label: 'Gifts', icon: '\uD83C\uDF81', href: '/store/photo-books' },
+  { label: 'Photo Books', icon: '\uD83D\uDCDA', href: '/store/photo-books', comingSoon: false },
+  { label: 'Cards', icon: '\uD83D\uDC8C', href: null, comingSoon: true },
+  { label: 'Prints', icon: '\uD83D\uDDBC\uFE0F', href: null, comingSoon: true },
+  { label: 'Gifts', icon: '\uD83C\uDF81', href: null, comingSoon: true },
 ]
 
 // ─── Home page ──────────────────────────────────────────────────
@@ -106,17 +106,29 @@ export default function Home() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {categories.map((cat, i) => (
             <Reveal key={cat.label} delay={0.05 + i * 0.08}>
-              <motion.div
-                whileHover={{ y: -3 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                onClick={() => navigate(cat.href)}
-                className="cursor-pointer rounded-lg border border-border bg-card p-8 text-center hover:border-gold/40 hover:shadow-md transition-all duration-200 dark:bg-card dark:border-border"
-              >
-                <span className="text-4xl block mb-3">{cat.icon}</span>
-                <span className="text-base font-medium text-card-foreground">
-                  {cat.label}
-                </span>
-              </motion.div>
+              {cat.comingSoon ? (
+                <div className="rounded-lg border border-border bg-card p-8 text-center opacity-60 cursor-not-allowed dark:bg-card dark:border-border">
+                  <span className="text-4xl block mb-3">{cat.icon}</span>
+                  <span className="text-base font-medium text-card-foreground block">
+                    {cat.label}
+                  </span>
+                  <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase mt-1.5 block">
+                    Coming Soon
+                  </span>
+                </div>
+              ) : (
+                <motion.div
+                  whileHover={{ y: -3 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                  onClick={() => navigate(cat.href!)}
+                  className="cursor-pointer rounded-lg border border-border bg-card p-8 text-center hover:border-gold/40 hover:shadow-md transition-all duration-200 dark:bg-card dark:border-border"
+                >
+                  <span className="text-4xl block mb-3">{cat.icon}</span>
+                  <span className="text-base font-medium text-card-foreground">
+                    {cat.label}
+                  </span>
+                </motion.div>
+              )}
             </Reveal>
           ))}
         </div>
