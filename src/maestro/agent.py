@@ -269,3 +269,25 @@ async def run_maestro(
 
     result = await agent.run(prompt, deps=deps)
     return result.output
+
+
+def run_maestro_sync(
+    event: CartAbandonedEvent,
+    model,
+    db_url: str | None = None,
+) -> DecisionArtifact:
+    """Sync variant — uses agent.run_sync(). Safe to call from threads."""
+    agent = create_agent(model)
+    deps = MaestroDeps(customer_id=event.customer_id, event=event, db_url=db_url)
+
+    prompt = (
+        f"Cart abandoned event for customer {event.customer_id}. "
+        f"Cart ID: {event.cart_id}. "
+        f"Items: {[item.model_dump() for item in event.items]}. "
+        f"Total: ${event.cart_total:.2f}. "
+        f"Abandoned at: {event.abandoned_at.isoformat()}. "
+        f"Evaluate this customer for cart recovery disposition."
+    )
+
+    result = agent.run_sync(prompt, deps=deps)
+    return result.output
