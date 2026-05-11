@@ -105,7 +105,12 @@ from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.profiles.openai import OpenAIModelProfile
 from pydantic_ai.providers.openai import OpenAIProvider
 
-_w = WorkspaceClient(profile="9cefok")
+# In Databricks Apps: WorkspaceClient() uses service principal (DATABRICKS_HOST is set)
+# Locally: use profile
+if os.environ.get("DATABRICKS_HOST"):
+    _w = WorkspaceClient()
+else:
+    _w = WorkspaceClient(profile="9cefok")
 
 _host = os.environ.get("DATABRICKS_HOST", _w.config.host).rstrip("/")
 if not _host.startswith("http"):
