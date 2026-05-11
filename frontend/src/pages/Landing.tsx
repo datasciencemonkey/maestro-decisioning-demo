@@ -431,7 +431,7 @@ export default function Landing() {
               className="text-[17px] leading-[1.8] max-w-[540px] mb-12"
               style={{ color: dark ? 'rgba(255,255,255,0.5)' : L.secondary }}
             >
-              One AI agent reasons across campaigns, production calendars, support tickets, and ML models &mdash; makes a governed decision in&nbsp;under&nbsp;2&nbsp;seconds.
+              Our governed agentic AI reasons across campaigns, production calendars, support tickets, and ML models &mdash; decides what to do, sets its own plan, and pulls through at exactly the right moment.
             </motion.p>
 
             {/* CTA */}
