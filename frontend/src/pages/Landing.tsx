@@ -363,10 +363,10 @@ export default function Landing() {
       {/* ── Theme toggle ── */}
       <button
         onClick={toggle}
-        className={`fixed top-5 right-5 z-50 w-9 h-9 flex items-center justify-center rounded-[4px] transition-all duration-[250ms] ease-in-out ${
+        className={`fixed top-5 right-5 z-50 w-9 h-9 flex items-center justify-center rounded-full transition-all duration-[250ms] ease-in-out cursor-pointer ${
           dark
-            ? 'border border-white/[0.08] bg-white/[0.04] text-white/60 hover:bg-white/10'
-            : 'border border-[#0B2026] bg-transparent text-[#4A4A4A] hover:bg-[#0B2026] hover:text-white'
+            ? 'bg-transparent text-white/50 hover:text-white/80'
+            : 'bg-transparent text-[#4A4A4A]/60 hover:text-[#0B2026]'
         }`}
         aria-label="Toggle theme"
       >
@@ -393,16 +393,16 @@ export default function Landing() {
             {!dark && (
               <>
                 <div
-                  className="absolute pointer-events-none rounded-full blur-3xl animate-[orbFloat1_20s_ease-in-out_infinite]"
-                  style={{ width: 500, height: 500, top: '10%', left: '15%', background: 'radial-gradient(circle, rgba(235,22,0,0.06) 0%, transparent 70%)' }}
+                  className="absolute pointer-events-none rounded-full blur-[80px] animate-[orbFloat1_20s_ease-in-out_infinite]"
+                  style={{ width: 650, height: 650, top: '5%', left: '10%', background: 'radial-gradient(circle, rgba(235,22,0,0.12) 0%, rgba(235,22,0,0.03) 50%, transparent 75%)' }}
                 />
                 <div
-                  className="absolute pointer-events-none rounded-full blur-3xl animate-[orbFloat2_25s_ease-in-out_infinite]"
-                  style={{ width: 600, height: 600, top: '30%', right: '10%', background: 'radial-gradient(circle, rgba(64,209,245,0.05) 0%, transparent 70%)' }}
+                  className="absolute pointer-events-none rounded-full blur-[100px] animate-[orbFloat2_25s_ease-in-out_infinite]"
+                  style={{ width: 750, height: 750, top: '25%', right: '5%', background: 'radial-gradient(circle, rgba(64,209,245,0.10) 0%, rgba(64,209,245,0.02) 50%, transparent 75%)' }}
                 />
                 <div
-                  className="absolute pointer-events-none rounded-full blur-3xl animate-[orbFloat3_18s_ease-in-out_infinite]"
-                  style={{ width: 400, height: 400, bottom: '15%', left: '40%', background: 'radial-gradient(circle, rgba(196,168,122,0.06) 0%, transparent 70%)' }}
+                  className="absolute pointer-events-none rounded-full blur-[70px] animate-[orbFloat3_18s_ease-in-out_infinite]"
+                  style={{ width: 500, height: 500, bottom: '10%', left: '35%', background: 'radial-gradient(circle, rgba(196,168,122,0.12) 0%, rgba(196,168,122,0.03) 50%, transparent 75%)' }}
                 />
               </>
             )}
