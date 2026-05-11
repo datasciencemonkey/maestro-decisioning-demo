@@ -47,7 +47,7 @@ export default function UploadModal({ isOpen, onClose, onMatch }: UploadModalPro
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: 20 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-card rounded-2xl p-8 shadow-2xl max-w-md w-full"
+            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-card rounded-2xl p-8 shadow-2xl w-[calc(100vw-2rem)] sm:max-w-md"
           >
             {/* Header */}
             <div className="flex items-center justify-between mb-5">

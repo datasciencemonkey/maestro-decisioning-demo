@@ -70,9 +70,10 @@ export default function CartDrawer({ isOpen, onClose, items, total, onRemoveItem
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
             className={cn(
-              'fixed top-0 right-0 h-full w-[380px] z-50 flex flex-col',
+              'fixed top-0 right-0 h-full w-full sm:w-[380px] z-50 flex flex-col',
               'bg-card text-card-foreground shadow-2xl',
-              'dark:border-l dark:border-border'
+              'dark:border-l dark:border-border',
+              'pb-[env(safe-area-inset-bottom)]'
             )}
           >
             {/* Header */}

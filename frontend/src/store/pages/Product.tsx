@@ -150,9 +150,9 @@ export default function Product() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-12 py-8">
+    <div className="max-w-7xl mx-auto px-4 md:px-12 py-4 md:py-8">
       {/* Breadcrumb */}
-      <motion.nav {...stagger(0)} className="flex items-center gap-2 text-sm text-muted-foreground mb-8">
+      <motion.nav {...stagger(0)} className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground mb-8">
         <Link to="/store" className="hover:text-foreground transition-colors">
           Home
         </Link>
@@ -165,10 +165,10 @@ export default function Product() {
       </motion.nav>
 
       {/* Two-column layout */}
-      <div className="flex gap-12">
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-12">
         {/* Left — Image */}
         <motion.div
-          className="flex-[5] min-w-0"
+          className="w-full lg:flex-[5] min-w-0"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
@@ -184,7 +184,7 @@ export default function Product() {
         </motion.div>
 
         {/* Right — Info */}
-        <div className="flex-[4] min-w-0 flex flex-col gap-5">
+        <div className="w-full lg:flex-[4] min-w-0 flex flex-col gap-5">
           {/* Badge */}
           {product.badge && (
             <motion.div {...stagger(1)}>
@@ -193,7 +193,7 @@ export default function Product() {
           )}
 
           {/* Title */}
-          <motion.h1 {...stagger(2)} className="font-serif text-4xl text-foreground">
+          <motion.h1 {...stagger(2)} className="font-serif text-2xl md:text-4xl text-foreground">
             {product.title}
           </motion.h1>
 
@@ -223,7 +223,7 @@ export default function Product() {
                   key={size}
                   onClick={() => setSelectedSize(size)}
                   className={cn(
-                    'px-6 py-2.5 rounded-full border-2 text-sm font-medium transition-all cursor-pointer',
+                    'px-4 md:px-6 py-2 md:py-2.5 rounded-full border-2 text-sm font-medium transition-all cursor-pointer',
                     selectedSize === size
                       ? 'border-[#2C1810] bg-[#2C1810] text-white dark:border-[#C4A87A] dark:bg-[#C4A87A] dark:text-[#0D0B09]'
                       : 'border-border hover:border-[#C4A87A]/50'
@@ -265,10 +265,10 @@ export default function Product() {
 
       {/* You might also like — full width */}
       {suggestions.length > 0 && (
-        <section className="max-w-7xl mx-auto px-12 pb-12">
+        <section className="max-w-7xl mx-auto px-4 md:px-12 pb-12">
           <motion.div {...stagger(9)}>
             <h2 className="font-serif text-xl mb-6">You Might Also Like</h2>
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {suggestions.map(s => (
                 <SuggestionCard key={s.id} product={s} />
               ))}

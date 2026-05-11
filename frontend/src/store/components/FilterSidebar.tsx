@@ -18,11 +18,12 @@ interface FilterSidebarProps {
   filter: ProductFilter
   onFilterChange: (partial: Partial<ProductFilter>) => void
   onMatchClick: () => void
+  className?: string
 }
 
-export default function FilterSidebar({ filter, onFilterChange, onMatchClick }: FilterSidebarProps) {
+export default function FilterSidebar({ filter, onFilterChange, onMatchClick, className }: FilterSidebarProps) {
   return (
-    <aside className="w-56 shrink-0 space-y-6">
+    <aside className={cn('w-56 shrink-0 space-y-6', className)}>
       <h2 className="font-serif text-lg">Filters</h2>
 
       {/* Pet type */}

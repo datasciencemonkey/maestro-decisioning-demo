@@ -205,9 +205,9 @@ export default function Landing() {
           <p className="text-white/40 text-sm">A 15-minute live demo proving Databricks is the agentic CDP</p>
         </Reveal>
 
-        <div className="relative max-w-[1100px] mx-auto flex items-stretch gap-0">
-          {/* Connector line */}
-          <div className="absolute top-6 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/20 to-transparent" />
+        <div className="relative max-w-[1100px] mx-auto flex flex-col md:flex-row items-stretch gap-6 md:gap-0">
+          {/* Connector line (desktop only) */}
+          <div className="hidden md:block absolute top-6 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/20 to-transparent" />
 
           {beats.map((beat, i) => (
             <Reveal key={beat.num} delay={0.1 + i * 0.2} className="flex-1 px-4 relative">
@@ -215,7 +215,7 @@ export default function Landing() {
                 {beat.num}
               </div>
               {i < 2 && (
-                <div className="absolute top-6 -right-4 w-8 h-px bg-gold/30">
+                <div className="hidden md:block absolute top-6 -right-4 w-8 h-px bg-gold/30">
                   <div className="absolute right-0 -top-[3px] w-0 h-0 border-[3px] border-transparent border-l-gold/30" />
                 </div>
               )}
@@ -244,7 +244,7 @@ export default function Landing() {
       </div>
 
       {/* ── Bottom CTA ── */}
-      <section className="relative z-10 py-24 text-center bg-gradient-to-b from-[#1A1612] to-[#0D0B09] overflow-hidden">
+      <section className="relative z-10 py-24 text-center px-4 md:px-8 bg-gradient-to-b from-[#1A1612] to-[#0D0B09] overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgba(196,168,122,0.06),transparent_70%)]" />
         <Reveal>
           <h2 className="font-serif text-[32px] mb-3 relative">Ready to see the agent think?</h2>

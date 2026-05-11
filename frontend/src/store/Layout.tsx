@@ -1,5 +1,6 @@
+import { useState } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import { Search, ShoppingCart, Sun, Moon } from 'lucide-react'
+import { Search, ShoppingCart, Sun, Moon, Menu, X } from 'lucide-react'
 import { useTheme } from '@/hooks/use-theme'
 import { useCart, CartProvider } from '@/store/hooks/use-cart'
 import CartDrawer from '@/store/components/CartDrawer'
@@ -18,12 +19,13 @@ function StoreShell() {
   const { theme, toggle } = useTheme()
   const { pathname } = useLocation()
   const cart = useCart()
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       {/* Promo bar */}
       <div
-        className="py-2 text-center text-white text-xs tracking-widest"
+        className="py-2 text-center text-white text-[10px] md:text-xs tracking-widest"
         style={{ background: 'linear-gradient(90deg, #7C6353, #A08468)' }}
       >
         <span className="inline-block w-1.5 h-1.5 rounded-full bg-white/60 mr-2" />Free shipping on pet photo books this week
@@ -31,14 +33,23 @@ function StoreShell() {
 
       {/* Nav bar */}
       <header className="bg-white dark:bg-card border-b border-border sticky top-0 z-30 shadow-sm">
-        <div className="max-w-7xl mx-auto flex items-center gap-6 px-6 py-3">
+        <div className="max-w-7xl mx-auto flex items-center gap-6 px-4 md:px-8 py-3">
+          {/* Hamburger (mobile only) */}
+          <button
+            onClick={() => setMobileNavOpen(prev => !prev)}
+            className="p-2 rounded-lg hover:bg-secondary transition-colors cursor-pointer md:hidden"
+            aria-label="Toggle navigation"
+          >
+            {mobileNavOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+
           {/* Logo */}
           <Link to="/store" className="flex items-center gap-2 shrink-0 cursor-pointer group">
             <span className="text-2xl transition-transform group-hover:scale-110 inline-block">🦋</span>
             <span className="font-serif text-xl text-foreground">Fluttershy</span>
           </Link>
 
-          {/* Nav links */}
+          {/* Nav links (desktop) */}
           <nav className="hidden md:flex items-center gap-1 ml-4">
             {navLinks.map(link => (
               <Link
@@ -59,8 +70,8 @@ function StoreShell() {
           {/* Spacer */}
           <div className="flex-1" />
 
-          {/* Search */}
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary/60 border border-border w-52">
+          {/* Search (hidden on mobile) */}
+          <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary/60 border border-border w-52">
             <Search size={14} className="text-muted-foreground shrink-0" />
             <input
               type="text"
@@ -95,6 +106,27 @@ function StoreShell() {
             )}
           </button>
         </div>
+
+        {/* Mobile nav drawer */}
+        {mobileNavOpen && (
+          <nav className="md:hidden border-t border-border bg-white dark:bg-card px-4 py-3 space-y-1">
+            {navLinks.map(link => (
+              <Link
+                key={link.to}
+                to={link.to}
+                onClick={() => setMobileNavOpen(false)}
+                className={cn(
+                  'block px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                  pathname === link.to
+                    ? 'bg-secondary text-foreground'
+                    : 'text-muted-foreground hover:text-[#C4A87A]'
+                )}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        )}
       </header>
 
       {/* Page content */}
@@ -103,8 +135,8 @@ function StoreShell() {
       </main>
 
       {/* Store footer */}
-      <footer className="bg-secondary/30 dark:bg-card/50 border-t border-border py-8 px-8">
-        <div className="max-w-7xl mx-auto flex items-center justify-between text-xs text-muted-foreground">
+      <footer className="bg-secondary/30 dark:bg-card/50 border-t border-border py-8 px-4 md:px-8">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-2 md:gap-0 text-center md:text-left text-xs text-muted-foreground">
           <span>Fluttershy — Made with love for pets everywhere</span>
           <div className="flex gap-6">
             <span className="hover:text-foreground cursor-pointer transition-colors">Help</span>
@@ -124,7 +156,7 @@ function StoreShell() {
             Meet Cindy &mdash; back on Fluttershy for her kitten Whiskers
           </p>
         </div>
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="hidden md:flex items-center gap-1 shrink-0">
           {narratorModes.map(mode => (
             <button
               key={mode}

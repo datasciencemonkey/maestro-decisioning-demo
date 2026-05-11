@@ -46,7 +46,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* ── Hero Banner ── */}
-      <section className="relative h-[420px] flex items-center justify-center overflow-hidden bg-gradient-to-br from-cream to-linen dark:from-[#1A1612] dark:to-[#0D0B09]">
+      <section className="relative h-[300px] md:h-[420px] flex items-center justify-center overflow-hidden bg-gradient-to-br from-cream to-linen dark:from-[#1A1612] dark:to-[#0D0B09]">
         {/* Background image overlay */}
         <img
           src="https://images.unsplash.com/photo-1615497001839-b0a0eac3274c?w=1400&h=800&fit=crop"
@@ -70,7 +70,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.35, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="font-serif text-5xl leading-tight text-foreground mb-4"
+            className="font-serif text-3xl md:text-5xl leading-tight text-foreground mb-4"
           >
             Pet Photo Books
           </motion.h1>
@@ -79,7 +79,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
-            className="text-base text-foreground/60 mb-8"
+            className="text-sm md:text-base text-foreground/60 mb-8"
           >
             Tell their story. Keep their moments.
           </motion.p>
@@ -98,12 +98,12 @@ export default function Home() {
       </section>
 
       {/* ── Shop by Category ── */}
-      <section className="max-w-5xl mx-auto px-6 py-8">
+      <section className="max-w-5xl mx-auto px-4 md:px-6 py-8">
         <Reveal className="text-center mb-10">
           <h2 className="font-serif text-3xl text-foreground">Shop by Category</h2>
         </Reveal>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
           {categories.map((cat, i) => (
             <Reveal key={cat.label} delay={0.05 + i * 0.08}>
               {cat.comingSoon ? (
@@ -135,7 +135,7 @@ export default function Home() {
       </section>
 
       {/* ── Featured Products ── */}
-      <section className="max-w-6xl mx-auto px-6 pb-20">
+      <section className="max-w-6xl mx-auto px-4 md:px-6 pb-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
