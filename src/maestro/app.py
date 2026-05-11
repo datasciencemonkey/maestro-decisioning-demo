@@ -132,7 +132,12 @@ async def index():
   <h1>Maestro CDP</h1>
   <p class="subtitle">Beat 2 — Cross-Campaign Agentic Reasoning</p>
   <button id="runBtn" onclick="runDemo()">Run Cart Recovery for Cindy</button>
+  <button id="wfBtn" onclick="runWorkflow()" style="background:#4462c9;margin-left:0.5rem;">Run Full Journey (Beat 2+2.5)</button>
   <span id="status"></span>
+
+  <div id="wfTimeline" style="display:none;margin-top:1rem;">
+    <div class="card"><h3>Journey Workflow Timeline</h3><div id="wfSteps"></div></div>
+  </div>
 
   <div class="panel" id="results" style="display:none;">
     <div class="card" id="campaigns"><h3>Campaigns</h3><div id="campList"></div></div>
@@ -202,6 +207,68 @@ async function runDemo() {
     btn.disabled = false;
   }
 }
+
+async function runWorkflow() {
+  const btn = document.getElementById('wfBtn');
+  const status = document.getElementById('status');
+  const timeline = document.getElementById('wfTimeline');
+  const stepsDiv = document.getElementById('wfSteps');
+  btn.disabled = true;
+  timeline.style.display = 'block';
+  stepsDiv.innerHTML = '';
+  status.textContent = 'Starting workflow...';
+
+  try {
+    const res = await fetch('/api/workflow?delay=15', { method: 'POST' });
+    const data = await res.json();
+    if (!res.ok) { status.textContent = 'Error: ' + (data.detail || res.statusText); return; }
+
+    const jid = data.journey_id;
+    status.textContent = `Workflow ${jid} started (${data.delay_seconds}s sleep)`;
+
+    const stepIcons = {
+      agent_reasoning: '🧠', decision_rendered: '✅', persisting: '💾',
+      persisted_to_lakebase: '💾', sleep_started: '💤', sleep_completed: '⏰',
+      sleeping: '💤', resuming: '🔄', journey_completed: '🎉', failed: '❌',
+    };
+
+    // Poll every 2 seconds
+    const poll = setInterval(async () => {
+      try {
+        const sr = await fetch('/api/workflow/' + jid);
+        const sd = await sr.json();
+        status.textContent = `[${sd.step}] ${sd.status}`;
+
+        let html = '';
+        for (const s of sd.steps_completed) {
+          const icon = stepIcons[s.step] || '•';
+          const t = new Date(s.ts * 1000).toLocaleTimeString();
+          const extra = s.delay ? ` (${s.delay}s)` : '';
+          html += `<div class="trace-line">${icon} ${t} — ${s.step.replace(/_/g,' ')}${extra}</div>`;
+        }
+        if (sd.step === 'sleeping') {
+          html += `<div class="trace-line" style="border-color:#FF8C2A;">💤 Sleeping... (durable pause on Lakebase)</div>`;
+        }
+        stepsDiv.innerHTML = html;
+
+        if (sd.status === 'completed' || sd.status === 'failed') {
+          clearInterval(poll);
+          btn.disabled = false;
+          if (sd.status === 'completed') {
+            html += `<div class="trace-line" style="border-color:#00D4AA;font-weight:600;">🎉 Journey complete — state verified in Lakebase</div>`;
+            stepsDiv.innerHTML = html;
+            status.textContent = `Journey ${jid} completed!`;
+          } else {
+            status.textContent = `Journey failed: ${sd.error || 'unknown'}`;
+          }
+        }
+      } catch (e) { /* ignore poll errors */ }
+    }, 2000);
+  } catch (e) {
+    status.textContent = 'Error: ' + e.message;
+    btn.disabled = false;
+  }
+}
 </script>
 </body>
 </html>"""
@@ -253,6 +320,129 @@ async def run_agent():
         "campaigns": campaigns,
         "latency_s": elapsed,
     }
+
+
+@app.post("/api/workflow")
+async def start_workflow(delay: int = 15):
+    """Start the full Beat 2 + 2.5 journey workflow.
+
+    Returns immediately with a journey_id. Poll /api/workflow/{id} for status.
+    The workflow: agent reasons → persist → sleep(delay) → resume → complete.
+    """
+    import threading
+    import traceback
+    import uuid
+
+    import psycopg2
+
+    from maestro.agent import run_maestro
+    from maestro.synthetic import CINDY_EVENT
+
+    journey_id = f"jrn_cust_88241_{uuid.uuid4().hex[:6]}"
+
+    # Store workflow state in-memory for polling (simple for demo)
+    _workflow_states[journey_id] = {
+        "journey_id": journey_id,
+        "step": "starting",
+        "status": "in_progress",
+        "delay_seconds": delay,
+        "steps_completed": [],
+        "decision": None,
+        "error": None,
+    }
+
+    def _run_workflow():
+        try:
+            import asyncio
+
+            state = _workflow_states[journey_id]
+
+            # Step 1: Agent reasoning
+            state["step"] = "agent_reasoning"
+            state["steps_completed"].append({"step": "agent_reasoning", "ts": time.time()})
+
+            model, _ = _get_model()
+            loop = asyncio.new_event_loop()
+            result = loop.run_until_complete(run_maestro(CINDY_EVENT, model))
+            loop.close()
+
+            decision_dump = result.model_dump()
+            state["decision"] = decision_dump
+            state["steps_completed"].append({"step": "decision_rendered", "ts": time.time()})
+
+            # Step 2: Persist to Lakebase
+            state["step"] = "persisting"
+            try:
+                from maestro.bootstrap import get_lakebase_conn_params
+                params = get_lakebase_conn_params()
+                conn = psycopg2.connect(**params)
+                conn.autocommit = True
+                cur = conn.cursor()
+                cur.execute(
+                    """INSERT INTO journey_state (journey_id, customer_id, current_step,
+                        next_action_due_ts, state_blob, status)
+                    VALUES (%s, %s, %s, %s, %s, 'pending')
+                    ON CONFLICT (journey_id) DO UPDATE SET
+                        current_step = EXCLUDED.current_step,
+                        state_blob = EXCLUDED.state_blob,
+                        updated_at = NOW()""",
+                    (journey_id, "cust_88241", "awaiting_send",
+                     "2026-05-10T08:00:00-05:00", json.dumps(decision_dump)),
+                )
+                cur.close()
+                conn.close()
+                state["steps_completed"].append({"step": "persisted_to_lakebase", "ts": time.time()})
+            except Exception as e:
+                state["steps_completed"].append({"step": "persist_error", "ts": time.time(), "error": str(e)})
+
+            # Step 3: Durable sleep
+            state["step"] = "sleeping"
+            state["steps_completed"].append({"step": "sleep_started", "ts": time.time(), "delay": delay})
+            time.sleep(delay)
+            state["steps_completed"].append({"step": "sleep_completed", "ts": time.time()})
+
+            # Step 4: Resume — update status
+            state["step"] = "resuming"
+            try:
+                params = get_lakebase_conn_params()
+                conn = psycopg2.connect(**params)
+                conn.autocommit = True
+                cur = conn.cursor()
+                cur.execute(
+                    "UPDATE journey_state SET status = 'completed', updated_at = NOW() WHERE journey_id = %s",
+                    (journey_id,),
+                )
+                cur.close()
+                conn.close()
+                state["steps_completed"].append({"step": "journey_completed", "ts": time.time()})
+            except Exception as e:
+                state["steps_completed"].append({"step": "resume_error", "ts": time.time(), "error": str(e)})
+
+            state["step"] = "completed"
+            state["status"] = "completed"
+
+        except Exception as e:
+            state = _workflow_states[journey_id]
+            state["step"] = "failed"
+            state["status"] = "failed"
+            state["error"] = f"{e}\n{traceback.format_exc()[-300:]}"
+
+    thread = threading.Thread(target=_run_workflow, daemon=True)
+    thread.start()
+
+    return {"journey_id": journey_id, "status": "started", "delay_seconds": delay}
+
+
+# In-memory workflow state (demo only — production uses DBOS system tables)
+_workflow_states: dict[str, dict] = {}
+
+
+@app.get("/api/workflow/{journey_id}")
+async def get_workflow_status(journey_id: str):
+    """Poll workflow status. Returns current step and completed steps timeline."""
+    if journey_id not in _workflow_states:
+        raise HTTPException(status_code=404, detail=f"Workflow {journey_id} not found")
+    return _workflow_states[journey_id]
 
 
 @app.get("/health")

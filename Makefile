@@ -8,6 +8,10 @@ test-local:
 test-dev:
 	uv run pytest tests/test_system.py tests/test_app_endpoints.py -v -s
 
+# ── DBOS workflow test (needs Lakebase, no LLM) ─────────────────────────
+test-dbos:
+	uv run pytest tests/test_system.py::TestLayer5Workflow -v -s
+
 # ── All tests ────────────────────────────────────────────────────────────
 test-all: test-local test-dev
 
