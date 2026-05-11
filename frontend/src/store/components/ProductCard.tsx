@@ -40,7 +40,7 @@ export default function ProductCard({ product }: { product: Product }) {
       whileHover={{ y: -4 }}
       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
       onClick={() => navigate(`/store/product/${product.id}`)}
-      className="group flex flex-col cursor-pointer rounded-xl bg-card border border-border shadow-sm hover:shadow-xl transition-all duration-300"
+      className="group flex flex-col cursor-pointer rounded-xl bg-card border border-border shadow-sm hover:shadow-lg transition-all duration-300"
     >
       {/* Image */}
       <div className="relative aspect-[4/3] overflow-hidden rounded-t-xl">
@@ -71,7 +71,7 @@ export default function ProductCard({ product }: { product: Product }) {
         <h3 className="font-serif text-lg text-card-foreground leading-tight mb-0.5">
           {product.title}
         </h3>
-        <p className="text-xs text-muted-foreground mb-2">{product.subtitle}</p>
+        <p className="text-sm text-muted-foreground mb-2">{product.subtitle}</p>
 
         {/* Rating */}
         <div className="flex items-center gap-1 mb-3">

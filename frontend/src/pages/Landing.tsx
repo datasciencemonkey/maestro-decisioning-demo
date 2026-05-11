@@ -459,7 +459,7 @@ export default function Landing() {
                 className={`relative group inline-flex items-center gap-3 px-11 py-[18px] font-semibold text-[15px] overflow-hidden cursor-pointer transition-all duration-[250ms] ease-in-out ${
                   dark
                     ? 'rounded-[14px] bg-gradient-to-br from-gold to-gold-light text-espresso hover:-translate-y-[3px] hover:shadow-[0_12px_40px_rgba(196,168,122,0.35)] active:translate-y-0'
-                    : 'rounded-[4px] bg-[#EB1600] text-white border-none hover:bg-[#0B2026] hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(11,32,38,0.15)]'
+                    : 'rounded-lg bg-[#EB1600] text-white border-none hover:bg-[#0B2026] hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(11,32,38,0.15)]'
                 }`}
                 style={{ letterSpacing: dark ? '0.5px' : '1.5px' }}
               >
@@ -568,7 +568,7 @@ export default function Landing() {
                     className={`p-8 text-center transition-all duration-[250ms] ease-in-out ${
                       dark
                         ? 'rounded-[16px] bg-white/[0.03] border border-white/[0.06] hover:bg-[rgba(196,168,122,0.04)] hover:border-[rgba(196,168,122,0.12)]'
-                        : 'rounded-[4px] bg-white border border-[#0B202615] hover:border-[#0B202640] hover:shadow-[0_4px_20px_rgba(0,0,0,0.04)]'
+                        : 'rounded-lg bg-white border border-[#0B202615] hover:border-[#0B202640] hover:shadow-[0_4px_20px_rgba(0,0,0,0.04)]'
                     }`}
                   >
                     <h3 className="font-serif text-xl mb-3">{beat.title}</h3>
@@ -660,7 +660,7 @@ export default function Landing() {
                 className={`relative group inline-flex items-center gap-3 px-11 py-[18px] font-semibold text-[15px] overflow-hidden cursor-pointer transition-all duration-[250ms] ease-in-out ${
                   dark
                     ? 'rounded-[14px] bg-gradient-to-br from-gold to-gold-light text-espresso hover:-translate-y-[3px] hover:shadow-[0_12px_40px_rgba(196,168,122,0.35)]'
-                    : 'rounded-[4px] bg-[#EB1600] text-white border-none hover:bg-[#0B2026] hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(11,32,38,0.15)]'
+                    : 'rounded-lg bg-[#EB1600] text-white border-none hover:bg-[#0B2026] hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(11,32,38,0.15)]'
                 }`}
                 style={{ letterSpacing: dark ? '0.5px' : '1.5px' }}
               >

@@ -150,7 +150,7 @@ export default function Product() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-12 py-4 md:py-8">
+    <div className="max-w-7xl mx-auto px-4 md:px-12 py-6 md:py-10">
       {/* Breadcrumb */}
       <motion.nav {...stagger(0)} className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground mb-8">
         <Link to="/store" className="hover:text-foreground transition-colors">
@@ -217,7 +217,7 @@ export default function Product() {
 
           {/* Size selector */}
           <motion.div {...stagger(6)}>
-            <p className="text-[10px] font-bold tracking-[2px] text-muted-foreground uppercase mb-2">
+            <p className="text-xs font-bold tracking-[2px] text-muted-foreground uppercase mb-2">
               Size
             </p>
             <div className="flex gap-2">
@@ -243,7 +243,7 @@ export default function Product() {
             <button
               onClick={handleAddToCart}
               className={cn(
-                'w-full py-4 rounded-xl text-lg font-semibold cursor-pointer transition-all',
+                'w-full py-4 rounded-lg text-lg font-semibold cursor-pointer transition-all',
                 added
                   ? 'bg-green-600 text-white'
                   : 'bg-[#EB1600] text-white dark:bg-gold dark:text-[#0D0B09] hover:shadow-lg hover:shadow-[#EB1600]/25 dark:hover:shadow-gold/25',
@@ -268,7 +268,7 @@ export default function Product() {
 
       {/* You might also like — full width */}
       {suggestions.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 md:px-12 pb-12">
+        <section className="mt-16 pb-12">
           <motion.div {...stagger(9)}>
             <h2 className="font-serif text-xl mb-6">You Might Also Like</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

@@ -95,7 +95,7 @@ function StoreShell() {
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       {/* Promo bar */}
       <div
-        className="py-2 text-center text-white text-[10px] md:text-xs tracking-widest bg-[#0B2026]"
+        className="py-2 text-center text-white text-xs tracking-widest bg-[#0B2026]"
       >
         <span className="inline-block w-1.5 h-1.5 rounded-full bg-white/60 mr-2" />Free shipping on pet photo books this week
       </div>
@@ -127,7 +127,7 @@ function StoreShell() {
                 className={cn(
                   'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer',
                   pathname === link.to
-                    ? 'bg-secondary text-foreground'
+                    ? 'bg-secondary text-foreground font-semibold'
                     : 'text-muted-foreground hover:text-foreground'
                 )}
               >

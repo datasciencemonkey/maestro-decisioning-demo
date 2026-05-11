@@ -150,7 +150,7 @@ export default function CartDrawer({ isOpen, onClose, items, total, onRemoveItem
                 </div>
                 <button
                   className={cn(
-                    'w-full mt-3 py-3 rounded-xl font-semibold text-sm tracking-wide',
+                    'w-full mt-3 py-3 rounded-lg font-semibold text-sm tracking-wide',
                     'text-white cursor-pointer',
                     'bg-[#EB1600] dark:bg-gold dark:text-[#0D0B09]',
                     'hover:shadow-lg hover:shadow-[#EB1600]/25 dark:hover:shadow-gold/25 hover:-translate-y-0.5',

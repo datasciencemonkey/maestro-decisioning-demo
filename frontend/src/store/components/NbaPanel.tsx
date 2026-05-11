@@ -17,7 +17,7 @@ export default function NbaPanel({ recommendations }: NbaPanelProps) {
       {/* Header */}
       <div className="flex items-center gap-2">
         <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse ring-2 ring-green-500/20" />
-        <span className="text-[10px] font-bold tracking-widest text-muted-foreground">
+        <span className="text-[11px] font-bold tracking-widest text-muted-foreground">
           AI RECOMMENDATIONS
         </span>
       </div>
@@ -26,15 +26,15 @@ export default function NbaPanel({ recommendations }: NbaPanelProps) {
       <div className="bg-secondary/50 rounded-lg p-4 mb-4 space-y-1.5">
         <p className="font-serif text-sm">Welcome, Cindy</p>
         <div className="space-y-0.5">
-          <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+          <p className="text-xs text-muted-foreground flex items-center gap-1.5">
             <span className="w-1 h-1 rounded-full bg-[#EB1600] dark:bg-gold" />
             Repeat buyer
           </p>
-          <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+          <p className="text-xs text-muted-foreground flex items-center gap-1.5">
             <span className="w-1 h-1 rounded-full bg-[#EB1600] dark:bg-gold" />
             Cat parent
           </p>
-          <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+          <p className="text-xs text-muted-foreground flex items-center gap-1.5">
             <span className="w-1 h-1 rounded-full bg-[#EB1600] dark:bg-gold" />
             Whiskers
           </p>
@@ -70,7 +70,7 @@ export default function NbaPanel({ recommendations }: NbaPanelProps) {
       </div>
 
       {/* Footer */}
-      <p className="text-[10px] text-muted-foreground text-center pt-3 border-t border-border">
+      <p className="text-[11px] text-muted-foreground text-center pt-3 border-t border-border">
         Powered by Agent Bricks &middot; Real-time
       </p>
     </motion.aside>

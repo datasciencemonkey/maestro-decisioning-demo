@@ -99,7 +99,7 @@ export default function Home() {
       </section>
 
       {/* ── Shop by Category ── */}
-      <section className="max-w-5xl mx-auto px-4 md:px-6 py-8">
+      <section className="max-w-5xl mx-auto px-4 md:px-6 py-12">
         <Reveal className="text-center mb-10">
           <h2 className="font-serif text-3xl text-foreground">Shop by Category</h2>
         </Reveal>
@@ -113,7 +113,7 @@ export default function Home() {
                   <span className="text-base font-medium text-card-foreground block">
                     {cat.label}
                   </span>
-                  <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase mt-1.5 block">
+                  <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase mt-1.5 block">
                     Coming Soon
                   </span>
                 </div>

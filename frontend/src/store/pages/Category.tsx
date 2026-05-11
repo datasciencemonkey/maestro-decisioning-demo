@@ -20,11 +20,11 @@ export default function Category() {
   const [filtersOpen, setFiltersOpen] = useState(false)
 
   return (
-    <div className="relative max-w-7xl mx-auto px-4 md:px-8 py-6">
+    <div className="relative max-w-7xl mx-auto px-4 md:px-12 py-6">
       {/* Decorative gradient orb */}
       <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-[radial-gradient(circle,rgba(196,168,122,0.05),transparent_70%)] pointer-events-none" />
       {/* Breadcrumb */}
-      <nav className="text-xs md:text-sm text-muted-foreground mb-4">
+      <nav className="text-sm text-muted-foreground mb-4">
         <span>Home</span>
         <span className="mx-1.5 text-muted-foreground">&gt;</span>
         <span>Photo Books</span>
@@ -34,7 +34,7 @@ export default function Category() {
 
       {/* Page heading */}
       <div className="mb-6">
-        <h1 className="font-serif text-2xl mb-1 text-foreground">Pet Photo Books</h1>
+        <h1 className="font-serif text-3xl mb-1 text-foreground">Pet Photo Books</h1>
         <p className="text-sm text-muted-foreground">
           Capture your furry friend's best moments in a custom photo book
         </p>

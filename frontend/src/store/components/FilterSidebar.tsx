@@ -28,7 +28,7 @@ export default function FilterSidebar({ filter, onFilterChange, onMatchClick, cl
 
       {/* Pet type */}
       <div>
-        <p className="text-[10px] font-bold tracking-[2px] text-muted-foreground uppercase mb-3">
+        <p className="text-[11px] font-bold tracking-[2px] text-muted-foreground uppercase mb-3">
           PET TYPE
         </p>
         <div className="flex flex-wrap gap-2">
@@ -51,7 +51,7 @@ export default function FilterSidebar({ filter, onFilterChange, onMatchClick, cl
 
       {/* Book size */}
       <div>
-        <p className="text-[10px] font-bold tracking-[2px] text-muted-foreground uppercase mb-3">
+        <p className="text-[11px] font-bold tracking-[2px] text-muted-foreground uppercase mb-3">
           BOOK SIZE
         </p>
         <div className="space-y-2">
