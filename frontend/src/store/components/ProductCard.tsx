@@ -108,7 +108,7 @@ export default function ProductCard({ product }: { product: Product }) {
               })
               setAdded(true)
             }}
-            className="relative overflow-hidden flex-1 inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-[#7C6353] to-[#A08468] text-white rounded-lg py-2.5 text-sm font-semibold hover:opacity-90 transition-opacity after:absolute after:inset-0 after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent after:-translate-x-full hover:after:translate-x-full after:transition-transform after:duration-500"
+            className="relative overflow-hidden flex-1 inline-flex items-center justify-center gap-1.5 bg-[#EB1600] text-white dark:bg-gold dark:text-[#0D0B09] rounded-lg py-2.5 text-sm font-semibold hover:opacity-90 transition-opacity after:absolute after:inset-0 after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent after:-translate-x-full hover:after:translate-x-full after:transition-transform after:duration-500"
           >
             {added ? <Check size={14} /> : <ShoppingCart size={14} />}
             {added ? 'Added!' : 'Add to Cart'}

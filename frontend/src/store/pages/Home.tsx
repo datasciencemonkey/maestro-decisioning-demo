@@ -90,7 +90,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.65, duration: 0.6 }}
             onClick={() => navigate('/store/photo-books')}
-            className="inline-flex items-center gap-2 px-8 py-3 rounded-lg bg-[#EB1600] text-white dark:bg-gradient-to-r dark:from-gold dark:to-gold-light dark:text-espresso font-semibold text-sm shadow-lg shadow-[#7C6353]/20 hover:shadow-xl hover:shadow-[#7C6353]/30 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+            className="inline-flex items-center gap-2 px-8 py-3 rounded-lg bg-[#EB1600] text-white dark:bg-gradient-to-r dark:from-gold dark:to-gold-light dark:text-[#0D0B09] font-semibold text-sm shadow-lg shadow-[#EB1600]/20 hover:shadow-xl hover:shadow-[#EB1600]/30 dark:shadow-gold/20 dark:hover:shadow-gold/30 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
           >
             Start Creating
             <ArrowRight size={16} />

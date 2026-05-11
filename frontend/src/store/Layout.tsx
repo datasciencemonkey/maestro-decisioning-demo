@@ -95,8 +95,7 @@ function StoreShell() {
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       {/* Promo bar */}
       <div
-        className="py-2 text-center text-white text-[10px] md:text-xs tracking-widest"
-        style={{ background: 'linear-gradient(90deg, #7C6353, #A08468)' }}
+        className="py-2 text-center text-white text-[10px] md:text-xs tracking-widest bg-[#0B2026]"
       >
         <span className="inline-block w-1.5 h-1.5 rounded-full bg-white/60 mr-2" />Free shipping on pet photo books this week
       </div>
@@ -158,7 +157,7 @@ function StoreShell() {
           >
             {theme === 'dark'
               ? <Sun size={18} className="text-gold" />
-              : <Moon size={18} className="text-mocha" />
+              : <Moon size={18} className="text-foreground" />
             }
           </button>
 
@@ -170,7 +169,7 @@ function StoreShell() {
           >
             <ShoppingCart size={18} className="text-foreground" />
             {cart.itemCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 rounded-full bg-gradient-to-br from-[#C4A87A] to-[#DBC09E] text-espresso text-[10px] font-bold flex items-center justify-center leading-none">
+              <span className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center leading-none">
                 {cart.itemCount}
               </span>
             )}
@@ -217,7 +216,7 @@ function StoreShell() {
       </footer>
 
       {/* Narrator strip */}
-      <div className="h-[52px] bg-espresso dark:bg-[#0D0B09]/80 border-t border-white/10 flex items-center justify-between px-6">
+      <div className="h-[52px] bg-[#0B2026] dark:bg-[#0D0B09]/80 border-t border-white/10 flex items-center justify-between px-6">
         <div className="flex items-center gap-3 min-w-0">
           <span className="shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full bg-gold/20 text-gold text-[10px] font-bold tracking-wider border border-gold/30">
             {narratorLabel}
@@ -245,7 +244,7 @@ function StoreShell() {
             <button
               onClick={handleNextScene}
               disabled={sceneIndex >= demoScenes.length - 1}
-              className="ml-2 px-3 py-1 rounded-full bg-gradient-to-r from-[#C4A87A] to-[#DBC09E] text-[#2C1810] text-[10px] font-bold tracking-wider cursor-pointer hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+              className="ml-2 px-3 py-1 rounded-full bg-primary text-primary-foreground text-[10px] font-bold tracking-wider cursor-pointer hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Next →
             </button>

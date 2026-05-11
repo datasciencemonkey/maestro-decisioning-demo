@@ -39,7 +39,7 @@ export default function FilterSidebar({ filter, onFilterChange, onMatchClick, cl
               className={cn(
                 'px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer',
                 filter.pet === chip.value
-                  ? 'bg-[#2C1810] text-white dark:bg-[#C4A87A] dark:text-[#0D0B09]'
+                  ? 'bg-[#0B2026] text-white dark:bg-gold dark:text-[#0D0B09]'
                   : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
               )}
             >
@@ -65,7 +65,7 @@ export default function FilterSidebar({ filter, onFilterChange, onMatchClick, cl
                 defaultChecked={opt.defaultChecked}
                 className="w-4 h-4 rounded border-border accent-gold cursor-pointer"
               />
-              <span className="text-sm text-foreground group-hover:text-mocha dark:group-hover:text-gold transition-colors">
+              <span className="text-sm text-foreground group-hover:text-foreground dark:group-hover:text-gold transition-colors">
                 {opt.label}
               </span>
             </label>

@@ -81,7 +81,7 @@ export default function CartDrawer({ isOpen, onClose, items, total, onRemoveItem
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-5 border-b border-border">
               <div className="flex items-center gap-2">
-                <ShoppingBag size={18} className="text-mocha dark:text-gold" />
+                <ShoppingBag size={18} className="text-foreground dark:text-gold" />
                 <h2 className="font-serif text-lg">Your Cart</h2>
               </div>
               <button
@@ -114,7 +114,7 @@ export default function CartDrawer({ isOpen, onClose, items, total, onRemoveItem
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{item.name}</p>
                         <p className="text-xs text-muted-foreground mt-0.5">Qty: {item.quantity}</p>
-                        <p className="text-sm font-semibold text-mocha dark:text-gold mt-1">
+                        <p className="text-sm font-semibold text-foreground dark:text-gold mt-1">
                           ${(item.price * item.quantity).toFixed(2)}
                         </p>
                       </div>
@@ -151,9 +151,9 @@ export default function CartDrawer({ isOpen, onClose, items, total, onRemoveItem
                 <button
                   className={cn(
                     'w-full mt-3 py-3 rounded-xl font-semibold text-sm tracking-wide',
-                    'text-espresso cursor-pointer',
-                    'bg-gradient-to-br from-gold to-gold-light',
-                    'hover:shadow-lg hover:shadow-gold/25 hover:-translate-y-0.5',
+                    'text-white cursor-pointer',
+                    'bg-[#EB1600] dark:bg-gold dark:text-[#0D0B09]',
+                    'hover:shadow-lg hover:shadow-[#EB1600]/25 dark:hover:shadow-gold/25 hover:-translate-y-0.5',
                     'active:translate-y-0 transition-all duration-200'
                   )}
                 >
@@ -163,7 +163,7 @@ export default function CartDrawer({ isOpen, onClose, items, total, onRemoveItem
             )}
 
             {/* Demo control */}
-            <div className="px-6 py-4 bg-espresso dark:bg-[#0D0B09]/60 border-t border-white/10">
+            <div className="px-6 py-4 bg-[#0B2026] dark:bg-[#0D0B09]/60 border-t border-white/10">
               <p className="text-[10px] font-bold tracking-[2px] text-white/40 mb-3">DEMO CONTROL</p>
               <button
                 onClick={handleAbandonCart}

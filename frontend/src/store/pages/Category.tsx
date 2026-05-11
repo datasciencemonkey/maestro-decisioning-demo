@@ -50,7 +50,7 @@ export default function Category() {
               className={cn(
                 'shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer',
                 filter.pet === chip.value
-                  ? 'bg-[#2C1810] text-white dark:bg-[#C4A87A] dark:text-[#0D0B09]'
+                  ? 'bg-[#0B2026] text-white dark:bg-gold dark:text-[#0D0B09]'
                   : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
               )}
             >

@@ -88,7 +88,7 @@ function SuggestionCard({ product }: { product: ProductType }) {
       </div>
       <div className="p-3">
         <p className="text-sm font-medium truncate">{product.title}</p>
-        <p className="text-sm font-bold text-mocha dark:text-gold mt-1">
+        <p className="text-sm font-bold text-foreground dark:text-gold mt-1">
           ${product.price.toFixed(2)}
         </p>
       </div>
@@ -129,7 +129,7 @@ export default function Product() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <p className="text-2xl font-serif mb-2">Product not found</p>
-          <Link to="/store" className="text-sm text-mocha dark:text-gold underline">
+          <Link to="/store" className="text-sm text-foreground dark:text-gold underline">
             Back to store
           </Link>
         </div>
@@ -228,7 +228,7 @@ export default function Product() {
                   className={cn(
                     'px-4 md:px-6 py-2 md:py-2.5 rounded-full border-2 text-sm font-medium transition-all cursor-pointer',
                     selectedSize === size
-                      ? 'border-[#2C1810] bg-[#2C1810] text-white dark:border-[#C4A87A] dark:bg-[#C4A87A] dark:text-[#0D0B09]'
+                      ? 'border-[#0B2026] bg-[#0B2026] text-white dark:border-gold dark:bg-gold dark:text-[#0D0B09]'
                       : 'border-border hover:border-[#C4A87A]/50'
                   )}
                 >
@@ -246,7 +246,7 @@ export default function Product() {
                 'w-full py-4 rounded-xl text-lg font-semibold cursor-pointer transition-all',
                 added
                   ? 'bg-green-600 text-white'
-                  : 'bg-gradient-to-r from-[#7C6353] to-[#A08468] text-white hover:shadow-lg hover:shadow-[#7C6353]/25',
+                  : 'bg-[#EB1600] text-white dark:bg-gold dark:text-[#0D0B09] hover:shadow-lg hover:shadow-[#EB1600]/25 dark:hover:shadow-gold/25',
                 'active:translate-y-0'
               )}
             >
