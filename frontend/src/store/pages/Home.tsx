@@ -61,7 +61,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
-            className="inline-block text-[11px] font-bold tracking-[3px] uppercase text-gold mb-4"
+            className="inline-block text-xs font-bold tracking-[3px] uppercase text-[#C4A87A] mb-4"
           >
             Welcome Home Collection
           </motion.span>
@@ -79,7 +79,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
-            className="text-base text-muted-foreground mb-8"
+            className="text-base text-foreground/60 mb-8"
           >
             Tell their story. Keep their moments.
           </motion.p>
@@ -98,7 +98,7 @@ export default function Home() {
       </section>
 
       {/* ── Shop by Category ── */}
-      <section className="max-w-5xl mx-auto px-6 py-10">
+      <section className="max-w-5xl mx-auto px-6 py-8">
         <Reveal className="text-center mb-10">
           <h2 className="font-serif text-3xl text-foreground">Shop by Category</h2>
         </Reveal>
@@ -136,7 +136,12 @@ export default function Home() {
 
       {/* ── Featured Products ── */}
       <section className="max-w-6xl mx-auto px-6 pb-20">
-        <Reveal className="flex items-center justify-center gap-4 mb-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.5 }}
+          className="flex items-center justify-center gap-4 mb-10"
+        >
           <h2 className="font-serif text-3xl text-foreground">Featured</h2>
           <span
             onClick={() => navigate('/store/photo-books')}
@@ -144,13 +149,18 @@ export default function Home() {
           >
             View All &rarr;
           </span>
-        </Reveal>
+        </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {featured.map((product, i) => (
-            <Reveal key={product.id} delay={0.05 + i * 0.08}>
+            <motion.div
+              key={product.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.6 + i * 0.1 }}
+            >
               <ProductCard product={product} />
-            </Reveal>
+            </motion.div>
           ))}
         </div>
       </section>
