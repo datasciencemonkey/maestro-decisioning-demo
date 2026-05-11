@@ -93,6 +93,14 @@ IMPORTANT CONSTRAINTS:
   • Never breach frequency caps — suppress lower-priority campaigns instead
   • Never use a channel without active consent
   • A triggered campaign always outranks a scheduled campaign
+
+CDP DOMAIN KNOWLEDGE:
+  Campaign Priority: triggered > active/scheduled > paused > dormant
+  Frequency Cap Resolution: suppress lower-priority campaign, never the triggered one
+  Quiet Hours: 9 PM – 7 AM in customer timezone; shift to next 8 AM
+  Tone: pet owner → warm/personal with pet name; repeat buyer → familiar; new → welcoming
+  Channel: consent is non-negotiable; prefer customer's stated preference
+  Signal Weights: frequency_cap=1.0 (hard), propensity=0.6-0.8, support=0.3-0.5, feasibility=0.3-0.5
 """
 
 
@@ -109,7 +117,7 @@ def create_agent(model) -> Agent[MaestroDeps, DecisionArtifact]:
         instructions=SYSTEM_PROMPT,
         name="maestro-cdp",
         retries=1,
-        capabilities=[SkillsCapability(directories=["./skills"])],
+        capabilities=[SkillsCapability(directories=["./app_skills"])],
     )
 
     # ── Tool Registration ───────────────────────────────────────────────
