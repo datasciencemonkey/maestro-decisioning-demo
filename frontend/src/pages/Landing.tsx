@@ -669,7 +669,7 @@ export default function Landing() {
               borderTop: `1px solid ${dark ? 'rgba(255,255,255,0.04)' : L.border + '12'}`,
             }}
           >
-            Built on Databricks &mdash; one platform, one governance plane, one agent.
+            Built on Databricks &mdash; one platform, one governance plane, governed agentic AI.
           </footer>
         </div>
 
