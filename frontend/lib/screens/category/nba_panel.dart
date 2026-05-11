@@ -139,7 +139,7 @@ class NbaPanel extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       child: Text(
-        'Powered by Mosaic AI \u00b7 Real-time',
+        'Powered by Agent Bricks \u00b7 Real-time',
         style: AppTheme.bodySmall.copyWith(
           color: AppColors.textMuted,
           fontSize: 10,
