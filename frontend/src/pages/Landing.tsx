@@ -393,16 +393,16 @@ export default function Landing() {
             {!dark && (
               <>
                 <div
-                  className="absolute pointer-events-none rounded-full blur-[80px] animate-[orbFloat1_20s_ease-in-out_infinite]"
-                  style={{ width: 650, height: 650, top: '5%', left: '10%', background: 'radial-gradient(circle, rgba(235,22,0,0.12) 0%, rgba(235,22,0,0.03) 50%, transparent 75%)' }}
+                  className="absolute pointer-events-none rounded-full blur-[60px] animate-[orbFloat1_20s_ease-in-out_infinite]"
+                  style={{ width: 700, height: 700, top: '0%', left: '5%', background: 'radial-gradient(circle, rgba(235,22,0,0.22) 0%, rgba(235,22,0,0.08) 40%, transparent 70%)' }}
                 />
                 <div
-                  className="absolute pointer-events-none rounded-full blur-[100px] animate-[orbFloat2_25s_ease-in-out_infinite]"
-                  style={{ width: 750, height: 750, top: '25%', right: '5%', background: 'radial-gradient(circle, rgba(64,209,245,0.10) 0%, rgba(64,209,245,0.02) 50%, transparent 75%)' }}
+                  className="absolute pointer-events-none rounded-full blur-[80px] animate-[orbFloat2_25s_ease-in-out_infinite]"
+                  style={{ width: 800, height: 800, top: '20%', right: '0%', background: 'radial-gradient(circle, rgba(64,209,245,0.18) 0%, rgba(64,209,245,0.06) 40%, transparent 70%)' }}
                 />
                 <div
-                  className="absolute pointer-events-none rounded-full blur-[70px] animate-[orbFloat3_18s_ease-in-out_infinite]"
-                  style={{ width: 500, height: 500, bottom: '10%', left: '35%', background: 'radial-gradient(circle, rgba(196,168,122,0.12) 0%, rgba(196,168,122,0.03) 50%, transparent 75%)' }}
+                  className="absolute pointer-events-none rounded-full blur-[50px] animate-[orbFloat3_18s_ease-in-out_infinite]"
+                  style={{ width: 550, height: 550, bottom: '5%', left: '30%', background: 'radial-gradient(circle, rgba(196,168,122,0.20) 0%, rgba(196,168,122,0.06) 40%, transparent 70%)' }}
                 />
               </>
             )}
