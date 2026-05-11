@@ -262,6 +262,40 @@ def get_workflow_status(workflow_id: str):
         raise HTTPException(status_code=404, detail=str(e))
 
 
+@app.get("/api/workflows")
+def list_workflows():
+    """List recent journey workflows with their status from both tables."""
+    if not app.state.db_params:
+        raise HTTPException(status_code=503, detail="Lakebase not available")
+    conn = psycopg2.connect(**app.state.db_params)
+    cur = conn.cursor()
+    # Business state
+    cur.execute("""
+        SELECT journey_id, customer_id, current_step, status,
+               created_at, updated_at
+        FROM journey_state ORDER BY updated_at DESC LIMIT 10
+    """)
+    journeys = [
+        {"journey_id": r[0], "customer_id": r[1], "step": r[2], "status": r[3],
+         "created_at": str(r[4]), "updated_at": str(r[5])}
+        for r in cur.fetchall()
+    ]
+    # DBOS workflow state
+    cur.execute("""
+        SELECT workflow_uuid, status, name, created_at
+        FROM dbos.workflow_status
+        WHERE name = 'journey_workflow'
+        ORDER BY created_at DESC LIMIT 10
+    """)
+    workflows = [
+        {"workflow_id": r[0], "status": r[1], "name": r[2], "created_at": str(r[3])}
+        for r in cur.fetchall()
+    ]
+    cur.close()
+    conn.close()
+    return {"journeys": journeys, "dbos_workflows": workflows}
+
+
 @app.get("/health")
 async def health():
     return {"status": "ok", "service": "maestro-cdp"}
