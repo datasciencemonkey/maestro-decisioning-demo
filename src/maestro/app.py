@@ -33,68 +33,78 @@ app = FastAPI(title="Maestro CDP", version="0.1.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 
-def _get_db_config() -> DBOSConfig:
-    from maestro.bootstrap import get_lakebase_conn_params
-    params = get_lakebase_conn_params()
-    db_url = (
-        f"postgresql://{params['user']}:{quote_plus(params['password'])}"
-        f"@{params['host']}:{params['port']}/{params['database']}?sslmode=require"
-    )
-    app.state.db_params = params
-    return DBOSConfig(
-        name="maestro-cdp-app",
-        system_database_url=db_url,
-        application_database_url=db_url,
-    )
+def _get_db_config():
+    """Get DBOS config. Returns None if Lakebase CLI not available (e.g., Databricks Apps)."""
+    try:
+        from maestro.bootstrap import get_lakebase_conn_params
+        params = get_lakebase_conn_params()
+        db_url = (
+            f"postgresql://{params['user']}:{quote_plus(params['password'])}"
+            f"@{params['host']}:{params['port']}/{params['database']}?sslmode=require"
+        )
+        app.state.db_params = params
+        return DBOSConfig(
+            name="maestro-cdp-app",
+            system_database_url=db_url,
+            application_database_url=db_url,
+        )
+    except Exception as e:
+        print(f"DBOS init skipped (Lakebase creds unavailable): {e}")
+        app.state.db_params = None
+        return None
 
 
 # DBOS integrates with FastAPI — handles launch/destroy via lifespan middleware
-DBOS(fastapi=app, config=_get_db_config())
+_dbos_config = _get_db_config()
+if _dbos_config:
+    DBOS(fastapi=app, config=_dbos_config)
+else:
+    print("Running without DBOS — workflow endpoints will be unavailable")
 
 
-# ── DBOS Steps (module level) ──────────────────────────────────────────────
+# ── DBOS Steps + Workflow (only if DBOS initialized) ──────────────────────
 
-@DBOS.step()
-def persist_journey(journey_id: str, customer_id: str, decision_json: str) -> str:
-    params = app.state.db_params
-    conn = psycopg2.connect(**params)
-    conn.autocommit = True
-    cur = conn.cursor()
-    cur.execute(
-        """INSERT INTO journey_state (journey_id, customer_id, current_step,
-            next_action_due_ts, state_blob, status)
-        VALUES (%s, %s, %s, %s, %s, 'pending')
-        ON CONFLICT (journey_id) DO UPDATE SET
-            current_step = EXCLUDED.current_step,
-            state_blob = EXCLUDED.state_blob, updated_at = NOW()""",
-        (journey_id, customer_id, "awaiting_send", "2026-05-10T08:00:00-05:00", decision_json),
-    )
-    cur.close()
-    conn.close()
-    return journey_id
+if _dbos_config:
 
+    @DBOS.step()
+    def persist_journey(journey_id: str, customer_id: str, decision_json: str) -> str:
+        params = app.state.db_params
+        conn = psycopg2.connect(**params)
+        conn.autocommit = True
+        cur = conn.cursor()
+        cur.execute(
+            """INSERT INTO journey_state (journey_id, customer_id, current_step,
+                next_action_due_ts, state_blob, status)
+            VALUES (%s, %s, %s, %s, %s, 'pending')
+            ON CONFLICT (journey_id) DO UPDATE SET
+                current_step = EXCLUDED.current_step,
+                state_blob = EXCLUDED.state_blob, updated_at = NOW()""",
+            (journey_id, customer_id, "awaiting_send", "2026-05-10T08:00:00-05:00", decision_json),
+        )
+        cur.close()
+        conn.close()
+        return journey_id
 
-@DBOS.step()
-def complete_journey(journey_id: str) -> str:
-    params = app.state.db_params
-    conn = psycopg2.connect(**params)
-    conn.autocommit = True
-    cur = conn.cursor()
-    cur.execute(
-        "UPDATE journey_state SET status = 'completed', updated_at = NOW() WHERE journey_id = %s",
-        (journey_id,),
-    )
-    cur.close()
-    conn.close()
-    return journey_id
+    @DBOS.step()
+    def complete_journey(journey_id: str) -> str:
+        params = app.state.db_params
+        conn = psycopg2.connect(**params)
+        conn.autocommit = True
+        cur = conn.cursor()
+        cur.execute(
+            "UPDATE journey_state SET status = 'completed', updated_at = NOW() WHERE journey_id = %s",
+            (journey_id,),
+        )
+        cur.close()
+        conn.close()
+        return journey_id
 
-
-@DBOS.workflow()
-def journey_workflow(journey_id: str, customer_id: str, decision_json: str, delay_seconds: int) -> str:
-    persist_journey(journey_id, customer_id, decision_json)
-    DBOS.sleep(delay_seconds)
-    complete_journey(journey_id)
-    return journey_id
+    @DBOS.workflow()
+    def journey_workflow(journey_id: str, customer_id: str, decision_json: str, delay_seconds: int) -> str:
+        persist_journey(journey_id, customer_id, decision_json)
+        DBOS.sleep(delay_seconds)
+        complete_journey(journey_id)
+        return journey_id
 
 
 # ── Model init (module level — runs before uvicorn, never blocks event loop) ─
