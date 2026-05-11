@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  /* Soft Modern palette */
+  --color-espresso: #2C1810;
+  --color-mocha: #7C6353;
+  --color-gold: #C4A87A;
+  --color-gold-light: #DBC09E;
+  --color-cream: #EDE4D8;
+  --color-linen: #FAF8F6;
+
+  --color-background: var(--color-linen);
+  --color-foreground: var(--color-espresso);
+  --color-card: #FFFFFF;
+  --color-card-foreground: var(--color-espresso);
+  --color-primary: var(--color-mocha);
+  --color-primary-foreground: #FFFFFF;
+  --color-secondary: var(--color-cream);
+  --color-secondary-foreground: var(--color-mocha);
+  --color-accent: var(--color-gold);
+  --color-accent-foreground: var(--color-espresso);
+  --color-muted: var(--color-cream);
+  --color-muted-foreground: #A89880;
+  --color-border: var(--color-cream);
+  --color-ring: var(--color-gold);
+  --color-destructive: #EF4444;
+
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'DM Serif Display', ui-serif, Georgia, serif;
+}
+
+/* Dark mode overrides */
+.dark {
+  --color-background: #0D0B09;
+  --color-foreground: #FAF8F6;
+  --color-card: #1A1612;
+  --color-card-foreground: #FAF8F6;
+  --color-primary: var(--color-gold);
+  --color-primary-foreground: #0D0B09;
+  --color-secondary: #2A2420;
+  --color-secondary-foreground: var(--color-cream);
+  --color-muted: #2A2420;
+  --color-muted-foreground: #8A7A68;
+  --color-border: #2A2420;
+  --color-ring: var(--color-gold);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+}
