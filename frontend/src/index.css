@@ -31,7 +31,7 @@
   --radius-md: 10px;
   --radius-lg: 14px;
 
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'DM Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-serif: 'DM Serif Display', ui-serif, Georgia, serif;
 }
 
@@ -83,3 +83,5 @@
 @keyframes glowPulse { 0%,100% { opacity:.6; transform: translateX(-50%) scale(1) } 50% { opacity:1; transform: translateX(-50%) scale(1.2) } }
 @keyframes scrollBounce { 0%,100% { transform: scaleY(1); opacity:.6 } 50% { transform: scaleY(.5); opacity:.2 } }
 @keyframes techMarquee { 0% { transform: translateX(0) } 100% { transform: translateX(-50%) } }
+@keyframes journeyPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(196,168,122,0.4) } 50% { box-shadow: 0 0 0 8px rgba(196,168,122,0) } }
+@keyframes journeyPulseLight { 0%,100% { box-shadow: 0 0 0 0 rgba(255,54,33,0.3) } 50% { box-shadow: 0 0 0 8px rgba(255,54,33,0) } }
