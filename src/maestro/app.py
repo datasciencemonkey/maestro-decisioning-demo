@@ -110,7 +110,7 @@ if _dbos_config:
 # ── Model init (module level — runs before uvicorn, never blocks event loop) ─
 
 from databricks.sdk import WorkspaceClient
-from openai import AsyncOpenAI
+from databricks_openai import AsyncDatabricksOpenAI
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.profiles.openai import OpenAIModelProfile
 from pydantic_ai.providers.openai import OpenAIProvider
@@ -122,15 +122,14 @@ if os.environ.get("DATABRICKS_HOST"):
 else:
     _w = WorkspaceClient(profile="9cefok")
 
+# Use AsyncDatabricksOpenAI — handles auth (incl. service principal token refresh)
+# Override base_url to route through AI Gateway instead of serving-endpoints
 _host = os.environ.get("DATABRICKS_HOST", _w.config.host).rstrip("/")
 if not _host.startswith("http"):
     _host = f"https://{_host}"
-_auth = _w.config.authenticate()
-_token = _auth.get("Authorization", "").replace("Bearer ", "") if isinstance(_auth, dict) else ""
-if not _token:
-    _token = os.environ.get("DATABRICKS_TOKEN", "")
 
-_client = AsyncOpenAI(api_key=_token, base_url=f"{_host}/ai-gateway/mlflow/v1")
+_client = AsyncDatabricksOpenAI(workspace_client=_w)
+_client.base_url = f"{_host}/ai-gateway/mlflow/v1"
 _provider = OpenAIProvider(openai_client=_client)
 _profile = OpenAIModelProfile(openai_supports_strict_tool_definition=False)
 MODEL = OpenAIChatModel("maestro-endpoint", provider=_provider, profile=_profile)
