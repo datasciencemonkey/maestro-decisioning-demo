@@ -64,8 +64,8 @@ export default function UploadModal({ isOpen, onClose, onMatch }: UploadModalPro
             {analyzing ? (
               /* Spinner state */
               <div className="flex flex-col items-center justify-center py-12 gap-4">
-                <Loader2 size={32} className="text-gold animate-spin" />
-                <p className="text-sm font-medium text-gold">Analyzing your pet...</p>
+                <Loader2 size={32} className="text-[#EB1600] dark:text-gold animate-spin" />
+                <p className="text-sm font-medium text-[#EB1600] dark:text-gold">Analyzing your pet...</p>
               </div>
             ) : (
               /* Photo grid */
@@ -78,7 +78,7 @@ export default function UploadModal({ isOpen, onClose, onMatch }: UploadModalPro
                     <button
                       key={i}
                       onClick={handleSelect}
-                      className="aspect-square rounded-xl overflow-hidden cursor-pointer ring-2 ring-transparent hover:ring-[#C4A87A] transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                      className="aspect-square rounded-xl overflow-hidden cursor-pointer ring-2 ring-transparent hover:ring-accent transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
                     >
                       <img
                         src={url}

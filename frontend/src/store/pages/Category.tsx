@@ -26,9 +26,9 @@ export default function Category() {
       {/* Breadcrumb */}
       <nav className="text-xs md:text-sm text-muted-foreground mb-4">
         <span>Home</span>
-        <span className="mx-1.5 text-[#C4A87A]">&gt;</span>
+        <span className="mx-1.5 text-muted-foreground">&gt;</span>
         <span>Photo Books</span>
-        <span className="mx-1.5 text-[#C4A87A]">&gt;</span>
+        <span className="mx-1.5 text-muted-foreground">&gt;</span>
         <span className="text-foreground font-medium">Pet Photo Books</span>
       </nav>
 

@@ -7,9 +7,9 @@ import { useCart } from '@/store/hooks/use-cart'
 
 const badgeStyles: Record<string, string> = {
   bestseller:
-    'bg-gradient-to-r from-[#C4A87A] to-[#DBC09E] text-[#2C1810] text-[10px] font-bold tracking-wider px-3 py-1 rounded-full',
+    'bg-gradient-to-r from-gold to-gold-light text-databricks-navy text-[10px] font-bold tracking-wider px-3 py-1 rounded-full',
   tabbyMatch:
-    'bg-gradient-to-r from-[#C4A87A] to-[#DBC09E] text-[#2C1810] text-[10px] font-bold tracking-wider px-3 py-1 rounded-full',
+    'bg-gradient-to-r from-gold to-gold-light text-databricks-navy text-[10px] font-bold tracking-wider px-3 py-1 rounded-full',
   new: 'bg-red-500 text-white text-[10px] font-bold tracking-wider px-3 py-1 rounded-full',
 }
 
@@ -81,7 +81,7 @@ export default function ProductCard({ product }: { product: Product }) {
               size={14}
               className={
                 i < Math.round(product.rating)
-                  ? 'fill-[#C4A87A] text-[#C4A87A]'
+                  ? 'fill-accent text-accent'
                   : 'fill-none text-muted-foreground/40'
               }
             />

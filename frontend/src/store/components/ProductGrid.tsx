@@ -29,7 +29,7 @@ export default function ProductGrid({ products, sort, onSortChange }: ProductGri
           <select
             value={sort}
             onChange={e => onSortChange(e.target.value as SortOption)}
-            className="appearance-none bg-card border border-border rounded-lg px-3 py-1.5 text-sm pr-8 text-foreground cursor-pointer focus:outline-none focus:ring-1 focus:ring-gold/40"
+            className="appearance-none bg-card border border-border rounded-lg px-3 py-1.5 text-sm pr-8 text-foreground cursor-pointer focus:outline-none focus:ring-1 focus:ring-ring/40"
           >
             {sortOptions.map(opt => (
               <option key={opt.value} value={opt.value}>

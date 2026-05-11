@@ -171,10 +171,10 @@ export default function CartDrawer({ isOpen, onClose, items, total, onRemoveItem
                 className={cn(
                   'w-full py-2.5 rounded-xl text-sm font-semibold tracking-wide cursor-pointer transition-all duration-200',
                   abandonState === 'flash'
-                    ? 'bg-gold text-espresso border border-gold shadow-lg shadow-gold/40'
+                    ? 'bg-[#EB1600] text-white dark:bg-gold dark:text-[#0D0B09] border border-[#EB1600] dark:border-gold shadow-lg shadow-[#EB1600]/40 dark:shadow-gold/40'
                     : abandonState === 'sent'
                       ? 'bg-green-600/20 text-green-400 border border-green-500/40'
-                      : 'bg-gold/15 text-gold border border-gold/30 hover:bg-gold/25 hover:border-gold/50',
+                      : 'bg-[#EB1600]/15 text-[#EB1600] border border-[#EB1600]/30 dark:bg-gold/15 dark:text-gold dark:border-gold/30 hover:bg-[#EB1600]/25 hover:border-[#EB1600]/50 dark:hover:bg-gold/25 dark:hover:border-gold/50',
                   abandonState === 'loading' && 'opacity-70 cursor-wait'
                 )}
               >

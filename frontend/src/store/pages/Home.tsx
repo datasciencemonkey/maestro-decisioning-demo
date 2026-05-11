@@ -62,7 +62,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
-            className="inline-block text-xs font-bold tracking-[3px] uppercase text-[#C4A87A] mb-4"
+            className="inline-block text-xs font-bold tracking-[3px] uppercase text-accent mb-4"
           >
             Welcome Home Collection
           </motion.span>
@@ -122,7 +122,7 @@ export default function Home() {
                   whileHover={{ y: -3 }}
                   transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                   onClick={() => navigate(cat.href!)}
-                  className="cursor-pointer rounded-lg border border-border bg-card p-8 text-center hover:border-[#C4A87A]/30 hover:shadow-md transition-all duration-200 dark:bg-card dark:border-border"
+                  className="cursor-pointer rounded-lg border border-border bg-card p-8 text-center hover:border-accent/30 hover:shadow-md transition-all duration-200 dark:bg-card dark:border-border"
                 >
                   <span className="text-4xl block mb-3">{cat.icon}</span>
                   <span className="text-base font-medium text-card-foreground">
@@ -146,7 +146,7 @@ export default function Home() {
           <h2 className="font-serif text-3xl text-foreground">Featured</h2>
           <span
             onClick={() => navigate('/store/photo-books')}
-            className="text-sm font-medium text-gold hover:text-gold-light cursor-pointer transition-colors"
+            className="text-sm font-medium text-[#EB1600] hover:text-[#EB1600]/80 dark:text-gold dark:hover:text-gold-light cursor-pointer transition-colors"
           >
             View All &rarr;
           </span>

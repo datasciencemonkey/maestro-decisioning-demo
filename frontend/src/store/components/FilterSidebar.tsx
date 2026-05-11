@@ -63,7 +63,7 @@ export default function FilterSidebar({ filter, onFilterChange, onMatchClick, cl
               <input
                 type="checkbox"
                 defaultChecked={opt.defaultChecked}
-                className="w-4 h-4 rounded border-border accent-gold cursor-pointer"
+                className="w-4 h-4 rounded border-border accent-[#EB1600] dark:accent-gold cursor-pointer"
               />
               <span className="text-sm text-foreground group-hover:text-foreground dark:group-hover:text-gold transition-colors">
                 {opt.label}
@@ -76,11 +76,11 @@ export default function FilterSidebar({ filter, onFilterChange, onMatchClick, cl
       {/* Match My Pet card */}
       <button
         onClick={onMatchClick}
-        className="w-full border-2 border-dashed border-[#C4A87A]/40 hover:border-[#C4A87A] transition-colors rounded-xl p-5 text-center cursor-pointer"
+        className="w-full border-2 border-dashed border-[#EB1600]/40 hover:border-[#EB1600] dark:border-[#C4A87A]/40 dark:hover:border-[#C4A87A] transition-colors rounded-xl p-5 text-center cursor-pointer"
       >
         <div className="flex flex-col items-center gap-2">
-          <Camera size={24} className="text-[#C4A87A]" />
-          <span className="text-sm font-semibold text-[#C4A87A]">Match My Pet</span>
+          <Camera size={24} className="text-[#EB1600] dark:text-[#C4A87A]" />
+          <span className="text-sm font-semibold text-[#EB1600] dark:text-[#C4A87A]">Match My Pet</span>
           <span className="text-[11px] text-muted-foreground">AI-powered photo matching</span>
         </div>
       </button>

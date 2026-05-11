@@ -128,7 +128,7 @@ function StoreShell() {
                   'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer',
                   pathname === link.to
                     ? 'bg-secondary text-foreground'
-                    : 'text-muted-foreground hover:text-[#C4A87A]'
+                    : 'text-muted-foreground hover:text-foreground'
                 )}
               >
                 {link.label}
@@ -156,7 +156,7 @@ function StoreShell() {
             aria-label="Toggle theme"
           >
             {theme === 'dark'
-              ? <Sun size={18} className="text-gold" />
+              ? <Sun size={18} className="text-[#EB1600] dark:text-gold" />
               : <Moon size={18} className="text-foreground" />
             }
           </button>
@@ -188,7 +188,7 @@ function StoreShell() {
                   'block px-3 py-2 rounded-lg text-sm font-medium transition-colors',
                   pathname === link.to
                     ? 'bg-secondary text-foreground'
-                    : 'text-muted-foreground hover:text-[#C4A87A]'
+                    : 'text-muted-foreground hover:text-foreground'
                 )}
               >
                 {link.label}
@@ -218,7 +218,7 @@ function StoreShell() {
       {/* Narrator strip */}
       <div className="h-[52px] bg-[#0B2026] dark:bg-[#0D0B09]/80 border-t border-white/10 flex items-center justify-between px-6">
         <div className="flex items-center gap-3 min-w-0">
-          <span className="shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full bg-gold/20 text-gold text-[10px] font-bold tracking-wider border border-gold/30">
+          <span className="shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#EB1600]/15 text-[#EB1600] dark:bg-gold/20 dark:text-gold text-[10px] font-bold tracking-wider border border-[#EB1600]/20 dark:border-gold/30">
             {narratorLabel}
           </span>
           <p className="text-white/50 text-xs truncate">
@@ -233,7 +233,7 @@ function StoreShell() {
               className={cn(
                 'px-3 py-1 rounded-full text-[10px] font-semibold tracking-wider transition-colors cursor-pointer',
                 mode === narratorMode
-                  ? 'bg-gold/20 text-gold border border-gold/30'
+                  ? 'bg-[#EB1600]/15 text-[#EB1600] border border-[#EB1600]/20 dark:bg-gold/20 dark:text-gold dark:border-gold/30'
                   : 'text-white/30 hover:text-white/50 hover:bg-white/5'
               )}
             >

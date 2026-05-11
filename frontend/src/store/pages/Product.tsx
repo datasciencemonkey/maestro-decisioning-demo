@@ -35,7 +35,7 @@ function StarRating({ rating, count }: { rating: number; count: number }) {
             <Star
               key={i}
               size={16}
-              className={filled ? 'text-[#C4A87A] fill-[#C4A87A]' : 'text-muted fill-none'}
+              className={filled ? 'text-accent fill-accent' : 'text-muted fill-none'}
             />
           )
         })}
@@ -48,8 +48,8 @@ function StarRating({ rating, count }: { rating: number; count: number }) {
 }
 
 const badgeStyles: Record<string, string> = {
-  bestseller: 'bg-gradient-to-r from-gold to-gold-light text-espresso',
-  tabbyMatch: 'bg-gradient-to-r from-gold to-gold-light text-espresso',
+  bestseller: 'bg-gradient-to-r from-gold to-gold-light text-databricks-navy dark:text-[#0D0B09]',
+  tabbyMatch: 'bg-gradient-to-r from-gold to-gold-light text-databricks-navy dark:text-[#0D0B09]',
   new: 'bg-destructive text-white',
 }
 
@@ -156,11 +156,11 @@ export default function Product() {
         <Link to="/store" className="hover:text-foreground transition-colors">
           Home
         </Link>
-        <ChevronRight size={14} className="text-[#C4A87A]" />
+        <ChevronRight size={14} className="text-muted-foreground" />
         <Link to="/store/photo-books" className="hover:text-foreground transition-colors">
           Photo Books
         </Link>
-        <ChevronRight size={14} className="text-[#C4A87A]" />
+        <ChevronRight size={14} className="text-muted-foreground" />
         <span className="text-foreground font-medium">{product.title}</span>
       </motion.nav>
 
@@ -211,7 +211,7 @@ export default function Product() {
 
           {/* Price */}
           <motion.p {...stagger(5)} className="flex items-center gap-2 text-3xl font-bold mt-2 text-foreground">
-            <span className="w-2 h-2 rounded-full bg-[#C4A87A] shrink-0" />
+            <span className="w-2 h-2 rounded-full bg-accent shrink-0" />
             ${product.price.toFixed(2)}
           </motion.p>
 
@@ -229,7 +229,7 @@ export default function Product() {
                     'px-4 md:px-6 py-2 md:py-2.5 rounded-full border-2 text-sm font-medium transition-all cursor-pointer',
                     selectedSize === size
                       ? 'border-[#0B2026] bg-[#0B2026] text-white dark:border-gold dark:bg-gold dark:text-[#0D0B09]'
-                      : 'border-border hover:border-[#C4A87A]/50'
+                      : 'border-border hover:border-accent/50'
                   )}
                 >
                   {size}
