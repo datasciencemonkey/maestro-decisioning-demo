@@ -389,12 +389,22 @@ export default function Landing() {
               />
             ))}
 
-            {/* Light mode: subtle warm radial */}
+            {/* Light mode: animated floating gradient orbs */}
             {!dark && (
-              <div
-                className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full pointer-events-none"
-                style={{ background: 'radial-gradient(circle, rgba(64,209,245,0.04) 0%, transparent 70%)' }}
-              />
+              <>
+                <div
+                  className="absolute pointer-events-none rounded-full blur-3xl animate-[orbFloat1_20s_ease-in-out_infinite]"
+                  style={{ width: 500, height: 500, top: '10%', left: '15%', background: 'radial-gradient(circle, rgba(235,22,0,0.06) 0%, transparent 70%)' }}
+                />
+                <div
+                  className="absolute pointer-events-none rounded-full blur-3xl animate-[orbFloat2_25s_ease-in-out_infinite]"
+                  style={{ width: 600, height: 600, top: '30%', right: '10%', background: 'radial-gradient(circle, rgba(64,209,245,0.05) 0%, transparent 70%)' }}
+                />
+                <div
+                  className="absolute pointer-events-none rounded-full blur-3xl animate-[orbFloat3_18s_ease-in-out_infinite]"
+                  style={{ width: 400, height: 400, bottom: '15%', left: '40%', background: 'radial-gradient(circle, rgba(196,168,122,0.06) 0%, transparent 70%)' }}
+                />
+              </>
             )}
 
             {/* Title */}
