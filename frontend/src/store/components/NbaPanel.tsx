@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import type { Recommendation } from '@/store/hooks/use-products'
 
 interface NbaPanelProps {
@@ -6,7 +8,12 @@ interface NbaPanelProps {
 
 export default function NbaPanel({ recommendations }: NbaPanelProps) {
   return (
-    <aside className="w-64 shrink-0 bg-card border border-[#C4A87A]/20 rounded-xl p-5 space-y-4 self-start">
+    <motion.aside
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.5, delay: 0.3 }}
+      className="w-64 shrink-0 bg-card border border-[#C4A87A]/20 rounded-xl p-5 space-y-4 self-start"
+    >
       {/* Header */}
       <div className="flex items-center gap-2">
         <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
@@ -41,8 +48,9 @@ export default function NbaPanel({ recommendations }: NbaPanelProps) {
         </p>
         <div className="space-y-2.5">
           {recommendations.map(rec => (
-            <div
+            <Link
               key={rec.id}
+              to={`/store/product/${rec.id}`}
               className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-secondary/40 transition-colors cursor-pointer"
             >
               <div className="w-8 h-8 rounded-md bg-cream dark:bg-muted overflow-hidden shrink-0">
@@ -56,7 +64,7 @@ export default function NbaPanel({ recommendations }: NbaPanelProps) {
                 <p className="text-xs font-medium truncate">{rec.title}</p>
                 <p className="text-[11px] text-[#C4A87A] font-semibold">{rec.matchPercent}% match</p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
@@ -65,6 +73,6 @@ export default function NbaPanel({ recommendations }: NbaPanelProps) {
       <p className="text-[10px] text-muted-foreground text-center pt-3 border-t border-border">
         Powered by Agent Bricks &middot; Real-time
       </p>
-    </aside>
+    </motion.aside>
   )
 }

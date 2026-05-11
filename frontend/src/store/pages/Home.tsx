@@ -33,9 +33,9 @@ function Reveal({
 // ─── Category tiles ─────────────────────────────────────────────
 const categories = [
   { label: 'Photo Books', icon: '\uD83D\uDCDA', href: '/store/photo-books' },
-  { label: 'Cards', icon: '\uD83D\uDC8C', href: '/store/cards' },
-  { label: 'Prints', icon: '\uD83D\uDDBC\uFE0F', href: '/store/prints' },
-  { label: 'Gifts', icon: '\uD83C\uDF81', href: '/store/gifts' },
+  { label: 'Cards', icon: '\uD83D\uDC8C', href: '/store/photo-books' },
+  { label: 'Prints', icon: '\uD83D\uDDBC\uFE0F', href: '/store/photo-books' },
+  { label: 'Gifts', icon: '\uD83C\uDF81', href: '/store/photo-books' },
 ]
 
 // ─── Home page ──────────────────────────────────────────────────

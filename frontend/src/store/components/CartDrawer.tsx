@@ -1,5 +1,6 @@
+import { useState, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { X, Trash2, ShoppingBag } from 'lucide-react'
+import { X, Trash2, ShoppingBag, Loader2 } from 'lucide-react'
 import type { CartItem } from '@/store/hooks/use-cart'
 import { cn } from '@/lib/utils'
 
@@ -13,6 +14,40 @@ interface CartDrawerProps {
 
 export default function CartDrawer({ isOpen, onClose, items, total, onRemoveItem }: CartDrawerProps) {
   const shipping = 0 // FREE
+  const [abandonState, setAbandonState] = useState<'idle' | 'loading' | 'flash' | 'sent'>('idle')
+
+  useEffect(() => {
+    if (abandonState === 'sent') {
+      const t = setTimeout(() => setAbandonState('idle'), 2000)
+      return () => clearTimeout(t)
+    }
+    if (abandonState === 'flash') {
+      const t = setTimeout(() => setAbandonState('sent'), 400)
+      return () => clearTimeout(t)
+    }
+  }, [abandonState])
+
+  async function handleAbandonCart() {
+    setAbandonState('loading')
+    try {
+      await fetch('http://localhost:8000/api/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event_type: 'cart_abandoned',
+          customer_id: 'cust_88241',
+          cart_id: 'cart_demo',
+          abandoned_at: new Date().toISOString(),
+          cart_total: total,
+          items: items.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity })),
+          tier1_clearance: true,
+        }),
+      })
+    } catch (err) {
+      console.error('Failed to send cart_abandoned event (backend may not be running):', err)
+    }
+    setAbandonState('flash')
+  }
 
   return (
     <AnimatePresence>
@@ -128,13 +163,24 @@ export default function CartDrawer({ isOpen, onClose, items, total, onRemoveItem
             <div className="px-6 py-4 bg-espresso dark:bg-black/60 border-t border-white/10">
               <p className="text-[10px] font-bold tracking-[2px] text-white/40 mb-3">DEMO CONTROL</p>
               <button
+                onClick={handleAbandonCart}
+                disabled={abandonState === 'loading'}
                 className={cn(
-                  'w-full py-2.5 rounded-xl text-sm font-semibold tracking-wide cursor-pointer',
-                  'bg-gold/15 text-gold border border-gold/30',
-                  'hover:bg-gold/25 hover:border-gold/50 transition-all duration-200'
+                  'w-full py-2.5 rounded-xl text-sm font-semibold tracking-wide cursor-pointer transition-all duration-200',
+                  abandonState === 'flash'
+                    ? 'bg-gold text-espresso border border-gold shadow-lg shadow-gold/40'
+                    : abandonState === 'sent'
+                      ? 'bg-green-600/20 text-green-400 border border-green-500/40'
+                      : 'bg-gold/15 text-gold border border-gold/30 hover:bg-gold/25 hover:border-gold/50',
+                  abandonState === 'loading' && 'opacity-70 cursor-wait'
                 )}
               >
-                Abandon Cart &rarr; Launch Beat 2
+                {abandonState === 'loading' && <Loader2 size={14} className="inline animate-spin mr-1.5" />}
+                {abandonState === 'sent'
+                  ? 'Event Sent!'
+                  : abandonState === 'flash'
+                    ? 'Event Sent!'
+                    : <>Abandon Cart &rarr; Launch Beat 2</>}
               </button>
             </div>
           </motion.div>

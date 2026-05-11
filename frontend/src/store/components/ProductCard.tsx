@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Star, ShoppingCart } from 'lucide-react'
+import { Star, ShoppingCart, Check } from 'lucide-react'
 import type { Product } from '@/store/data/products'
+import { useCart } from '@/store/hooks/use-cart'
 
 const badgeStyles: Record<string, string> = {
   bestseller:
@@ -24,7 +25,15 @@ function badgeLabel(product: Product): string {
 
 export default function ProductCard({ product }: { product: Product }) {
   const navigate = useNavigate()
+  const cart = useCart()
   const [imgError, setImgError] = useState(false)
+  const [added, setAdded] = useState(false)
+
+  useEffect(() => {
+    if (!added) return
+    const t = setTimeout(() => setAdded(false), 1500)
+    return () => clearTimeout(t)
+  }, [added])
 
   return (
     <motion.div
@@ -88,12 +97,19 @@ export default function ProductCard({ product }: { product: Product }) {
           <button
             onClick={(e) => {
               e.stopPropagation()
-              // Cart integration handled by parent/context
+              cart.addItem({
+                id: product.id,
+                name: product.title,
+                price: product.price,
+                quantity: 1,
+                image: product.imageUrl,
+              })
+              setAdded(true)
             }}
             className="flex-1 inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-[#7C6353] to-[#A08468] text-white rounded-lg py-2.5 text-sm font-semibold hover:opacity-90 transition-opacity"
           >
-            <ShoppingCart size={14} />
-            Add to Cart
+            {added ? <Check size={14} /> : <ShoppingCart size={14} />}
+            {added ? 'Added!' : 'Add to Cart'}
           </button>
         </div>
       </div>

@@ -57,5 +57,25 @@
   }
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    scroll-behavior: smooth;
   }
 }
+
+/* Text selection */
+::selection {
+  background: rgba(196,168,122,0.25);
+  color: inherit;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(196,168,122,0.3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(196,168,122,0.5); }
+
+/* Landing page keyframe animations */
+@keyframes goldShift { 0% { background-position: 0% } 100% { background-position: 200% } }
+@keyframes ctaShimmer { 0% { transform: translateX(-100%) } 50%,100% { transform: translateX(100%) } }
+@keyframes glowPulse { 0%,100% { opacity:.6; transform: translateX(-50%) scale(1) } 50% { opacity:1; transform: translateX(-50%) scale(1.2) } }
+@keyframes scrollBounce { 0%,100% { transform: scaleY(1); opacity:.6 } 50% { transform: scaleY(.5); opacity:.2 } }
+@keyframes techMarquee { 0% { transform: translateX(0) } 100% { transform: translateX(-50%) } }

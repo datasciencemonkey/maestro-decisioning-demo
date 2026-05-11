@@ -1,8 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, useInView } from 'framer-motion'
-import { useTheme } from '@/hooks/use-theme'
-import { Sun, Moon } from 'lucide-react'
 
 // ─── Particle canvas ────────────────────────────────────────────
 function ParticleCanvas() {
@@ -106,7 +104,6 @@ const techItems = ['Pydantic AI', 'MLflow Tracing', 'DBOS on Lakebase', 'Unity C
 // ─── Landing page ───────────────────────────────────────────────
 export default function Landing() {
   const navigate = useNavigate()
-  const { theme, toggle } = useTheme()
 
   const launchDemo = useCallback(() => {
     navigate('/store')
@@ -127,15 +124,6 @@ export default function Landing() {
             style={{ width: size, height: size, animationDelay: `${i}s`, animationDuration: '6s' }}
           />
         ))}
-
-        {/* Theme toggle */}
-        <button
-          onClick={toggle}
-          className="absolute top-6 right-8 p-2 rounded-lg border border-white/10 hover:border-gold/30 transition-colors"
-          aria-label="Toggle theme"
-        >
-          {theme === 'dark' ? <Sun size={16} className="text-gold" /> : <Moon size={16} className="text-gold" />}
-        </button>
 
         {/* Badge */}
         <motion.div
@@ -281,13 +269,6 @@ export default function Landing() {
         Built on Databricks &mdash; one platform, one governance plane, one agent.
       </footer>
 
-      <style>{`
-        @keyframes goldShift { 0% { background-position: 0% } 100% { background-position: 200% } }
-        @keyframes ctaShimmer { 0% { transform: translateX(-100%) } 50%,100% { transform: translateX(100%) } }
-        @keyframes glowPulse { 0%,100% { opacity:.6; transform: translateX(-50%) scale(1) } 50% { opacity:1; transform: translateX(-50%) scale(1.2) } }
-        @keyframes scrollBounce { 0%,100% { transform: scaleY(1); opacity:.6 } 50% { transform: scaleY(.5); opacity:.2 } }
-        @keyframes techMarquee { 0% { transform: translateX(0) } 100% { transform: translateX(-50%) } }
-      `}</style>
     </div>
   )
 }

@@ -104,6 +104,18 @@ function StoreShell() {
         <Outlet />
       </main>
 
+      {/* Store footer */}
+      <footer className="bg-secondary/30 dark:bg-card/50 border-t border-border py-8 px-8">
+        <div className="max-w-7xl mx-auto flex items-center justify-between text-xs text-muted-foreground">
+          <span>Fluttershy — Made with love for pets everywhere</span>
+          <div className="flex gap-6">
+            <span className="hover:text-foreground cursor-pointer transition-colors">Help</span>
+            <span className="hover:text-foreground cursor-pointer transition-colors">Privacy</span>
+            <span className="hover:text-foreground cursor-pointer transition-colors">Terms</span>
+          </div>
+        </div>
+      </footer>
+
       {/* Narrator strip */}
       <div className="h-[52px] bg-espresso dark:bg-black/80 border-t border-white/10 flex items-center justify-between px-6">
         <div className="flex items-center gap-3 min-w-0">

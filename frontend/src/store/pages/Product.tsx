@@ -1,4 +1,4 @@
-import { type SyntheticEvent, useMemo, useState } from 'react'
+import { type SyntheticEvent, useEffect, useMemo, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Star, ChevronRight } from 'lucide-react'
@@ -100,15 +100,28 @@ export default function Product() {
   const { id } = useParams<{ id: string }>()
   const cart = useCart()
   const [selectedSize, setSelectedSize] = useState<string>(sizes[1])
+  const [added, setAdded] = useState(false)
+
+  useEffect(() => {
+    if (!added) return
+    const t = setTimeout(() => setAdded(false), 1500)
+    return () => clearTimeout(t)
+  }, [added])
 
   const product = products.find(p => p.id === id)
 
   const suggestions = useMemo(() => {
     if (!product) return []
     const others = products.filter(p => p.id !== product.id)
-    const shuffled = [...others].sort(() => Math.random() - 0.5)
+    // Deterministic shuffle based on product id
+    const seed = product.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0)
+    const shuffled = [...others].sort((a, b) => {
+      const ha = (a.id.charCodeAt(0) * seed) % 100
+      const hb = (b.id.charCodeAt(0) * seed) % 100
+      return ha - hb
+    })
     return shuffled.slice(0, 3)
-  }, [product])
+  }, [product.id])
 
   if (!product) {
     return (
@@ -132,6 +145,7 @@ export default function Product() {
       quantity: 1,
       image: product.imageUrl,
     })
+    setAdded(true)
   }
 
   return (
@@ -225,13 +239,14 @@ export default function Product() {
             <button
               onClick={handleAddToCart}
               className={cn(
-                'w-full py-4 rounded-xl text-lg font-semibold cursor-pointer',
-                'bg-gradient-to-r from-[#7C6353] to-[#A08468] text-white',
-                'hover:shadow-lg hover:shadow-[#7C6353]/25 transition-all',
+                'w-full py-4 rounded-xl text-lg font-semibold cursor-pointer transition-all',
+                added
+                  ? 'bg-green-600 text-white'
+                  : 'bg-gradient-to-r from-[#7C6353] to-[#A08468] text-white hover:shadow-lg hover:shadow-[#7C6353]/25',
                 'active:translate-y-0'
               )}
             >
-              Add to Cart &mdash; ${product.price.toFixed(2)}
+              {added ? 'Added to Cart!' : <>Add to Cart &mdash; ${product.price.toFixed(2)}</>}
             </button>
           </motion.div>
 
