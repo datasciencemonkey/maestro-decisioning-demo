@@ -67,7 +67,18 @@ else:
 if _dbos_config:
 
     @DBOS.step()
-    def persist_journey(journey_id: str, customer_id: str, decision_json: str) -> str:
+    def persist_journey(journey_id: str, customer_id: str, decision_json: str, delay_seconds: int) -> str:
+        from datetime import datetime, timedelta, timezone
+        # Compute due_ts from now + delay (what DBOS.sleep will wait)
+        due_ts = (datetime.now(timezone.utc) + timedelta(seconds=delay_seconds)).isoformat()
+        # Also check if decision has a send_time
+        try:
+            decision = json.loads(decision_json)
+            send_times = [d["value"] for d in decision.get("decisions", []) if d.get("type") == "send_time" and d.get("value")]
+            if send_times:
+                due_ts = send_times[0]
+        except Exception:
+            pass
         params = app.state.db_params
         conn = psycopg2.connect(**params)
         conn.autocommit = True
@@ -78,8 +89,9 @@ if _dbos_config:
             VALUES (%s, %s, %s, %s, %s, 'pending')
             ON CONFLICT (journey_id) DO UPDATE SET
                 current_step = EXCLUDED.current_step,
+                next_action_due_ts = EXCLUDED.next_action_due_ts,
                 state_blob = EXCLUDED.state_blob, updated_at = NOW()""",
-            (journey_id, customer_id, "awaiting_send", "2026-05-10T08:00:00-05:00", decision_json),
+            (journey_id, customer_id, "awaiting_send", due_ts, decision_json),
         )
         cur.close()
         conn.close()
@@ -101,7 +113,7 @@ if _dbos_config:
 
     @DBOS.workflow()
     def journey_workflow(journey_id: str, customer_id: str, decision_json: str, delay_seconds: int) -> str:
-        persist_journey(journey_id, customer_id, decision_json)
+        persist_journey(journey_id, customer_id, decision_json, delay_seconds)
         DBOS.sleep(delay_seconds)
         complete_journey(journey_id)
         return journey_id
