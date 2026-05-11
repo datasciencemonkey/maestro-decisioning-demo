@@ -4,6 +4,18 @@ import { motion, useInView } from 'framer-motion'
 import { Sun, Moon } from 'lucide-react'
 import { useTheme } from '../hooks/use-theme'
 
+// ─── Brand tokens (light mode = Databricks official) ───────────
+const L = {
+  bg: '#F9F7F4',
+  text: '#0B2026',
+  secondary: '#4A4A4A',
+  accent: '#40D1F5',
+  cta: '#EB1600',
+  hover: '#F1F5FA',
+  border: '#0B2026',
+  borderLight: '#0B2026',
+} as const
+
 // ─── Particle canvas (dark mode only) ──────────────────────────
 function ParticleCanvas() {
   const ref = useRef<HTMLCanvasElement>(null)
@@ -124,7 +136,6 @@ function JourneySidebar({ dark }: { dark: boolean }) {
       const scrollY = window.scrollY
       const docHeight = document.documentElement.scrollHeight - window.innerHeight
       const progress = docHeight > 0 ? scrollY / docHeight : 0
-      // Map scroll progress to journey steps
       const idx = Math.min(
         cindyJourney.length - 1,
         Math.floor(progress * (cindyJourney.length + 1))
@@ -136,20 +147,44 @@ function JourneySidebar({ dark }: { dark: boolean }) {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  // Compute the progress line height
+  const lineProgress = activeIndex >= 0
+    ? ((activeIndex + 1) / cindyJourney.length) * 100
+    : 0
+
   return (
     <div ref={containerRef} className="w-full">
       {/* Header */}
       <div className="mb-6">
-        <p className={`text-[10px] font-semibold tracking-[2.5px] uppercase mb-2 ${dark ? 'text-gold/50' : 'text-[#5A6F77]'}`}>
+        <p
+          className="text-[10px] font-bold tracking-[2.5px] uppercase mb-2"
+          style={{ color: dark ? 'rgba(196,168,122,0.5)' : L.secondary }}
+        >
           Cindy&apos;s Journey
         </p>
-        <div className={`h-px w-12 ${dark ? 'bg-gold/20' : 'bg-[#DCE0E2]'}`} />
+        <div
+          className="h-px w-12"
+          style={{ background: dark ? 'rgba(196,168,122,0.2)' : L.border + '20' }}
+        />
       </div>
 
       {/* Steps */}
       <div className="relative">
-        {/* Vertical line */}
-        <div className={`absolute left-[15px] top-2 bottom-2 w-px ${dark ? 'bg-white/[0.06]' : 'bg-[#DCE0E2]'}`} />
+        {/* Background vertical line */}
+        <div
+          className="absolute left-[15px] top-2 bottom-2 w-px"
+          style={{ background: dark ? 'rgba(255,255,255,0.06)' : L.border + '15' }}
+        />
+        {/* Animated progress line */}
+        <div
+          className="absolute left-[15px] top-2 w-px transition-all duration-700 ease-out"
+          style={{
+            height: `${lineProgress}%`,
+            background: dark
+              ? 'linear-gradient(to bottom, rgba(196,168,122,0.6), rgba(196,168,122,0.2))'
+              : `linear-gradient(to bottom, ${L.cta}99, ${L.cta}33)`,
+          }}
+        />
 
         {cindyJourney.map((step, i) => {
           const isPast = i < activeIndex
@@ -157,27 +192,41 @@ function JourneySidebar({ dark }: { dark: boolean }) {
           const isFuture = i > activeIndex
 
           return (
-            <div
+            <motion.div
               key={step.id}
-              className={`relative flex items-start gap-3.5 mb-5 last:mb-0 transition-all duration-500 ${isFuture ? 'opacity-[0.25]' : 'opacity-100'}`}
+              initial={{ opacity: 0, x: 12 }}
+              animate={{
+                opacity: isFuture ? 0.2 : 1,
+                x: 0,
+              }}
+              transition={{
+                duration: 0.5,
+                delay: isFuture ? 0 : 0.05 * i,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+              className="relative flex items-start gap-3.5 mb-5 last:mb-0"
             >
               {/* Dot */}
               <div className="relative z-10 shrink-0 flex items-center justify-center w-[30px] h-[30px]">
                 <div
-                  className={`w-3 h-3 rounded-full transition-all duration-500 ${
-                    isCurrent
-                      ? dark
-                        ? 'bg-gold scale-125'
-                        : 'bg-[#FF3621] scale-125'
+                  className="rounded-full transition-all duration-500"
+                  style={{
+                    width: isCurrent ? 14 : 10,
+                    height: isCurrent ? 14 : 10,
+                    background: isCurrent
+                      ? dark ? '#C4A87A' : L.cta
                       : isPast
-                        ? dark
-                          ? 'bg-gold/70'
-                          : 'bg-[#FF3621]/60'
-                        : dark
-                          ? 'bg-white/10 border border-white/10'
-                          : 'bg-[#DCE0E2] border border-[#DCE0E2]'
-                  }`}
-                  style={isCurrent ? { animation: dark ? 'journeyPulse 2s ease infinite' : 'journeyPulseLight 2s ease infinite' } : undefined}
+                        ? dark ? 'rgba(196,168,122,0.6)' : L.cta + '80'
+                        : dark ? 'rgba(255,255,255,0.08)' : L.border + '18',
+                    border: isFuture
+                      ? `1px solid ${dark ? 'rgba(255,255,255,0.08)' : L.border + '18'}`
+                      : 'none',
+                    animation: isCurrent
+                      ? dark
+                        ? 'journeyPulse 2s ease infinite'
+                        : 'journeyPulseLight 2s ease infinite'
+                      : undefined,
+                  }}
                 />
               </div>
 
@@ -185,27 +234,33 @@ function JourneySidebar({ dark }: { dark: boolean }) {
               <div className="pt-0.5 min-w-0">
                 <div className="flex items-center gap-2 mb-0.5">
                   <span className="text-base leading-none">{step.emoji}</span>
-                  <span className={`text-[13px] font-semibold leading-tight ${
-                    isCurrent
-                      ? dark ? 'text-gold' : 'text-[#1B3139]'
-                      : isPast
-                        ? dark ? 'text-white/70' : 'text-[#1B3139]/70'
-                        : dark ? 'text-white/25' : 'text-[#5A6F77]/50'
-                  }`}>
+                  <span
+                    className="text-[14px] font-semibold leading-tight transition-colors duration-300"
+                    style={{
+                      color: isCurrent
+                        ? dark ? '#C4A87A' : L.text
+                        : isPast
+                          ? dark ? 'rgba(255,255,255,0.65)' : L.text + 'B0'
+                          : dark ? 'rgba(255,255,255,0.2)' : L.secondary + '60',
+                    }}
+                  >
                     {step.title}
                   </span>
                 </div>
-                <p className={`text-[11px] leading-[1.5] ${
-                  isCurrent
-                    ? dark ? 'text-white/50' : 'text-[#5A6F77]'
-                    : isPast
-                      ? dark ? 'text-white/30' : 'text-[#5A6F77]/60'
-                      : dark ? 'text-white/15' : 'text-[#5A6F77]/30'
-                }`}>
+                <p
+                  className="text-[13px] leading-[1.5] transition-colors duration-300"
+                  style={{
+                    color: isCurrent
+                      ? dark ? 'rgba(255,255,255,0.45)' : L.secondary
+                      : isPast
+                        ? dark ? 'rgba(255,255,255,0.25)' : L.secondary + '90'
+                        : dark ? 'rgba(255,255,255,0.1)' : L.secondary + '40',
+                  }}
+                >
                   {step.desc}
                 </p>
               </div>
-            </div>
+            </motion.div>
           )
         })}
       </div>
@@ -215,31 +270,46 @@ function JourneySidebar({ dark }: { dark: boolean }) {
 
 // ─── Mobile journey track ──────────────────────────────────────
 function JourneyMobileTrack({ dark, activeIndex }: { dark: boolean; activeIndex: number }) {
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  // Auto-scroll to active step
+  useEffect(() => {
+    if (scrollRef.current && activeIndex >= 0) {
+      const child = scrollRef.current.children[0]?.children[activeIndex] as HTMLElement | undefined
+      if (child) {
+        child.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+      }
+    }
+  }, [activeIndex])
+
   return (
-    <div className="overflow-x-auto scrollbar-none -mx-4 px-4 pb-4">
-      <div className="flex gap-3 w-max">
+    <div ref={scrollRef} className="overflow-x-auto -mx-4 px-4 pb-1" style={{ scrollbarWidth: 'none' }}>
+      <div className="flex gap-2.5 w-max">
         {cindyJourney.map((step, i) => {
           const isPast = i < activeIndex
           const isCurrent = i === activeIndex
-          const isFuture = i > activeIndex
           return (
             <div
               key={step.id}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-[12px] whitespace-nowrap transition-all duration-500 ${
-                isCurrent
-                  ? dark
-                    ? 'border-gold/40 bg-gold/10 text-gold'
-                    : 'border-[#FF3621]/30 bg-[#FF3621]/5 text-[#1B3139]'
+              className="flex items-center gap-1.5 px-3 py-2 text-[11px] whitespace-nowrap transition-all duration-500"
+              style={{
+                borderRadius: 4,
+                border: `1px solid ${
+                  isCurrent
+                    ? dark ? 'rgba(196,168,122,0.4)' : L.border
+                    : isPast
+                      ? dark ? 'rgba(255,255,255,0.08)' : L.border + '30'
+                      : dark ? 'rgba(255,255,255,0.04)' : L.border + '12'
+                }`,
+                background: isCurrent
+                  ? dark ? 'rgba(196,168,122,0.08)' : L.hover
+                  : 'transparent',
+                color: isCurrent
+                  ? dark ? '#C4A87A' : L.text
                   : isPast
-                    ? dark
-                      ? 'border-white/10 bg-white/[0.03] text-white/50'
-                      : 'border-[#DCE0E2] bg-[#F7F9FA] text-[#5A6F77]'
-                    : isFuture
-                      ? dark
-                        ? 'border-white/[0.04] text-white/20'
-                        : 'border-[#DCE0E2]/50 text-[#5A6F77]/30'
-                      : ''
-              }`}
+                    ? dark ? 'rgba(255,255,255,0.45)' : L.secondary
+                    : dark ? 'rgba(255,255,255,0.18)' : L.secondary + '50',
+              }}
             >
               <span>{step.emoji}</span>
               <span className="font-medium">{step.title}</span>
@@ -279,7 +349,13 @@ export default function Landing() {
   }, [])
 
   return (
-    <div className={`min-h-screen relative transition-colors duration-300 ${dark ? 'bg-[#0D0B09] text-white' : 'bg-white text-[#1B3139]'}`}>
+    <div
+      className="min-h-screen relative transition-colors duration-300"
+      style={{
+        background: dark ? '#0D0B09' : L.bg,
+        color: dark ? '#ffffff' : L.text,
+      }}
+    >
       {/* Dark-mode-only ambient effects */}
       {dark && <ParticleCanvas />}
       {dark && <CursorGlow />}
@@ -287,10 +363,10 @@ export default function Landing() {
       {/* ── Theme toggle ── */}
       <button
         onClick={toggle}
-        className={`fixed top-5 right-5 z-50 w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-200 ${
+        className={`fixed top-5 right-5 z-50 w-9 h-9 flex items-center justify-center rounded-[4px] transition-all duration-[250ms] ease-in-out ${
           dark
-            ? 'bg-white/[0.06] border border-white/[0.08] hover:bg-white/[0.1] text-white/60 hover:text-white/90'
-            : 'bg-[#F7F9FA] border border-[#DCE0E2] hover:bg-[#DCE0E2] text-[#5A6F77] hover:text-[#1B3139]'
+            ? 'border border-white/[0.08] bg-white/[0.04] text-white/60 hover:bg-white/10'
+            : 'border border-[#0B2026] bg-transparent text-[#4A4A4A] hover:bg-[#0B2026] hover:text-white'
         }`}
         aria-label="Toggle theme"
       >
@@ -303,7 +379,7 @@ export default function Landing() {
         <div className="w-full lg:w-[65%] xl:w-[68%]">
 
           {/* ── Hero ── */}
-          <section className={`relative min-h-screen flex flex-col items-center justify-center text-center px-8 overflow-hidden ${dark ? '' : ''}`}>
+          <section className="relative min-h-screen flex flex-col items-center justify-center text-center px-8 overflow-hidden">
             {/* Concentric rings (dark only) */}
             {dark && [600, 900, 1200].map((size, i) => (
               <div
@@ -313,17 +389,16 @@ export default function Landing() {
               />
             ))}
 
-            {/* Light mode decorative elements */}
+            {/* Light mode: subtle warm radial */}
             {!dark && (
-              <>
-                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#DCE0E2] to-transparent" />
-                <div className="absolute top-1/4 -right-32 w-[500px] h-[500px] rounded-full bg-[#FF3621]/[0.03]" />
-                <div className="absolute bottom-1/4 -left-32 w-[400px] h-[400px] rounded-full bg-[#F7F9FA]" />
-              </>
+              <div
+                className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full pointer-events-none"
+                style={{ background: 'radial-gradient(circle, rgba(64,209,245,0.04) 0%, transparent 70%)' }}
+              />
             )}
 
             {/* Title */}
-            <h1 className={`font-serif text-[clamp(36px,5.5vw,68px)] font-normal leading-[1.1] max-w-[850px] mb-7 ${dark ? '' : 'text-[#1B3139]'}`}>
+            <h1 className="font-serif text-[clamp(36px,5.5vw,68px)] font-normal leading-[1.1] max-w-[850px] mb-7">
               {['The ', null, 'Lives on Your ', 'Data Platform'].map((text, i) => (
                 <span key={i} className="block overflow-hidden">
                   <motion.span
@@ -333,11 +408,13 @@ export default function Landing() {
                     transition={{ delay: 0.3 + i * 0.15, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
                   >
                     {i === 1 ? (
-                      <span className={
-                        dark
+                      <span
+                        className={dark
                           ? 'bg-gradient-to-r from-gold via-gold-light to-gold bg-[length:200%_auto] bg-clip-text text-transparent animate-[goldShift_4s_linear_infinite]'
-                          : 'text-[#FF3621]'
-                      }>
+                          : ''
+                        }
+                        style={!dark ? { color: L.cta } : undefined}
+                      >
                         Agentic CDP
                       </span>
                     ) : text}
@@ -351,7 +428,8 @@ export default function Landing() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.9, duration: 0.8 }}
-              className={`text-[17px] leading-[1.8] max-w-[540px] mb-12 ${dark ? 'text-white/50' : 'text-[#5A6F77]'}`}
+              className="text-[17px] leading-[1.8] max-w-[540px] mb-12"
+              style={{ color: dark ? 'rgba(255,255,255,0.5)' : L.secondary }}
             >
               One AI agent reasons across campaigns, production calendars, support tickets, and ML models &mdash; makes a governed decision in&nbsp;under&nbsp;2&nbsp;seconds.
             </motion.p>
@@ -368,11 +446,12 @@ export default function Landing() {
               )}
               <button
                 onClick={launchDemo}
-                className={`relative group inline-flex items-center gap-3 px-11 py-[18px] font-semibold text-[16px] tracking-[0.5px] overflow-hidden transition-all duration-250 cursor-pointer ${
+                className={`relative group inline-flex items-center gap-3 px-11 py-[18px] font-semibold text-[15px] overflow-hidden cursor-pointer transition-all duration-[250ms] ease-in-out ${
                   dark
                     ? 'rounded-[14px] bg-gradient-to-br from-gold to-gold-light text-espresso hover:-translate-y-[3px] hover:shadow-[0_12px_40px_rgba(196,168,122,0.35)] active:translate-y-0'
-                    : 'rounded-sm bg-[#FF3621] text-white hover:-translate-y-[2px] hover:shadow-[0_8px_30px_rgba(255,54,33,0.25)] active:translate-y-0'
+                    : 'rounded-[4px] bg-[#EB1600] text-white border-none hover:bg-[#0B2026] hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(11,32,38,0.15)]'
                 }`}
+                style={{ letterSpacing: dark ? '0.5px' : '1.5px' }}
               >
                 {dark && <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full animate-[ctaShimmer_3s_ease-in-out_infinite]" />}
                 <span className="relative z-10">Launch Demo</span>
@@ -387,67 +466,118 @@ export default function Landing() {
               transition={{ delay: 1.6 }}
               className="absolute bottom-8 flex flex-col items-center gap-2"
             >
-              <span className={`text-[10px] tracking-[2px] ${dark ? 'text-white/25' : 'text-[#5A6F77]/30'}`}>SCROLL</span>
-              <div className={`w-px h-8 animate-[scrollBounce_2s_ease_infinite] ${
-                dark ? 'bg-gradient-to-b from-gold/40 to-transparent' : 'bg-gradient-to-b from-[#FF3621]/30 to-transparent'
-              }`} />
+              <span
+                className="text-[10px] tracking-[2px]"
+                style={{ color: dark ? 'rgba(255,255,255,0.25)' : L.secondary + '40' }}
+              >
+                SCROLL
+              </span>
+              <div
+                className="w-px h-8 animate-[scrollBounce_2s_ease_infinite]"
+                style={{
+                  background: dark
+                    ? 'linear-gradient(to bottom, rgba(196,168,122,0.4), transparent)'
+                    : `linear-gradient(to bottom, ${L.border}40, transparent)`,
+                }}
+              />
             </motion.div>
           </section>
 
           {/* ── Mobile journey track (visible below lg) ── */}
-          <div className={`lg:hidden sticky top-0 z-40 py-3 px-4 border-b ${
-            dark ? 'bg-[#0D0B09]/95 backdrop-blur-sm border-white/[0.04]' : 'bg-white/95 backdrop-blur-sm border-[#DCE0E2]'
-          }`}>
+          <div
+            className="lg:hidden sticky top-0 z-40 py-3 px-4"
+            style={{
+              background: dark ? 'rgba(13,11,9,0.95)' : `${L.bg}F2`,
+              backdropFilter: 'blur(8px)',
+              borderBottom: `1px solid ${dark ? 'rgba(255,255,255,0.04)' : L.border + '15'}`,
+            }}
+          >
             <JourneyMobileTrack dark={dark} activeIndex={mobileActiveIndex} />
           </div>
 
           {/* ── Three Beats ── */}
-          <section className={`relative px-4 md:px-8 py-28 ${
-            dark
-              ? 'bg-gradient-to-b from-[#12100D] to-[#1A1612]'
-              : 'bg-[#F7F9FA]'
-          }`}>
+          <section
+            className="relative px-4 md:px-8 py-28"
+            style={{
+              background: dark
+                ? 'linear-gradient(to bottom, #12100D, #1A1612)'
+                : L.hover,
+            }}
+          >
             <Reveal className="text-center mb-16">
-              <h2 className={`font-serif text-4xl mb-3 ${dark ? '' : 'text-[#1B3139]'}`}>Three Beats. One Goal.</h2>
-              <p className={`text-sm ${dark ? 'text-white/40' : 'text-[#5A6F77]'}`}>A 15-minute live demo proving Databricks is the agentic CDP</p>
+              <h2 className="font-serif text-4xl mb-3">Three Beats. One Goal.</h2>
+              <p style={{ color: dark ? 'rgba(255,255,255,0.4)' : L.secondary }} className="text-sm">
+                A 15-minute live demo proving Databricks is the agentic CDP
+              </p>
             </Reveal>
 
             <div className="relative max-w-[1000px] mx-auto flex flex-col md:flex-row items-stretch gap-6 md:gap-0">
               {/* Connector line (desktop only) */}
-              <div className={`hidden md:block absolute top-6 left-0 right-0 h-px ${
-                dark ? 'bg-gradient-to-r from-transparent via-gold/20 to-transparent' : 'bg-gradient-to-r from-transparent via-[#DCE0E2] to-transparent'
-              }`} />
+              <div
+                className="hidden md:block absolute top-6 left-0 right-0 h-px"
+                style={{
+                  background: dark
+                    ? 'linear-gradient(to right, transparent, rgba(196,168,122,0.2), transparent)'
+                    : `linear-gradient(to right, transparent, ${L.border}20, transparent)`,
+                }}
+              />
 
               {beats.map((beat, i) => (
                 <Reveal key={beat.num} delay={0.1 + i * 0.2} className="flex-1 px-4 relative">
-                  <div className={`w-12 h-12 rounded-[14px] flex items-center justify-center font-bold text-base mb-6 mx-auto relative z-10 transition-all duration-300 hover:scale-110 ${
-                    dark
-                      ? i === 0
-                        ? 'bg-gradient-to-br from-gold to-gold-light text-espresso hover:shadow-lg hover:shadow-gold/20'
-                        : i === 1
-                          ? 'bg-espresso text-gold border border-gold/20 hover:shadow-lg hover:shadow-gold/20'
-                          : 'bg-gradient-to-br from-mocha to-[#A08468] text-white hover:shadow-lg hover:shadow-gold/20'
-                      : 'bg-[#FF3621] text-white hover:shadow-lg hover:shadow-[#FF3621]/20'
-                  }`}>
+                  <div
+                    className="w-12 h-12 flex items-center justify-center font-bold text-base mb-6 mx-auto relative z-10 transition-all duration-300 hover:scale-110"
+                    style={{
+                      borderRadius: dark ? 14 : 4,
+                      ...(dark
+                        ? i === 0
+                          ? { background: 'linear-gradient(135deg, #C4A87A, #DBC09E)', color: '#2C1810' }
+                          : i === 1
+                            ? { background: '#2C1810', color: '#C4A87A', border: '1px solid rgba(196,168,122,0.2)' }
+                            : { background: 'linear-gradient(135deg, #7C6353, #A08468)', color: '#ffffff' }
+                        : { background: L.text, color: '#ffffff' }
+                      ),
+                    }}
+                  >
                     {beat.num}
                   </div>
                   {i < 2 && (
-                    <div className={`hidden md:block absolute top-6 -right-4 w-8 h-px ${dark ? 'bg-gold/30' : 'bg-[#DCE0E2]'}`}>
-                      <div className={`absolute right-0 -top-[3px] w-0 h-0 border-[3px] border-transparent ${dark ? 'border-l-gold/30' : 'border-l-[#DCE0E2]'}`} />
+                    <div
+                      className="hidden md:block absolute top-6 -right-4 w-8 h-px"
+                      style={{ background: dark ? 'rgba(196,168,122,0.3)' : L.border + '25' }}
+                    >
+                      <div
+                        className="absolute right-0 -top-[3px] w-0 h-0"
+                        style={{
+                          border: '3px solid transparent',
+                          borderLeftColor: dark ? 'rgba(196,168,122,0.3)' : L.border + '25',
+                        }}
+                      />
                     </div>
                   )}
-                  <div className={`rounded-2xl p-8 text-center transition-all duration-300 ${
-                    dark
-                      ? 'bg-white/[0.03] border border-white/[0.06] hover:bg-gold/[0.04] hover:border-gold/[0.12]'
-                      : 'bg-white border border-[#DCE0E2] hover:border-[#FF3621]/20 hover:shadow-[0_4px_20px_rgba(0,0,0,0.04)]'
-                  }`}>
-                    <h3 className={`font-serif text-xl mb-3 ${dark ? '' : 'text-[#1B3139]'}`}>{beat.title}</h3>
-                    <p className={`text-[13px] leading-[1.7] mb-4 ${dark ? 'text-white/45' : 'text-[#5A6F77]'}`}>{beat.desc}</p>
-                    <span className={`inline-block text-[9px] font-bold tracking-[1.5px] uppercase px-3 py-1.5 rounded-sm ${
+                  <div
+                    className={`p-8 text-center transition-all duration-[250ms] ease-in-out ${
                       dark
-                        ? 'text-gold bg-gold/[0.08] border border-gold/[0.12]'
-                        : 'text-[#FF3621] bg-[#FF3621]/[0.06] border border-[#FF3621]/[0.1]'
-                    }`}>
+                        ? 'rounded-[16px] bg-white/[0.03] border border-white/[0.06] hover:bg-[rgba(196,168,122,0.04)] hover:border-[rgba(196,168,122,0.12)]'
+                        : 'rounded-[4px] bg-white border border-[#0B202615] hover:border-[#0B202640] hover:shadow-[0_4px_20px_rgba(0,0,0,0.04)]'
+                    }`}
+                  >
+                    <h3 className="font-serif text-xl mb-3">{beat.title}</h3>
+                    <p
+                      className="text-[15px] leading-[1.7] mb-4"
+                      style={{ color: dark ? 'rgba(255,255,255,0.45)' : L.secondary }}
+                    >
+                      {beat.desc}
+                    </p>
+                    <span
+                      className="inline-block text-[11px] font-bold uppercase px-3 py-1.5"
+                      style={{
+                        letterSpacing: '1.5px',
+                        borderRadius: 2,
+                        color: dark ? '#C4A87A' : L.text,
+                        background: dark ? 'rgba(196,168,122,0.08)' : L.text + '08',
+                        border: `1px solid ${dark ? 'rgba(196,168,122,0.12)' : L.border + '15'}`,
+                      }}
+                    >
                       {beat.tag}
                     </span>
                   </div>
@@ -457,17 +587,34 @@ export default function Landing() {
           </section>
 
           {/* ── Tech marquee ── */}
-          <div className={`py-10 overflow-hidden ${
-            dark
-              ? 'bg-gold/[0.03] border-y border-gold/[0.06]'
-              : 'bg-[#FFFCF8] border-y border-[#DCE0E2]'
-          }`}>
+          <div
+            className="py-10 overflow-hidden"
+            style={{
+              background: dark ? 'rgba(196,168,122,0.03)' : L.bg,
+              borderTop: `1px solid ${dark ? 'rgba(196,168,122,0.06)' : L.border + '15'}`,
+              borderBottom: `1px solid ${dark ? 'rgba(196,168,122,0.06)' : L.border + '15'}`,
+            }}
+          >
+            <p
+              className="text-[10px] tracking-[3px] text-center mb-4 uppercase font-bold"
+              style={{ color: dark ? 'rgba(196,168,122,0.4)' : L.secondary + '80' }}
+            >
+              Powered by the Databricks Stack
+            </p>
             <div className="flex gap-12 animate-[techMarquee_20s_linear_infinite] w-max hover:[animation-play-state:paused]">
               {[...techItems, ...techItems].map((item, i) => (
-                <span key={i} className={`flex items-center gap-2 text-xs font-medium tracking-wider whitespace-nowrap transition-colors ${
-                  dark ? 'text-white/30 hover:text-gold' : 'text-[#5A6F77]/50 hover:text-[#FF3621]'
-                }`}>
-                  <span className={`w-[5px] h-[5px] rounded-full ${dark ? 'bg-gold/50' : 'bg-[#FF3621]/40'}`} />
+                <span
+                  key={i}
+                  className={`flex items-center gap-2 text-sm font-medium tracking-wider whitespace-nowrap transition-colors duration-200 ${
+                    dark
+                      ? 'text-white/30 hover:text-[#C4A87A]'
+                      : 'text-[#5A6F77]/40 hover:text-[#EB1600]'
+                  }`}
+                >
+                  <span
+                    className="w-[5px] h-[5px] rounded-full"
+                    style={{ background: dark ? 'rgba(196,168,122,0.5)' : 'rgba(90,111,119,0.4)' }}
+                  />
                   {item}
                 </span>
               ))}
@@ -475,56 +622,68 @@ export default function Landing() {
           </div>
 
           {/* ── Bottom CTA ── */}
-          <section className={`py-24 text-center px-4 md:px-8 overflow-hidden relative ${
-            dark
-              ? 'bg-gradient-to-b from-[#1A1612] to-[#0D0B09]'
-              : 'bg-white'
-          }`}>
+          <section
+            className="py-24 text-center px-4 md:px-8 overflow-hidden relative"
+            style={{
+              background: dark
+                ? 'linear-gradient(to bottom, #1A1612, #0D0B09)'
+                : L.bg,
+            }}
+          >
             {dark && (
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgba(196,168,122,0.06),transparent_70%)]" />
             )}
-            {!dark && (
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgba(255,54,33,0.03),transparent_70%)]" />
-            )}
             <Reveal>
-              <h2 className={`font-serif text-[32px] mb-3 relative ${dark ? '' : 'text-[#1B3139]'}`}>Ready to see the agent think?</h2>
+              <h2 className="font-serif text-[32px] mb-3 relative">Ready to see the agent think?</h2>
             </Reveal>
             <Reveal delay={0.1}>
-              <p className={`text-sm mb-10 relative ${dark ? 'text-white/40' : 'text-[#5A6F77]'}`}>
+              <p
+                className="text-sm mb-10 relative"
+                style={{ color: dark ? 'rgba(255,255,255,0.4)' : L.secondary }}
+              >
                 Watch Cindy&apos;s journey from browse to abandoned cart to personalized recovery.
               </p>
             </Reveal>
             <Reveal delay={0.2} className="relative">
               <button
                 onClick={launchDemo}
-                className={`relative group inline-flex items-center gap-3 px-11 py-[18px] font-semibold text-[16px] overflow-hidden transition-all duration-250 cursor-pointer ${
+                className={`relative group inline-flex items-center gap-3 px-11 py-[18px] font-semibold text-[15px] overflow-hidden cursor-pointer transition-all duration-[250ms] ease-in-out ${
                   dark
                     ? 'rounded-[14px] bg-gradient-to-br from-gold to-gold-light text-espresso hover:-translate-y-[3px] hover:shadow-[0_12px_40px_rgba(196,168,122,0.35)]'
-                    : 'rounded-sm bg-[#FF3621] text-white hover:-translate-y-[2px] hover:shadow-[0_8px_30px_rgba(255,54,33,0.25)]'
+                    : 'rounded-[4px] bg-[#EB1600] text-white border-none hover:bg-[#0B2026] hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(11,32,38,0.15)]'
                 }`}
+                style={{ letterSpacing: dark ? '0.5px' : '1.5px' }}
               >
                 {dark && <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full animate-[ctaShimmer_3s_ease-in-out_infinite]" />}
-                <span className="relative z-10">Enter the Demo</span>
+                <span className="relative z-10">Launch Demo</span>
                 <span className="relative z-10 text-xl transition-transform group-hover:translate-x-1">&rarr;</span>
               </button>
             </Reveal>
           </section>
 
           {/* ── Footer ── */}
-          <footer className={`py-5 text-center text-[11px] border-t ${
-            dark ? 'text-white/20 border-white/[0.04]' : 'text-[#5A6F77]/40 border-[#DCE0E2]'
-          }`}>
+          <footer
+            className="py-5 text-center text-[11px]"
+            style={{
+              color: dark ? 'rgba(255,255,255,0.2)' : L.secondary + '60',
+              borderTop: `1px solid ${dark ? 'rgba(255,255,255,0.04)' : L.border + '12'}`,
+            }}
+          >
             Built on Databricks &mdash; one platform, one governance plane, one agent.
           </footer>
         </div>
 
         {/* ── Cindy's Journey sidebar (desktop only) ── */}
         <aside className="hidden lg:block w-[35%] xl:w-[32%] relative">
-          <div className={`sticky top-20 p-6 pr-8 ml-2 mr-6 mt-[30vh] rounded-xl border transition-colors duration-300 ${
-            dark
-              ? 'bg-[#12100D]/80 border-white/[0.06] backdrop-blur-sm'
-              : 'bg-[#F7F9FA] border-[#DCE0E2]'
-          }`}>
+          <div
+            className="sticky top-20 p-6 pr-8 ml-2 mr-6 mt-[30vh] transition-colors duration-300"
+            style={{
+              borderRadius: dark ? 12 : 4,
+              background: dark ? 'rgba(18,16,13,0.8)' : '#ffffff',
+              border: `1px solid ${dark ? 'rgba(255,255,255,0.06)' : L.border + '15'}`,
+              backdropFilter: dark ? 'blur(8px)' : undefined,
+            }}
+          >
             <JourneySidebar dark={dark} />
           </div>
         </aside>
