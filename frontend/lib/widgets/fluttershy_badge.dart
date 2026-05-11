@@ -26,11 +26,26 @@ class _FluttershyBadgeState extends State<FluttershyBadge>
   @override
   void initState() {
     super.initState();
-    if (_isTabbyMatch) {
+    _syncShimmer();
+  }
+
+  @override
+  void didUpdateWidget(FluttershyBadge oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.badge != widget.badge) {
+      _syncShimmer();
+    }
+  }
+
+  void _syncShimmer() {
+    if (_isTabbyMatch && _shimmer == null) {
       _shimmer = AnimationController(
         vsync: this,
         duration: const Duration(seconds: 2),
       )..repeat();
+    } else if (!_isTabbyMatch && _shimmer != null) {
+      _shimmer!.dispose();
+      _shimmer = null;
     }
   }
 
