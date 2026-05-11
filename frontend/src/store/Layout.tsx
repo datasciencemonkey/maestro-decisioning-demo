@@ -30,7 +30,7 @@ function StoreShell() {
       </div>
 
       {/* Nav bar */}
-      <header className="bg-white dark:bg-card border-b border-border sticky top-0 z-30">
+      <header className="bg-white dark:bg-card border-b border-border sticky top-0 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto flex items-center gap-6 px-6 py-3">
           {/* Logo */}
           <Link to="/store" className="flex items-center gap-2 shrink-0 cursor-pointer group">

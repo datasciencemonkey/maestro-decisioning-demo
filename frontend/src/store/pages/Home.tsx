@@ -52,7 +52,7 @@ export default function Home() {
           src="https://images.unsplash.com/photo-1615497001839-b0a0eac3274c?w=1400&h=800&fit=crop"
           alt=""
           loading="lazy"
-          className="absolute inset-0 w-full h-full object-cover opacity-[0.15] dark:opacity-[0.1]"
+          className="absolute inset-0 w-full h-full object-cover opacity-[0.30] dark:opacity-[0.20]"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
 
@@ -98,7 +98,7 @@ export default function Home() {
       </section>
 
       {/* ── Shop by Category ── */}
-      <section className="max-w-5xl mx-auto px-6 py-16">
+      <section className="max-w-5xl mx-auto px-6 py-10">
         <Reveal className="text-center mb-10">
           <h2 className="font-serif text-3xl text-foreground">Shop by Category</h2>
         </Reveal>
@@ -110,10 +110,10 @@ export default function Home() {
                 whileHover={{ y: -3 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                 onClick={() => navigate(cat.href)}
-                className="cursor-pointer rounded-lg border border-border bg-card p-6 text-center hover:border-gold/40 hover:shadow-md transition-all duration-200 dark:bg-card dark:border-border"
+                className="cursor-pointer rounded-lg border border-border bg-card p-8 text-center hover:border-gold/40 hover:shadow-md transition-all duration-200 dark:bg-card dark:border-border"
               >
-                <span className="text-3xl block mb-2">{cat.icon}</span>
-                <span className="text-sm font-medium text-card-foreground">
+                <span className="text-4xl block mb-3">{cat.icon}</span>
+                <span className="text-base font-medium text-card-foreground">
                   {cat.label}
                 </span>
               </motion.div>
@@ -124,8 +124,14 @@ export default function Home() {
 
       {/* ── Featured Products ── */}
       <section className="max-w-6xl mx-auto px-6 pb-20">
-        <Reveal className="text-center mb-10">
+        <Reveal className="flex items-center justify-center gap-4 mb-10">
           <h2 className="font-serif text-3xl text-foreground">Featured</h2>
+          <span
+            onClick={() => navigate('/store/photo-books')}
+            className="text-sm font-medium text-gold hover:text-gold-light cursor-pointer transition-colors"
+          >
+            View All &rarr;
+          </span>
         </Reveal>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

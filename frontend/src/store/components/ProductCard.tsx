@@ -45,7 +45,7 @@ export default function ProductCard({ product }: { product: Product }) {
       {/* Image */}
       <div className="relative aspect-[4/3] overflow-hidden rounded-t-xl">
         {imgError ? (
-          <div className="w-full h-full bg-[#FFF8F0]" />
+          <div className="w-full h-full bg-[#FFF8F0] dark:bg-muted" />
         ) : (
           <img
             src={product.imageUrl}
