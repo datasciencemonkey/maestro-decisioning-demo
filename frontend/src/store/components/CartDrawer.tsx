@@ -30,7 +30,7 @@ export default function CartDrawer({ isOpen, onClose, items, total, onRemoveItem
   async function handleAbandonCart() {
     setAbandonState('loading')
     try {
-      await fetch('http://localhost:8000/api/events', {
+      await fetch('/api/events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -47,6 +47,8 @@ export default function CartDrawer({ isOpen, onClose, items, total, onRemoveItem
       console.error('Failed to send cart_abandoned event (backend may not be running):', err)
     }
     setAbandonState('flash')
+    // Navigate to Beat 2 after a brief flash
+    setTimeout(() => { window.location.href = '/beat2' }, 800)
   }
 
   return (
