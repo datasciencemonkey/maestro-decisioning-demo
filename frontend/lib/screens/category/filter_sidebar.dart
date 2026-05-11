@@ -91,30 +91,35 @@ class _FilterChipState extends State<_FilterChip> {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          decoration: BoxDecoration(
-            color: widget.isActive ? AppColors.espresso : AppColors.warmCream,
-            borderRadius: BorderRadius.circular(AppTheme.radiusButton),
-            border: Border.all(
-              color: widget.isActive
-                  ? AppColors.espresso
-                  : (_hovered ? AppColors.mocha : Colors.transparent),
+    return Semantics(
+      label: 'Filter by ${widget.label}',
+      button: true,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        child: GestureDetector(
+          onTap: widget.onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              color: widget.isActive ? AppColors.espresso : AppColors.warmCream,
+              borderRadius: BorderRadius.circular(AppTheme.radiusButton),
+              border: Border.all(
+                color: widget.isActive
+                    ? AppColors.espresso
+                    : (_hovered ? AppColors.mocha : Colors.transparent),
+              ),
             ),
-          ),
-          child: Text(
-            widget.label,
-            style: AppTheme.bodyMedium.copyWith(
-              color: widget.isActive
-                  ? AppColors.white
-                  : AppColors.textSecondary,
-              fontWeight: FontWeight.w600,
+            child: Text(
+              widget.label,
+              style: AppTheme.bodyMedium.copyWith(
+                color: widget.isActive
+                    ? AppColors.white
+                    : AppColors.textSecondary,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ),
@@ -190,47 +195,52 @@ class _MatchMyPetCardState extends State<_MatchMyPetCard> {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: _hovered
-                ? AppColors.brushedGold.withValues(alpha: 0.06)
-                : AppColors.surface,
-            borderRadius: BorderRadius.circular(AppTheme.radiusCard),
-            border: Border.all(
-              color: AppColors.brushedGold,
-              width: 1.5,
-              strokeAlign: BorderSide.strokeAlignInside,
-            ),
-          ),
-          child: Column(
-            children: [
-              Icon(
-                Icons.camera_alt_outlined,
+    return Semantics(
+      label: 'Match My Pet - upload a photo for AI matching',
+      button: true,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        child: GestureDetector(
+          onTap: widget.onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: _hovered
+                  ? AppColors.brushedGold.withValues(alpha: 0.06)
+                  : AppColors.surface,
+              borderRadius: BorderRadius.circular(AppTheme.radiusCard),
+              border: Border.all(
                 color: AppColors.brushedGold,
-                size: 28,
+                width: 1.5,
+                strokeAlign: BorderSide.strokeAlignInside,
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Match My Pet',
-                style: AppTheme.titleMedium.copyWith(
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.camera_alt_outlined,
                   color: AppColors.brushedGold,
+                  size: 28,
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'AI-powered photo matching',
-                style: AppTheme.bodySmall.copyWith(
-                  color: AppColors.textMuted,
+                const SizedBox(height: 8),
+                Text(
+                  'Match My Pet',
+                  style: AppTheme.titleMedium.copyWith(
+                    color: AppColors.brushedGold,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 4),
+                Text(
+                  'AI-powered photo matching',
+                  style: AppTheme.bodySmall.copyWith(
+                    color: AppColors.textMuted,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

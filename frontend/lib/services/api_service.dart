@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../providers/cart_provider.dart';
 import '../data/mock_customer.dart';
 
@@ -29,7 +30,7 @@ class ApiService {
       });
     } catch (e) {
       // Backend may not be running — print but don't crash
-      print('fireCartAbandoned error: $e');
+      debugPrint('fireCartAbandoned error: $e');
     }
   }
 
@@ -39,7 +40,7 @@ class ApiService {
       final response = await _dio.get('/api/nba/recommendations/$customerId');
       return response.data as Map<String, dynamic>;
     } catch (e) {
-      print('fetchRecommendations error: $e');
+      debugPrint('fetchRecommendations error: $e');
       return null;
     }
   }
@@ -53,7 +54,7 @@ class ApiService {
       });
       return response.data as Map<String, dynamic>;
     } catch (e) {
-      print('matchPhoto error: $e');
+      debugPrint('matchPhoto error: $e');
       return null;
     }
   }

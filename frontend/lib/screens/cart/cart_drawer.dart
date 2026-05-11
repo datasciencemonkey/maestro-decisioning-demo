@@ -29,7 +29,9 @@ class CartDrawer extends ConsumerWidget {
           bottom: 0,
           right: 0,
           width: 380,
-          child: Material(
+          child: Semantics(
+            label: 'Shopping cart',
+            child: Material(
             elevation: 16,
             shadowColor: AppColors.cardShadow,
             child: Container(
@@ -58,6 +60,7 @@ class CartDrawer extends ConsumerWidget {
                 ],
               ),
             ),
+          ),
           ),
         ),
       ],
@@ -341,37 +344,40 @@ class _DemoControlState extends State<_DemoControl> {
           ),
           const SizedBox(height: 12),
           // Beat 2 trigger button
-          SizedBox(
-            width: double.infinity,
-            height: 44,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: AppColors.goldGradient,
-                borderRadius: BorderRadius.circular(AppTheme.radiusButton),
-              ),
-              child: ElevatedButton(
-                onPressed: _firing ? null : _onTap,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  disabledBackgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(AppTheme.radiusButton),
-                  ),
+          Semantics(
+            label: 'Launch Beat 2 demo',
+            child: SizedBox(
+              width: double.infinity,
+              height: 44,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: AppColors.goldGradient,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusButton),
                 ),
-                child: _firing
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                            strokeWidth: 2, color: AppColors.espresso),
-                      )
-                    : Text(
-                        '\u{1F680} Abandon Cart \u2192 Launch Beat 2',
-                        style: AppTheme.titleMedium
-                            .copyWith(color: AppColors.espresso),
-                      ),
+                child: ElevatedButton(
+                  onPressed: _firing ? null : _onTap,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    disabledBackgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(AppTheme.radiusButton),
+                    ),
+                  ),
+                  child: _firing
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: AppColors.espresso),
+                        )
+                      : Text(
+                          '\u{1F680} Abandon Cart \u2192 Launch Beat 2',
+                          style: AppTheme.titleMedium
+                              .copyWith(color: AppColors.espresso),
+                        ),
+                ),
               ),
             ),
           ),

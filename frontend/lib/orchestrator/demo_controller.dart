@@ -9,9 +9,6 @@ import '../providers/recommendations_provider.dart';
 import '../data/mock_products.dart';
 import '../services/api_service.dart';
 
-/// Global navigator key for showing dialogs from anywhere.
-final rootNavigatorKey = GlobalKey<NavigatorState>();
-
 /// Executes the real action for each scene in guided/autopilot mode.
 class DemoController {
   DemoController._();
@@ -71,9 +68,9 @@ class DemoController {
     }
   }
 
-  /// Show upload modal via global navigator — auto-dismiss after delay
+  /// Show upload modal via router's navigator — auto-dismiss after delay
   static void _showUploadModalGuided() {
-    final navContext = rootNavigatorKey.currentContext;
+    final navContext = appRouter.routerDelegate.navigatorKey.currentContext;
     if (navContext == null) return;
 
     showDialog(
@@ -122,7 +119,7 @@ class DemoController {
     );
 
     Future<void>.delayed(const Duration(milliseconds: 1500)).then((_) {
-      final ctx = rootNavigatorKey.currentContext;
+      final ctx = appRouter.routerDelegate.navigatorKey.currentContext;
       if (ctx != null && ctx.mounted) {
         Navigator.of(ctx, rootNavigator: true).pop();
       }
@@ -155,18 +152,23 @@ class DemoController {
       final scene = demoScenes[i];
       notifier.goToScene(i);
 
-      await _performAction(ref, scene);
+      try {
+        await _performAction(ref, scene);
 
-      final delay = switch (scene.id) {
-        SceneId.homeLanding => 2000,
-        SceneId.browsePhotoBooks => 2500,
-        SceneId.matchMyPet => 2000,
-        SceneId.aiMatching => 1500,
-        SceneId.viewProduct => 2500,
-        SceneId.addToCart => 2000,
-        SceneId.abandonCart => 1000,
-      };
-      await Future<void>.delayed(Duration(milliseconds: delay));
+        final delay = switch (scene.id) {
+          SceneId.homeLanding => 2000,
+          SceneId.browsePhotoBooks => 2500,
+          SceneId.matchMyPet => 2000,
+          SceneId.aiMatching => 1500,
+          SceneId.viewProduct => 2500,
+          SceneId.addToCart => 2000,
+          SceneId.abandonCart => 1000,
+        };
+        await Future<void>.delayed(Duration(milliseconds: delay));
+      } catch (_) {
+        // Single scene failure must not abort the whole autopilot
+        continue;
+      }
     }
 
     notifier.setPlaying(false);

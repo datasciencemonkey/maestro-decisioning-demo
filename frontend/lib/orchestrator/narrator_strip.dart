@@ -13,7 +13,9 @@ class NarratorStrip extends ConsumerWidget {
     final orchestrator = ref.watch(orchestratorProvider);
     final notifier = ref.read(orchestratorProvider.notifier);
 
-    return Container(
+    return Semantics(
+      label: 'Demo narrator strip',
+      child: Container(
       height: 52,
       decoration: const BoxDecoration(
         color: Color(0xF01A1A2E),
@@ -86,6 +88,7 @@ class NarratorStrip extends ConsumerWidget {
               onPressed: () => DemoController.advanceScene(ref),
             ),
         ],
+      ),
       ),
     );
   }

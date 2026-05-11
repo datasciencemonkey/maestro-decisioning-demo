@@ -25,20 +25,35 @@ class NavBar extends ConsumerWidget {
       child: Row(
         children: [
           // Logo + brand name
-          GestureDetector(
-            onTap: () => context.go('/'),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.flutter_dash, color: AppColors.accent, size: 28),
-                const SizedBox(width: 8),
-                Text(
-                  'Fluttershy',
-                  style: AppTheme.headlineSmall.copyWith(
-                    color: AppColors.textPrimary,
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () => context.go('/'),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: const BoxDecoration(
+                      gradient: AppColors.buttonGradient,
+                      shape: BoxShape.circle,
+                    ),
+                    alignment: Alignment.center,
+                    child: const Text(
+                      '\u{1F98B}',
+                      style: TextStyle(fontSize: 16),
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  Text(
+                    'Fluttershy',
+                    style: AppTheme.headlineSmall.copyWith(
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
 
@@ -82,10 +97,12 @@ class NavBar extends ConsumerWidget {
           const SizedBox(width: 20),
 
           // Cart icon with badge
-          GestureDetector(
-            onTap: () =>
-                ref.read(cartProvider.notifier).toggleDrawer(),
-            child: Stack(
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () =>
+                  ref.read(cartProvider.notifier).toggleDrawer(),
+              child: Stack(
               clipBehavior: Clip.none,
               children: [
                 Icon(
@@ -119,6 +136,7 @@ class NavBar extends ConsumerWidget {
                     ),
                   ),
               ],
+            ),
             ),
           ),
         ],

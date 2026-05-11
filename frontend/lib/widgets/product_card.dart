@@ -25,6 +25,7 @@ class _ProductCardState extends ConsumerState<ProductCard> {
     final product = widget.product;
 
     return MouseRegion(
+      cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       child: GestureDetector(

@@ -3,7 +3,7 @@ import '../models/product.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
 
-class FluttershyBadge extends StatelessWidget {
+class FluttershyBadge extends StatefulWidget {
   final ProductBadge badge;
   final int? matchPercent;
 
@@ -14,8 +14,35 @@ class FluttershyBadge extends StatelessWidget {
   });
 
   @override
+  State<FluttershyBadge> createState() => _FluttershyBadgeState();
+}
+
+class _FluttershyBadgeState extends State<FluttershyBadge>
+    with SingleTickerProviderStateMixin {
+  AnimationController? _shimmer;
+
+  bool get _isTabbyMatch => widget.badge == ProductBadge.tabbyMatch;
+
+  @override
+  void initState() {
+    super.initState();
+    if (_isTabbyMatch) {
+      _shimmer = AnimationController(
+        vsync: this,
+        duration: const Duration(seconds: 2),
+      )..repeat();
+    }
+  }
+
+  @override
+  void dispose() {
+    _shimmer?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
+    final child = Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         gradient: _gradient,
@@ -30,14 +57,39 @@ class FluttershyBadge extends StatelessWidget {
         ),
       ),
     );
+
+    if (!_isTabbyMatch) return child;
+
+    return AnimatedBuilder(
+      animation: _shimmer!,
+      builder: (context, inner) {
+        final dx = _shimmer!.value * 2 - 0.5;
+        return ShaderMask(
+          shaderCallback: (bounds) {
+            return LinearGradient(
+              begin: Alignment(dx - 0.3, 0),
+              end: Alignment(dx + 0.3, 0),
+              colors: const [
+                Color(0x00FFFFFF),
+                Color(0x44FFFFFF),
+                Color(0x00FFFFFF),
+              ],
+            ).createShader(bounds);
+          },
+          blendMode: BlendMode.srcATop,
+          child: inner,
+        );
+      },
+      child: child,
+    );
   }
 
   String get _label {
-    switch (badge) {
+    switch (widget.badge) {
       case ProductBadge.bestseller:
         return 'BESTSELLER';
       case ProductBadge.tabbyMatch:
-        final pct = matchPercent ?? 0;
+        final pct = widget.matchPercent ?? 0;
         return 'TABBY MATCH $pct%';
       case ProductBadge.newArrival:
         return 'NEW';
@@ -45,7 +97,7 @@ class FluttershyBadge extends StatelessWidget {
   }
 
   LinearGradient get _gradient {
-    switch (badge) {
+    switch (widget.badge) {
       case ProductBadge.bestseller:
         return AppColors.goldGradient;
       case ProductBadge.tabbyMatch:

@@ -14,7 +14,9 @@ class NbaPanel extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final recommendations = ref.watch(recommendationsProvider);
 
-    return Container(
+    return Semantics(
+      label: 'AI Recommendations panel',
+      child: Container(
       width: 240,
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -53,6 +55,7 @@ class NbaPanel extends ConsumerWidget {
           ),
           _buildFooter(),
         ],
+      ),
       ),
     );
   }

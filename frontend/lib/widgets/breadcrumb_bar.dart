@@ -16,28 +16,35 @@ class BreadcrumbBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-      child: Row(
-        children: [
-          for (int i = 0; i < items.length; i++) ...[
-            if (i > 0)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Text(
-                  '\u203A',
-                  style: AppTheme.bodyMedium.copyWith(
-                    color: AppColors.accent,
-                    fontWeight: FontWeight.w700,
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: const Duration(milliseconds: 300),
+      builder: (context, opacity, child) {
+        return Opacity(opacity: opacity, child: child);
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+        child: Row(
+          children: [
+            for (int i = 0; i < items.length; i++) ...[
+              if (i > 0)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Text(
+                    '\u203A',
+                    style: AppTheme.bodyMedium.copyWith(
+                      color: AppColors.accent,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
+              _BreadcrumbLabel(
+                item: items[i],
+                isLast: i == items.length - 1,
               ),
-            _BreadcrumbLabel(
-              item: items[i],
-              isLast: i == items.length - 1,
-            ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

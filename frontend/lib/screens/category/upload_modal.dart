@@ -28,26 +28,36 @@ class _UploadModalDialogState extends ConsumerState<_UploadModalDialog> {
   Future<void> _onPhotoSelected() async {
     setState(() => _analyzing = true);
 
-    await Future<void>.delayed(const Duration(milliseconds: 1200));
+    try {
+      await Future<void>.delayed(const Duration(milliseconds: 1200));
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    // Apply match scores to products
-    ref.read(productsProvider.notifier).applyMatch({
-      'pb_welcome_home_24pp': 96,
-      'pb_whisker_tales': 91,
-      'pb_kitten_cuddles': 88,
-      'pb_playful_paws': 93,
-      'pb_first_year': 74,
-      'pb_classic_soft': 62,
-      'pb_paw_prints': 70,
-    });
+      // Apply match scores to products
+      ref.read(productsProvider.notifier).applyMatch({
+        'pb_welcome_home_24pp': 96,
+        'pb_whisker_tales': 91,
+        'pb_kitten_cuddles': 88,
+        'pb_playful_paws': 93,
+        'pb_first_year': 74,
+        'pb_classic_soft': 62,
+        'pb_paw_prints': 70,
+      });
 
-    // Update recommendations with higher-scoring matches
-    ref.read(recommendationsProvider.notifier).updateAfterMatch();
+      // Update recommendations with higher-scoring matches
+      ref.read(recommendationsProvider.notifier).updateAfterMatch();
 
-    if (mounted) {
-      Navigator.of(context).pop();
+      // Small delay to let UI settle before dismissing
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    } catch (_) {
+      // Swallow errors so the demo never crashes on stage
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
     }
   }
 
