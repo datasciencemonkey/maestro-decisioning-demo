@@ -79,6 +79,92 @@ function mapToolCalls(artifact: Artifact) {
   void iconMap
 }
 
+const NARRATIVE_STEPS = [
+  { icon: '👤', text: 'Who are they?', detail: 'Loading customer profile — Cindy Chen, gold tier, tabby kitten Whiskers' },
+  { icon: '🛒', text: 'What did they leave behind?', detail: 'Abandoned cart — "Welcome Home, Whiskers" photo book, $42' },
+  { icon: '📅', text: 'Can we still ship it?', detail: 'Checking production calendar — 4-day turnaround, standard shipping feasible' },
+  { icon: '📢', text: 'What campaigns are they in?', detail: 'Found 4 active campaigns — Spring Seasonal, Cart Recovery, VIP Loyalty, Reactivation' },
+  { icon: '⚠️', text: 'Would another email breach the cap?', detail: 'Frequency cap: 2/week — current 1, queued 1 (Spring Seasonal) → BREACH' },
+  { icon: '🎫', text: 'Any recent complaints?', detail: 'Support history clean — no open tickets in 30 days' },
+  { icon: '📊', text: 'How likely are they to convert?', detail: 'Propensity score: 0.81 — high confidence for cart recovery' },
+  { icon: '⏰', text: 'When should we reach out?', detail: 'Optimal send: 8:00 AM CT — adjusted from 11:48 PM (quiet hours)' },
+  { icon: '💾', text: 'Lock the decision — durably.', detail: 'Persisting journey state to Lakebase via DBOS' },
+]
+
+function AgentNarrative() {
+  const [step, setStep] = useState(0)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStep(s => (s < NARRATIVE_STEPS.length - 1 ? s + 1 : s))
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [])
+
+  return (
+    <motion.div
+      key="narrative"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="max-w-2xl mx-auto py-12 space-y-3"
+    >
+      <div className="text-center mb-8">
+        <p className="text-lg font-serif font-semibold text-card-foreground">
+          One decision. Nine domains.
+        </p>
+        <p className="text-sm text-muted-foreground mt-1">
+          Watch the agent think…
+        </p>
+      </div>
+
+      {NARRATIVE_STEPS.map((s, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{
+            opacity: i <= step ? 1 : 0.15,
+            x: i <= step ? 0 : -20,
+          }}
+          transition={{ duration: 0.4, delay: i <= step ? 0 : 0 }}
+          className={`flex items-start gap-3 p-3 rounded-lg transition-colors ${
+            i === step
+              ? 'bg-[var(--color-gold)]/10 border border-[var(--color-gold)]/20'
+              : i < step
+              ? 'bg-card border border-border'
+              : ''
+          }`}
+        >
+          <span className="text-lg mt-0.5">{s.icon}</span>
+          <div>
+            <p className={`text-sm font-medium ${
+              i === step ? 'text-[var(--color-gold)]' : 'text-card-foreground'
+            }`}>
+              {s.text}
+            </p>
+            {i <= step && (
+              <motion.p
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                className="text-xs text-muted-foreground mt-0.5"
+              >
+                {s.detail}
+              </motion.p>
+            )}
+          </div>
+          {i === step && (
+            <motion.div
+              animate={{ opacity: [0.3, 1, 0.3] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+              className="ml-auto w-2 h-2 rounded-full bg-[var(--color-gold)] mt-2"
+            />
+          )}
+        </motion.div>
+      ))}
+    </motion.div>
+  )
+}
+
 export default function Beat2Page() {
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState<ApiResponse | null>(null)
@@ -138,27 +224,9 @@ export default function Beat2Page() {
       </header>
 
       <main className="max-w-[1400px] mx-auto px-6 py-6 space-y-5">
-        {/* Loading overlay */}
+        {/* Narrative loading — shows what the agent is doing step by step */}
         <AnimatePresence>
-          {loading && (
-            <motion.div
-              key="loading"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex flex-col items-center justify-center py-24 gap-4"
-            >
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
-                className="w-10 h-10 rounded-full border-2 border-[var(--color-gold)]/30 border-t-[var(--color-gold)]"
-              />
-              <div className="text-center">
-                <p className="text-sm font-semibold text-card-foreground">Agent reasoning across 9 domains…</p>
-                <p className="text-xs text-muted-foreground mt-1">Checking campaigns, propensity, frequency cap…</p>
-              </div>
-            </motion.div>
-          )}
+          {loading && <AgentNarrative />}
         </AnimatePresence>
 
         {/* 3-panel layout — visible once loaded (or on error, shows fallback data) */}
