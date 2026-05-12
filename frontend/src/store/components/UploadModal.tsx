@@ -51,7 +51,7 @@ export default function UploadModal({ isOpen, onClose, onMatch }: UploadModalPro
           >
             {/* Header */}
             <div className="flex items-center justify-between mb-5">
-              <h3 className="font-serif text-lg">Match My Pet</h3>
+              <h3 className="font-sans font-bold text-lg">Match My Pet</h3>
               <button
                 onClick={onClose}
                 className="p-1.5 rounded-lg hover:bg-secondary transition-colors cursor-pointer"

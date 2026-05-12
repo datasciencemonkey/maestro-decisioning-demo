@@ -24,7 +24,7 @@ export default function NbaPanel({ recommendations }: NbaPanelProps) {
 
       {/* Customer card */}
       <div className="bg-secondary/50 rounded-lg p-4 mb-4 space-y-1.5">
-        <p className="font-serif text-sm">Welcome, Cindy</p>
+        <p className="font-sans font-bold text-sm">Welcome, Cindy</p>
         <div className="space-y-0.5">
           <p className="text-xs text-muted-foreground flex items-center gap-1.5">
             <span className="w-1 h-1 rounded-full bg-[#EB1600] dark:bg-gold" />

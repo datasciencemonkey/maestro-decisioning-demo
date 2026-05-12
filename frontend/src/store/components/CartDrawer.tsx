@@ -82,7 +82,7 @@ export default function CartDrawer({ isOpen, onClose, items, total, onRemoveItem
             <div className="flex items-center justify-between px-6 py-5 border-b border-border">
               <div className="flex items-center gap-2">
                 <ShoppingBag size={18} className="text-foreground dark:text-gold" />
-                <h2 className="font-serif text-lg">Your Cart</h2>
+                <h2 className="font-sans font-bold text-lg">Your Cart</h2>
               </div>
               <button
                 onClick={onClose}

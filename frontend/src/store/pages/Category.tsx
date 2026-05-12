@@ -34,7 +34,7 @@ export default function Category() {
 
       {/* Page heading */}
       <div className="mb-6">
-        <h1 className="font-serif text-3xl mb-1 text-foreground">Pet Photo Books</h1>
+        <h1 className="font-sans font-bold text-3xl mb-1 text-foreground">Pet Photo Books</h1>
         <p className="text-sm text-muted-foreground">
           Capture your furry friend's best moments in a custom photo book
         </p>

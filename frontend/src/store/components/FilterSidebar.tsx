@@ -24,7 +24,7 @@ interface FilterSidebarProps {
 export default function FilterSidebar({ filter, onFilterChange, onMatchClick, className }: FilterSidebarProps) {
   return (
     <aside className={cn('w-56 shrink-0 space-y-6', className)}>
-      <h2 className="font-serif text-lg">Filters</h2>
+      <h2 className="font-sans font-bold text-lg">Filters</h2>
 
       {/* Pet type */}
       <div>

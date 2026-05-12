@@ -115,7 +115,7 @@ function StoreShell() {
           {/* Logo */}
           <Link to="/store" className="flex items-center gap-2 shrink-0 cursor-pointer group">
             <span className="text-2xl transition-transform group-hover:scale-110 inline-block">🦋</span>
-            <span className="font-serif text-xl text-foreground">Fluttershy</span>
+            <span className="font-sans font-bold text-xl text-foreground">Fluttershy</span>
           </Link>
 
           {/* Nav links (desktop) */}

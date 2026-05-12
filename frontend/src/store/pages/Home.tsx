@@ -71,7 +71,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.35, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="font-serif text-3xl md:text-5xl leading-tight text-foreground mb-4"
+            className="font-sans font-bold text-3xl md:text-5xl leading-tight text-foreground mb-4"
           >
             Pet Photo Books
           </motion.h1>
@@ -101,7 +101,7 @@ export default function Home() {
       {/* ── Shop by Category ── */}
       <section className="max-w-5xl mx-auto px-4 md:px-6 py-12">
         <Reveal className="text-center mb-10">
-          <h2 className="font-serif text-3xl text-foreground">Shop by Category</h2>
+          <h2 className="font-sans font-bold text-3xl text-foreground">Shop by Category</h2>
         </Reveal>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
@@ -143,7 +143,7 @@ export default function Home() {
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.5 }}
           className="flex items-center justify-center gap-4 mb-10"
         >
-          <h2 className="font-serif text-3xl text-foreground">Featured</h2>
+          <h2 className="font-sans font-bold text-3xl text-foreground">Featured</h2>
           <span
             onClick={() => navigate('/store/photo-books')}
             className="text-sm font-medium text-[#EB1600] hover:text-[#EB1600]/80 dark:text-gold dark:hover:text-gold-light cursor-pointer transition-colors"

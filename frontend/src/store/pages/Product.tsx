@@ -195,7 +195,7 @@ export default function Product() {
           )}
 
           {/* Title */}
-          <motion.h1 {...stagger(2)} className="font-serif text-2xl md:text-4xl text-foreground">
+          <motion.h1 {...stagger(2)} className="font-sans font-bold text-2xl md:text-4xl text-foreground">
             {product.title}
           </motion.h1>
 
@@ -270,7 +270,7 @@ export default function Product() {
       {suggestions.length > 0 && (
         <section className="mt-16 pb-12">
           <motion.div {...stagger(9)}>
-            <h2 className="font-serif text-xl mb-6">You Might Also Like</h2>
+            <h2 className="font-sans font-bold text-xl mb-6">You Might Also Like</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {suggestions.map(s => (
                 <SuggestionCard key={s.id} product={s} />

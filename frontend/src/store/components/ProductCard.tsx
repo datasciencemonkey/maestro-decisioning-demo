@@ -68,7 +68,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
       {/* Content */}
       <div className="flex flex-col flex-1 p-4">
-        <h3 className="font-serif text-lg text-card-foreground leading-tight mb-0.5">
+        <h3 className="font-sans font-bold text-lg text-card-foreground leading-tight mb-0.5">
           {product.title}
         </h3>
         <p className="text-sm text-muted-foreground mb-2">{product.subtitle}</p>
@@ -92,8 +92,8 @@ export default function ProductCard({ product }: { product: Product }) {
         </div>
 
         {/* Price + Add to Cart */}
-        <div className="mt-auto flex items-center justify-between gap-2">
-          <span className="text-lg font-semibold text-card-foreground">
+        <div className="mt-auto">
+          <span className="block text-lg font-semibold text-card-foreground mb-2">
             ${product.price.toFixed(2)}
           </span>
           <button
@@ -108,7 +108,7 @@ export default function ProductCard({ product }: { product: Product }) {
               })
               setAdded(true)
             }}
-            className="relative overflow-hidden flex-1 inline-flex items-center justify-center gap-1.5 bg-[#EB1600] text-white dark:bg-gold dark:text-[#0D0B09] rounded-lg py-2.5 text-sm font-semibold hover:opacity-90 transition-opacity after:absolute after:inset-0 after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent after:-translate-x-full hover:after:translate-x-full after:transition-transform after:duration-500"
+            className="relative overflow-hidden w-full inline-flex items-center justify-center gap-1.5 bg-[#EB1600] text-white dark:bg-gold dark:text-[#0D0B09] rounded-lg py-2 text-sm font-semibold whitespace-nowrap hover:opacity-90 transition-opacity after:absolute after:inset-0 after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent after:-translate-x-full hover:after:translate-x-full after:transition-transform after:duration-500"
           >
             {added ? <Check size={14} /> : <ShoppingCart size={14} />}
             {added ? 'Added!' : 'Add to Cart'}
