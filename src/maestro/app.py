@@ -250,13 +250,23 @@ async def health():
     return {"status": "ok", "service": "maestro-cdp"}
 
 
-# ── Serve React frontend (must be AFTER all API routes) ─────────────────────
+# ── Serve React frontend (SPA catch-all, must be AFTER all API routes) ──────
 
 import pathlib
+from fastapi.responses import FileResponse
 _frontend_dist = pathlib.Path(__file__).parent.parent.parent / "frontend" / "dist"
 if _frontend_dist.exists():
     from fastapi.staticfiles import StaticFiles
-    app.mount("/", StaticFiles(directory=str(_frontend_dist), html=True), name="frontend")
+    # Serve static assets (JS, CSS, images)
+    app.mount("/assets", StaticFiles(directory=str(_frontend_dist / "assets")), name="assets")
+
+    # SPA catch-all: any non-API route serves index.html (React Router handles it)
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str):
+        file_path = _frontend_dist / full_path
+        if file_path.is_file():
+            return FileResponse(str(file_path))
+        return FileResponse(str(_frontend_dist / "index.html"))
 
 
 if __name__ == "__main__":
