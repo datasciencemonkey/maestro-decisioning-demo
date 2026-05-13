@@ -27,16 +27,24 @@ for key in list(os.environ):
     if key.startswith("OTEL_"):
         del os.environ[key]
 
-# ── App + DBOS init ─────────────────────────────────────────────────────────
+# ── App ────────────────────────────────────────────────────────────────────
 app = FastAPI(title="Maestro CDP", version="0.1.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
+# ── WorkspaceClient (needed by both DBOS config and model init) ────────────
+from databricks.sdk import WorkspaceClient
+
+if os.environ.get("DATABRICKS_HOST"):
+    _w = WorkspaceClient()
+else:
+    _w = WorkspaceClient(profile="9cefok")
+
 
 def _get_db_config():
-    """Get DBOS config. Returns None if Lakebase CLI not available (e.g., Databricks Apps)."""
+    """Get DBOS config. Works both locally (CLI) and on Databricks Apps (SDK)."""
     try:
-        from maestro.bootstrap import get_lakebase_conn_params
-        params = get_lakebase_conn_params()
+        # Try SDK-based approach first (works on Databricks Apps + locally)
+        params = _get_lakebase_params_sdk()
         db_url = (
             f"postgresql://{params['user']}:{quote_plus(params['password'])}"
             f"@{params['host']}:{params['port']}/{params['database']}?sslmode=require"
@@ -51,6 +59,44 @@ def _get_db_config():
         print(f"DBOS init skipped (Lakebase creds unavailable): {e}")
         app.state.db_params = None
         return None
+
+
+def _get_lakebase_params_sdk(database: str = "maestro_cdp") -> dict:
+    """Get Lakebase connection params using the Databricks REST API (no CLI needed)."""
+    import requests
+
+    host = _w.config.host.rstrip("/")
+    if not host.startswith("http"):
+        host = f"https://{host}"
+    headers = _w.config.authenticate()
+
+    project = "maestro-cdp"
+    branch_path = f"projects/{project}/branches/production"
+
+    # GET /api/2.0/postgres/{branch_path}/endpoints
+    resp = requests.get(
+        f"{host}/api/2.0/postgres/{branch_path}/endpoints",
+        headers=headers,
+    )
+    resp.raise_for_status()
+    pg_host = resp.json()["endpoints"][0]["status"]["hosts"]["host"]
+
+    # POST /api/2.0/postgres/credentials
+    resp = requests.post(
+        f"{host}/api/2.0/postgres/credentials",
+        headers=headers,
+        json={"endpoint": f"{branch_path}/endpoints/primary"},
+    )
+    resp.raise_for_status()
+    token = resp.json()["token"]
+
+    # Get current user
+    resp = requests.get(f"{host}/api/2.0/preview/scim/v2/Me", headers=headers)
+    resp.raise_for_status()
+    user = resp.json()["userName"]
+
+    return dict(host=pg_host, port=5432, database=database,
+                user=user, password=token, sslmode="require")
 
 
 # DBOS integrates with FastAPI — handles launch/destroy via lifespan middleware
@@ -120,18 +166,10 @@ if _dbos_config:
 
 # ── Model init (module level — runs before uvicorn, never blocks event loop) ─
 
-from databricks.sdk import WorkspaceClient
 from databricks_openai import AsyncDatabricksOpenAI
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.profiles.openai import OpenAIModelProfile
 from pydantic_ai.providers.openai import OpenAIProvider
-
-# In Databricks Apps: WorkspaceClient() uses service principal (DATABRICKS_HOST is set)
-# Locally: use profile
-if os.environ.get("DATABRICKS_HOST"):
-    _w = WorkspaceClient()
-else:
-    _w = WorkspaceClient(profile="9cefok")
 
 # Use AsyncDatabricksOpenAI — handles auth (incl. service principal token refresh)
 # Override base_url to route through AI Gateway instead of serving-endpoints
