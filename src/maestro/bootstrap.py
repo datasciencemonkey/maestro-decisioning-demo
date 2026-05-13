@@ -113,8 +113,8 @@ def bootstrap(profile: str = "9cefok"):
     )
     provider = OpenAIProvider(openai_client=client)
     # AI Gateway doesn't support strict tool definitions
-    profile = OpenAIModelProfile(openai_supports_strict_tool_definition=False)
-    model = OpenAIChatModel("maestro-endpoint", provider=provider, profile=profile)
+    model_profile = OpenAIModelProfile(openai_supports_strict_tool_definition=False)
+    model = OpenAIChatModel("maestro-endpoint", provider=provider, profile=model_profile)
 
     # Lakebase URL
     db_url = get_lakebase_url(profile=profile)
