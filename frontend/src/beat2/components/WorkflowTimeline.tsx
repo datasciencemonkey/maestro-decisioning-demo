@@ -156,14 +156,16 @@ export default function WorkflowTimeline({
     }
   }, [workflowId, onPhasesUpdate, onComplete])
 
-  const sleepProgress =
-    countdown !== null && delaySeconds > 0
+  const sleepProgress = isDone
+    ? 100
+    : countdown !== null && delaySeconds > 0
       ? ((delaySeconds - countdown) / delaySeconds) * 100
       : 0
 
   const sleepStep = steps.find(s => s.id === 'sleep')
   const sleepVisible =
-    (sleepStep?.state === 'active' || sleepStep?.state === 'done') &&
+    !isDone &&
+    (sleepStep?.state === 'active') &&
     countdown !== null
 
   return (
@@ -181,7 +183,7 @@ export default function WorkflowTimeline({
             DBOS Durable Workflow
           </p>
           <p className="text-xs mt-0.5" style={{ color: 'var(--color-muted-foreground)' }}>
-            Unified Beat 2 → 2.5 → 3 — persisted execution on Lakebase
+            Durable execution on Lakebase
           </p>
         </div>
 

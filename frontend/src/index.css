@@ -22,10 +22,10 @@
   --color-databricks-dark-bg: #1B2A32;
   --color-databricks-dark-card: #0B2026;
 
-  /* Status colors (semantic) */
-  --color-status-suppressed: #EB1600;
-  --color-status-priority: var(--color-databricks-cyan);
-  --color-status-active: #40D1F5;
+  /* Status colors (semantic — Databricks brand-aligned) */
+  --color-status-suppressed: #D0021B;
+  --color-status-priority: #EB1600;
+  --color-status-active: #EB1600;
   --color-status-dormant: #4A4A4A;
   --color-status-triggered: #22C55E;
 

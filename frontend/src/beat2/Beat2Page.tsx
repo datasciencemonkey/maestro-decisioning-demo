@@ -138,7 +138,7 @@ function AgentNarrative() {
             <div className="flex items-center gap-2 flex-wrap">
               <span className={`text-[10px] font-bold tracking-wider px-1.5 py-0.5 rounded-full border ${
                 i === step
-                  ? 'bg-[var(--color-databricks-cyan)]/15 text-[var(--color-databricks-cyan)] border-[var(--color-databricks-cyan)]/30'
+                  ? 'bg-[var(--color-databricks-red)]/15 text-[var(--color-databricks-red)] border-[var(--color-databricks-red)]/30'
                   : i < step
                   ? 'bg-muted text-muted-foreground border-border'
                   : 'bg-transparent text-muted-foreground/40 border-transparent'
@@ -267,7 +267,7 @@ export default function Beat2Page() {
             </div>
             <div>
               <p className="text-sm font-semibold text-card-foreground font-sans">Marketing Ops</p>
-              <p className="text-[10px] text-muted-foreground">Unified Beat 2 → 2.5 → 3 — Cross-Campaign Optimization</p>
+              <p className="text-[10px] text-muted-foreground">Cross-Campaign Optimization Engine</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
