@@ -497,7 +497,7 @@
         <br>
         <em>Skipped: read_support_tickets (propensity high enough), check_production_feasibility (standard item)</em>
         <br>
-        <em>AI Gateway latency: ~5–10s total through Claude</em>
+        <em>AI Gateway latency: ~60s total through Claude</em>
       </div>
     </div>
   </div>
@@ -542,7 +542,7 @@
     <div class="tl-content agent">
       <div class="tl-time">T+8s</div>
       <div class="tl-title">Agent 1 stops. MLflow trace closes.</div>
-      <div class="tl-detail">Agent reasoning: ~5–10s &middot; 6 reasoning calls + 2 persistence steps &middot; 2 tools skipped with justification</div>
+      <div class="tl-detail">Agent reasoning: ~60s &middot; 6 reasoning calls + 2 persistence steps &middot; 2 tools skipped with justification</div>
     </div>
   </div>
 
@@ -598,7 +598,7 @@
       <div class="tl-detail">
         Writes to <code>sent_emails</code> table &middot;
         Marks journey_state → <code>status: completed</code> &middot;
-        Email composition: ~5–10s additional
+        Email composition: ~60s additional
       </div>
     </div>
   </div>
@@ -634,7 +634,7 @@
   <table>
     <tr><th>Package</th><th>What It Adds</th><th>Why It Doesn't Help</th></tr>
     <tr><td>subagents-pydantic-ai</td><td>Multi-agent orchestration</td><td>Agent Reasoning uses a single supervisor. No multi-agent needed yet.</td></tr>
-    <tr><td>pydantic-ai-summarization</td><td>Context compression</td><td>Agent Reasoning is single-turn (~5–10s). No long context to compress.</td></tr>
+    <tr><td>pydantic-ai-summarization</td><td>Context compression</td><td>Agent Reasoning is single-turn (~60s). No long context to compress.</td></tr>
     <tr><td>pydantic-ai-backend</td><td>Docker sandboxing</td><td>Databricks Apps is serverless. Docker is incompatible.</td></tr>
     <tr><td>full-stack-ai-agent-template</td><td>FastAPI + Next.js scaffold</td><td>Demo uses Databricks Apps, not a custom web stack.</td></tr>
   </table>
@@ -988,9 +988,9 @@
   <!-- ═══════ ANNOTATION LABELS ═══════ -->
   <!-- Agent Reasoning label -->
   <rect x="690" y="230" width="175" height="55" rx="6" fill="rgba(64,209,245,0.08)" stroke="#1e4f5a" stroke-width="1"/>
-  <text x="777" y="248" text-anchor="middle" fill="#40d1f5" font-size="10" font-weight="600">Agent Reasoning: ~5–10s</text>
+  <text x="777" y="248" text-anchor="middle" fill="#40d1f5" font-size="10" font-weight="600">Agent Reasoning: ~60s</text>
   <text x="777" y="263" text-anchor="middle" fill="#8fb5bf" font-size="9">Agent 1 reasons, decides, persists</text>
-  <text x="777" y="276" text-anchor="middle" fill="#8fb5bf" font-size="9">Email composition: ~5–10s</text>
+  <text x="777" y="276" text-anchor="middle" fill="#8fb5bf" font-size="9">Email composition: ~60s</text>
 
   <!-- Durable Execution label -->
   <rect x="290" y="660" width="175" height="55" rx="6" fill="rgba(240,136,62,0.08)" stroke="#1e4f5a" stroke-width="1"/>
