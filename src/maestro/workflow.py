@@ -36,8 +36,8 @@ def _get_db_params() -> dict:
     from maestro.app import app
     if hasattr(app.state, "db_params") and app.state.db_params:
         return app.state.db_params
-
-    return get_lakebase_conn_params()
+    from maestro.bootstrap import get_lakebase_conn_params as _cli_params
+    return _cli_params()
 
 
 # ── Async DBOS Steps (for LLM calls) ──────────────────────────────────────
@@ -82,7 +82,7 @@ def persist_decision_step(decision_json: str) -> str:
 
     decision = json.loads(decision_json)
     decision_id = decision.get("decision_id", f"dec_{uuid.uuid4().hex[:8]}")
-    params = get_lakebase_conn_params()
+    params = _get_db_params()
 
     conn = psycopg2.connect(**params)
     conn.autocommit = True
@@ -162,7 +162,7 @@ def simulate_send_step(journey_id: str, customer_id: str, email_json: str) -> st
     from maestro.send import build_send_record, insert_sent_email
 
     record = build_send_record(journey_id, customer_id, email_json)
-    params = get_lakebase_conn_params()
+    params = _get_db_params()
     email_id = insert_sent_email(record, params)
     return email_id
 
