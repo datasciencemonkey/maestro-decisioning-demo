@@ -13,7 +13,7 @@ interface CartDrawerProps {
 }
 
 export default function CartDrawer({ isOpen, onClose, items, total, onRemoveItem }: CartDrawerProps) {
-  const shipping = 0 // FREE
+  const shipping: number = 0 // FREE
   const [abandonState, setAbandonState] = useState<'idle' | 'loading' | 'flash' | 'sent'>('idle')
 
   useEffect(() => {
