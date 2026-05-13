@@ -189,16 +189,22 @@ async def run_agent():
 
 
 @app.post("/api/workflow")
-def start_dbos_workflow(body: dict):
-    """Start DBOS durable workflow: persist -> sleep -> complete."""
-    import uuid
-    decision = body.get("decision", {})
-    delay = body.get("delay", 15)
-    customer_id = decision.get("customer_id", "cust_88241")
-    journey_id = decision.get("journey_id", f"jrn_{customer_id}_{uuid.uuid4().hex[:6]}")
+def start_unified_workflow(body: dict):
+    """Start unified Beat 2+2.5+3 workflow: agent -> persist -> sleep -> re-eval -> email -> send."""
+    import random
 
-    handle = DBOS.start_workflow(journey_workflow, journey_id, customer_id, json.dumps(decision), delay)
-    return {"workflow_id": handle.get_workflow_id(), "journey_id": journey_id, "delay": delay, "status": "started"}
+    from maestro.synthetic import CINDY_EVENT
+    from maestro.workflow import unified_journey_workflow
+
+    event_json = CINDY_EVENT.model_dump_json()
+    delay = body.get("delay", random.randint(15, 20))
+
+    handle = DBOS.start_workflow(unified_journey_workflow, event_json, delay)
+    return {
+        "workflow_id": handle.get_workflow_id(),
+        "delay": delay,
+        "status": "started",
+    }
 
 
 @app.get("/api/workflow/{workflow_id}")
@@ -209,6 +215,64 @@ def get_workflow_status(workflow_id: str):
         return {"workflow_id": workflow_id, "status": status.status if hasattr(status, 'status') else str(status)}
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
+
+
+@app.get("/api/workflow/{workflow_id}/phases")
+def get_workflow_phases(workflow_id: str):
+    """Return phase-level status for the unified workflow.
+
+    Frontend polls this every 2s to drive the auto-cascade UI.
+    """
+    try:
+        handle = DBOS.retrieve_workflow(workflow_id)
+        status_obj = handle.get_status()
+        status = status_obj.status if hasattr(status_obj, 'status') else str(status_obj)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+    # Map DBOS workflow status to phase progression
+    phases = {
+        "agent": {"status": "pending"},
+        "persist": {"status": "pending"},
+        "sleep": {"status": "pending"},
+        "re_evaluate": {"status": "pending"},
+        "email": {"status": "pending"},
+        "send": {"status": "pending"},
+    }
+
+    if status == "PENDING":
+        # Workflow is running — approximate phase from status
+        phases["agent"] = {"status": "done"}
+        phases["persist"] = {"status": "done"}
+        phases["sleep"] = {"status": "active"}
+        current_phase = "sleep"
+    elif status == "SUCCESS":
+        try:
+            result_json = handle.get_result()
+            result = json.loads(result_json) if isinstance(result_json, str) else result_json
+        except Exception:
+            result = {}
+
+        for key in phases:
+            phases[key] = {"status": "done"}
+
+        phases["re_evaluate"]["data"] = {"action": result.get("evaluation", "proceed")}
+        if result.get("email_id"):
+            phases["send"]["data"] = {"email_id": result["email_id"]}
+
+        current_phase = "done"
+    elif status in ("ERROR", "RETRIES_EXCEEDED"):
+        phases["agent"] = {"status": "done"}
+        current_phase = "error"
+    else:
+        current_phase = "unknown"
+
+    return {
+        "workflow_id": workflow_id,
+        "workflow_status": status,
+        "current_phase": current_phase,
+        "phases": phases,
+    }
 
 
 @app.get("/api/workflows")
