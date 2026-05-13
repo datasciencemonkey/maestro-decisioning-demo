@@ -76,17 +76,17 @@ function mapToolCalls(artifact: Artifact) {
   return tools
 }
 
-// ── Narrative steps ───────────────────────────────────────────────────────────
+// ── Narrative steps with enterprise domain labels ────────────────────────────
 const NARRATIVE_STEPS = [
-  { icon: '👤', text: 'Who are they?',                    detail: 'Loading customer profile — Cindy Chen, gold tier, tabby kitten Whiskers' },
-  { icon: '🛒', text: 'What did they leave behind?',       detail: 'Abandoned cart — "Welcome Home, Whiskers" photo book, $42' },
-  { icon: '📅', text: 'Can we still ship it?',            detail: 'Checking production calendar — 4-day turnaround, standard shipping feasible' },
-  { icon: '📢', text: 'What campaigns are they in?',       detail: 'Found 4 active campaigns — Spring Seasonal, Cart Recovery, VIP Loyalty, Reactivation' },
-  { icon: '⚠️', text: 'Would another email breach the cap?', detail: 'Frequency cap: 2/week — current 1, queued 1 (Spring Seasonal) → BREACH' },
-  { icon: '🎫', text: 'Any recent complaints?',            detail: 'Support history clean — no open tickets in 30 days' },
-  { icon: '📊', text: 'How likely are they to convert?',   detail: 'Propensity score: 0.81 — high confidence for cart recovery' },
-  { icon: '⏰', text: 'When should we reach out?',         detail: 'Optimal send: 8:00 AM CT — adjusted from 11:48 PM (quiet hours)' },
-  { icon: '💾', text: 'Lock the decision — durably.',      detail: 'Persisting journey state to Lakebase via DBOS' },
+  { icon: '👤', domain: 'Identity Resolution',     text: 'Who are they?',                      detail: 'Loading customer profile — Cindy Chen, gold tier, tabby kitten Whiskers' },
+  { icon: '🛒', domain: 'Commerce / Orders',        text: 'What did they leave behind?',         detail: 'Abandoned cart — "Welcome Home, Whiskers" photo book, $42' },
+  { icon: '📅', domain: 'Supply Chain',             text: 'Can we still ship it?',              detail: 'Checking production calendar — 4-day turnaround, standard shipping feasible' },
+  { icon: '📢', domain: 'Campaign Management',      text: 'What campaigns are they in?',         detail: 'Found 4 active campaigns — Spring Seasonal, Cart Recovery, VIP Loyalty, Reactivation' },
+  { icon: '⚠️', domain: 'Contact Policy',           text: 'Would another email breach the cap?', detail: 'Frequency cap: 2/week — current 1, queued 1 (Spring Seasonal) → BREACH' },
+  { icon: '🎫', domain: 'Customer Service',         text: 'Any recent complaints?',              detail: 'Support history clean — no open tickets in 30 days' },
+  { icon: '📊', domain: 'Predictive Analytics',     text: 'How likely are they to convert?',     detail: 'Propensity score: 0.81 — high confidence for cart recovery' },
+  { icon: '⏰', domain: 'Send Optimization',        text: 'When should we reach out?',           detail: 'Optimal send: 8:00 AM CT — adjusted from 11:48 PM (quiet hours)' },
+  { icon: '💾', domain: 'Journey Orchestration',    text: 'Lock the decision — durably.',        detail: 'Persisting journey state to Lakebase via DBOS' },
 ]
 
 // ── AgentNarrative sub-component ─────────────────────────────────────────────
@@ -109,8 +109,12 @@ function AgentNarrative() {
       className="max-w-2xl mx-auto py-12 space-y-3"
     >
       <div className="text-center mb-8">
-        <p className="text-lg font-serif font-semibold text-card-foreground">One decision. Nine domains.</p>
-        <p className="text-sm text-muted-foreground mt-1">Watch the agent think…</p>
+        <p className="text-lg font-serif font-semibold text-card-foreground">9 Domains. 1 Decision.</p>
+        <p className="text-sm text-muted-foreground mt-2 max-w-lg mx-auto leading-relaxed">
+          Watch the agent reason across Identity, Commerce, Supply Chain, Campaign Management,
+          Contact Policy, CRM, Predictive Analytics, Send Optimization, and Journey Orchestration
+          — in a single pass.
+        </p>
       </div>
 
       {NARRATIVE_STEPS.map((s, i) => (
@@ -128,10 +132,21 @@ function AgentNarrative() {
           }`}
         >
           <span className="text-lg mt-0.5">{s.icon}</span>
-          <div>
-            <p className={`text-sm font-medium ${i === step ? 'text-[var(--color-gold)]' : 'text-card-foreground'}`}>
-              {s.text}
-            </p>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className={`text-[10px] font-bold tracking-wider px-1.5 py-0.5 rounded-full border ${
+                i === step
+                  ? 'bg-[var(--color-databricks-cyan)]/15 text-[var(--color-databricks-cyan)] border-[var(--color-databricks-cyan)]/30'
+                  : i < step
+                  ? 'bg-muted text-muted-foreground border-border'
+                  : 'bg-transparent text-muted-foreground/40 border-transparent'
+              }`}>
+                {s.domain}
+              </span>
+              <p className={`text-sm font-medium ${i === step ? 'text-[var(--color-gold)]' : 'text-card-foreground'}`}>
+                {s.text}
+              </p>
+            </div>
             {i <= step && (
               <motion.p
                 initial={{ opacity: 0, height: 0 }}
