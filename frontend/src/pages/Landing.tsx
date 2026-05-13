@@ -409,7 +409,7 @@ export default function Landing() {
 
             {/* Title */}
             <h1 className="font-serif text-[clamp(36px,5.5vw,68px)] font-normal leading-[1.1] max-w-[850px] mb-7">
-              {['The ', null, 'Lives on Your ', 'Data Platform'].map((text, i) => (
+              {['The ', null, 'Lives in the ', 'Data Platform'].map((text, i) => (
                 <span key={i} className="block overflow-hidden">
                   <motion.span
                     className="inline-block"
