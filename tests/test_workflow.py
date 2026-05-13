@@ -171,7 +171,7 @@ def test_save_decision(db_params, dbos_setup):
         "created_at": "2026-05-10T08:00:00-05:00",
     }
 
-    result = save_decision_step(json.dumps(decision), "")
+    result = save_decision_step(json.dumps(decision))
     assert result == decision_id
 
     # Verify
