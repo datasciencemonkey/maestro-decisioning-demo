@@ -146,3 +146,22 @@ class DecisionArtifact(BaseModel):
     rationale: str
     trace_id: str | None = None
     created_at: datetime
+
+
+# ── Email Output (Beat 3) ──────────────────────────────────────────────────
+
+
+class EmailContent(BaseModel):
+    subject: str
+    body_html: str
+    body_text: str
+    hero_image_url: str
+    cta_text: str
+    cta_url: str
+
+
+class ReEvaluationResult(BaseModel):
+    action: Literal["proceed", "abort", "adjust"]
+    reason: str
+    changes_detected: list[str]
+    updated_artifact: str | None = None

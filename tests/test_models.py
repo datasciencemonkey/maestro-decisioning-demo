@@ -125,3 +125,42 @@ def test_decision_artifact_schema():
     suppress = [d for d in dumped["decisions"] if d["type"] == "suppress_from"]
     assert len(suppress) == 1
     assert "Spring Seasonal" in suppress[0]["target"]
+
+
+def test_email_content_model():
+    from maestro.models import EmailContent
+    email = EmailContent(
+        subject="Whiskers is waiting!",
+        body_html="<h1>Hi Cindy</h1><p>Your photo book misses you.</p>",
+        body_text="Hi Cindy, your photo book misses you.",
+        hero_image_url="/whiskers.jpg",
+        cta_text="Complete Your Order",
+        cta_url="https://fluttershy.com/cart/resume",
+    )
+    assert email.subject == "Whiskers is waiting!"
+    assert "Cindy" in email.body_html
+    assert email.cta_text == "Complete Your Order"
+
+
+def test_re_evaluation_result_proceed():
+    from maestro.models import ReEvaluationResult
+    result = ReEvaluationResult(
+        action="proceed",
+        reason="No changes detected since decision",
+        changes_detected=[],
+        updated_artifact=None,
+    )
+    assert result.action == "proceed"
+    assert result.changes_detected == []
+
+
+def test_re_evaluation_result_abort():
+    from maestro.models import ReEvaluationResult
+    result = ReEvaluationResult(
+        action="abort",
+        reason="Customer completed purchase during sleep window",
+        changes_detected=["purchase_completed"],
+        updated_artifact=None,
+    )
+    assert result.action == "abort"
+    assert "purchase_completed" in result.changes_detected
