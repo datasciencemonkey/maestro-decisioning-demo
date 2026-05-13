@@ -41,10 +41,24 @@ else:
 
 
 def _get_db_config():
-    """Get DBOS config. Works both locally (CLI) and on Databricks Apps (SDK)."""
+    """Get DBOS config. Tries SDK auth first, falls back to native Postgres role."""
+    # Lakebase endpoint (static — doesn't change)
+    pg_host = "ep-wispy-bonus-d2qqe068.database.us-east-1.cloud.databricks.com"
+    database = "maestro_cdp"
+
     try:
-        # Try SDK-based approach first (works on Databricks Apps + locally)
+        # Try SDK-based approach (works locally + on Apps with project permissions)
         params = _get_lakebase_params_sdk()
+    except Exception as e:
+        print(f"SDK Lakebase auth failed ({e}), falling back to native Postgres role")
+        # Fallback: native Postgres service role (always works)
+        params = dict(
+            host=pg_host, port=5432, database=database,
+            user="maestro_app", password="maestro-cdp-2026!",
+            sslmode="require",
+        )
+
+    try:
         db_url = (
             f"postgresql://{params['user']}:{quote_plus(params['password'])}"
             f"@{params['host']}:{params['port']}/{params['database']}?sslmode=require"
@@ -56,7 +70,7 @@ def _get_db_config():
             application_database_url=db_url,
         )
     except Exception as e:
-        print(f"DBOS init skipped (Lakebase creds unavailable): {e}")
+        print(f"DBOS init failed: {e}")
         app.state.db_params = None
         return None
 
