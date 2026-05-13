@@ -96,14 +96,14 @@ export default function WorkflowTimeline({ artifact }: WorkflowTimelineProps) {
   }, [workflowId])
 
   const stepBorder = (state: StepState) => {
-    if (state === 'active') return 'border-orange-400 shadow-[0_0_12px_rgba(251,146,60,0.35)]'
-    if (state === 'done') return 'border-green-500 shadow-[0_0_8px_rgba(34,197,94,0.2)]'
+    if (state === 'active') return 'border-[var(--color-status-active)] shadow-[0_0_12px_rgba(64,209,245,0.3)]'
+    if (state === 'done') return 'border-[var(--color-status-triggered)] shadow-[0_0_8px_rgba(34,197,94,0.2)]'
     return 'border-border'
   }
 
   const stepBg = (state: StepState) => {
-    if (state === 'active') return 'bg-orange-500/10 text-orange-400'
-    if (state === 'done') return 'bg-green-500/10 text-green-400'
+    if (state === 'active') return 'bg-[var(--color-status-active)]/10 text-[var(--color-status-active)]'
+    if (state === 'done') return 'bg-[var(--color-status-triggered)]/10 text-[var(--color-status-triggered)]'
     return 'bg-muted text-muted-foreground'
   }
 
@@ -128,7 +128,7 @@ export default function WorkflowTimeline({ artifact }: WorkflowTimelineProps) {
       </div>
 
       {error && (
-        <p className="text-xs text-red-400 mb-3">{error}</p>
+        <p className="text-xs text-[var(--color-status-suppressed)] mb-3">{error}</p>
       )}
 
       {/* Steps row */}
@@ -147,10 +147,10 @@ export default function WorkflowTimeline({ artifact }: WorkflowTimelineProps) {
                 {step.label}
               </span>
               {step.state === 'active' && (
-                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse shrink-0" />
+                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--color-status-active)] animate-pulse shrink-0" />
               )}
               {step.state === 'done' && (
-                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-green-400 shrink-0" />
+                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--color-status-triggered)] shrink-0" />
               )}
             </motion.div>
             {i < steps.length - 1 && (

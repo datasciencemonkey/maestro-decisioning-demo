@@ -12,23 +12,23 @@ interface Campaign {
 const statusConfig: Record<CampaignStatus, { label: string; color: string; icon: React.ReactNode; glow?: boolean }> = {
   suppressed: {
     label: 'SUPPRESSED',
-    color: 'bg-red-500/15 text-red-400 border-red-500/30',
+    color: 'bg-[var(--color-status-suppressed)]/15 text-[var(--color-status-suppressed)] border-[var(--color-status-suppressed)]/30',
     icon: <XCircle size={11} />,
   },
   prioritized: {
     label: 'PRIORITY',
-    color: 'bg-green-500/15 text-green-400 border-green-500/30',
-    icon: <Star size={11} className="fill-green-400" />,
+    color: 'bg-[var(--color-status-priority)]/15 text-[var(--color-status-priority)] border-[var(--color-status-priority)]/30',
+    icon: <Star size={11} className="fill-[var(--color-status-priority)]" />,
     glow: true,
   },
   active: {
     label: 'ACTIVE',
-    color: 'bg-[var(--color-gold)]/15 text-[var(--color-gold)] border-[var(--color-gold)]/30',
+    color: 'bg-[var(--color-status-active)]/15 text-[var(--color-status-active)] border-[var(--color-status-active)]/30',
     icon: <Circle size={11} className="fill-current" />,
   },
   triggered: {
     label: 'TRIGGERED',
-    color: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
+    color: 'bg-[var(--color-status-triggered)]/15 text-[var(--color-status-triggered)] border-[var(--color-status-triggered)]/30',
     icon: <Circle size={11} className="fill-current" />,
   },
   paused: {
@@ -38,7 +38,7 @@ const statusConfig: Record<CampaignStatus, { label: string; color: string; icon:
   },
   dormant: {
     label: 'DORMANT',
-    color: 'bg-muted text-muted-foreground border-border',
+    color: 'bg-muted text-[var(--color-status-dormant)] border-border',
     icon: <Circle size={11} />,
   },
 }
@@ -68,13 +68,13 @@ export default function CampaignPanel({ campaigns }: { campaigns?: Campaign[] })
               transition={{ duration: 0.35, delay: i * 0.08 }}
               className={`relative rounded-lg border p-3 ${
                 cfg.glow
-                  ? 'border-green-500/40 shadow-[0_0_12px_rgba(34,197,94,0.15)]'
+                  ? 'border-[var(--color-status-priority)]/40 shadow-[0_0_12px_rgba(196,168,122,0.15)]'
                   : 'border-border'
               } bg-card`}
             >
               {cfg.glow && (
                 <motion.div
-                  className="absolute inset-0 rounded-lg bg-green-500/5"
+                  className="absolute inset-0 rounded-lg bg-[var(--color-status-priority)]/5"
                   animate={{ opacity: [0.5, 1, 0.5] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 />

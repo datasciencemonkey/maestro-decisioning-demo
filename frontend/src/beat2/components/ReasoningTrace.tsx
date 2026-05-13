@@ -68,9 +68,9 @@ export default function ReasoningTrace({ toolCalls, rationale, latency }: Reason
             <div
               className={`relative z-10 w-9 h-9 shrink-0 rounded-full flex items-center justify-center text-base border ${
                 t.highlight === 'warn'
-                  ? 'bg-amber-500/10 border-amber-500/40'
+                  ? 'bg-[var(--color-status-suppressed)]/10 border-[var(--color-status-suppressed)]/40'
                   : t.highlight === 'ok'
-                  ? 'bg-green-500/10 border-green-500/30'
+                  ? 'bg-[var(--color-status-triggered)]/10 border-[var(--color-status-triggered)]/30'
                   : 'bg-card border-border'
               }`}
             >
@@ -82,18 +82,18 @@ export default function ReasoningTrace({ toolCalls, rationale, latency }: Reason
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-xs font-semibold text-card-foreground font-mono">{t.tool}</span>
                 {t.highlight === 'warn' && (
-                  <AlertTriangle size={11} className="text-amber-400" />
+                  <AlertTriangle size={11} className="text-[var(--color-status-suppressed)]" />
                 )}
                 {t.highlight === 'ok' && (
-                  <CheckCircle size={11} className="text-green-400" />
+                  <CheckCircle size={11} className="text-[var(--color-status-triggered)]" />
                 )}
               </div>
               <p
                 className={`text-[11px] mt-0.5 ${
                   t.highlight === 'warn'
-                    ? 'text-amber-400 font-semibold'
+                    ? 'text-[var(--color-status-suppressed)] font-semibold'
                     : t.highlight === 'ok'
-                    ? 'text-green-400'
+                    ? 'text-[var(--color-status-triggered)]'
                     : 'text-muted-foreground'
                 }`}
               >

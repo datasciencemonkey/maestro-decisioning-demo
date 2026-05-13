@@ -35,9 +35,9 @@ const FALLBACK_SIGNALS: Signal[] = [
 ]
 
 const typeColors: Record<string, string> = {
-  suppress_from: 'bg-red-500/15 text-red-400 border-red-500/30',
-  prioritize_in: 'bg-green-500/15 text-green-400 border-green-500/30',
-  tone: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
+  suppress_from: 'bg-[var(--color-status-suppressed)]/15 text-[var(--color-status-suppressed)] border-[var(--color-status-suppressed)]/30',
+  prioritize_in: 'bg-[var(--color-status-triggered)]/15 text-[var(--color-status-triggered)] border-[var(--color-status-triggered)]/30',
+  tone: 'bg-[var(--color-status-active)]/15 text-[var(--color-status-active)] border-[var(--color-status-active)]/30',
   send_time: 'bg-[var(--color-gold)]/15 text-[var(--color-gold)] border-[var(--color-gold)]/30',
   channel: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
 }
@@ -56,12 +56,12 @@ export default function DecisionPanel({ verdict, decisions, signals }: DecisionP
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.4 }}
-        className="flex items-center gap-2 bg-green-500/10 border border-green-500/30 rounded-xl px-4 py-3 mb-4"
+        className="flex items-center gap-2 bg-[var(--color-status-triggered)]/10 border border-[var(--color-status-triggered)]/30 rounded-xl px-4 py-3 mb-4"
       >
-        <CheckCircle2 size={18} className="text-green-400 shrink-0" />
+        <CheckCircle2 size={18} className="text-[var(--color-status-triggered)] shrink-0" />
         <div>
-          <p className="text-[10px] font-bold tracking-widest text-green-400/70 uppercase">Verdict</p>
-          <p className="font-serif text-lg text-green-400 leading-tight">{displayVerdict}</p>
+          <p className="text-[10px] font-bold tracking-widest text-[var(--color-status-triggered)]/70 uppercase">Verdict</p>
+          <p className="font-serif text-lg text-[var(--color-status-triggered)] leading-tight">{displayVerdict}</p>
         </div>
       </motion.div>
 
@@ -109,7 +109,7 @@ export default function DecisionPanel({ verdict, decisions, signals }: DecisionP
                 <span
                   className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
                     s.weight >= 0.8
-                      ? 'bg-red-500/15 text-red-400'
+                      ? 'bg-[var(--color-status-suppressed)]/15 text-[var(--color-status-suppressed)]'
                       : s.weight >= 0.5
                       ? 'bg-[var(--color-gold)]/15 text-[var(--color-gold)]'
                       : 'bg-muted text-muted-foreground'
