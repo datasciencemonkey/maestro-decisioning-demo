@@ -1,6 +1,6 @@
 """Unified DBOS durable workflow for Beat 2 + 2.5 + 3.
 
-Single workflow orchestrating: agent reasoning -> persist decision ->
+Single async workflow orchestrating: agent reasoning -> persist decision ->
 durable sleep -> re-evaluate context -> compose email -> simulate send.
 
 The workflow survives process restarts — DBOS checkpoints each step
@@ -16,28 +16,42 @@ from zoneinfo import ZoneInfo
 
 from dbos import DBOS
 
-from maestro.models import CartAbandonedEvent, DecisionArtifact
+from maestro.models import CartAbandonedEvent
 
 CT = ZoneInfo("America/Chicago")
 
 
-# ── DBOS Steps ─────────────────────────────────────────────────────────────
+# ── Async DBOS Steps (for LLM calls) ──────────────────────────────────────
+
+
+def _get_model():
+    """Get the module-level MODEL from app.py (already initialized)."""
+    from maestro.app import MODEL
+    return MODEL
 
 
 @DBOS.step()
-def run_agent_step(event_json: str) -> str:
+async def run_agent_step(event_json: str) -> str:
     """Run the Maestro agent. Returns DecisionArtifact as JSON."""
-    import asyncio
-
     from maestro.agent import run_maestro
-    from maestro.bootstrap import bootstrap
 
     event = CartAbandonedEvent.model_validate_json(event_json)
-    model, _db_url = bootstrap()
-    result = asyncio.get_event_loop().run_until_complete(
-        run_maestro(event, model, _db_url)
-    )
+    model = _get_model()
+    result = await run_maestro(event, model, None)
     return result.model_dump_json()
+
+
+@DBOS.step()
+async def compose_email_step(artifact_json: str) -> str:
+    """Compose personalized email via copywriter agent. Returns EmailContent JSON."""
+    from maestro.email_agent import compose_email
+
+    model = _get_model()
+    email = await compose_email(artifact_json, model)
+    return email.model_dump_json()
+
+
+# ── Sync DBOS Steps (for DB operations) ───────────────────────────────────
 
 
 @DBOS.step()
@@ -125,21 +139,6 @@ def re_evaluate_step(journey_id: str, artifact_json: str) -> str:
 
 
 @DBOS.step()
-def compose_email_step(artifact_json: str) -> str:
-    """Compose personalized email via copywriter agent. Returns EmailContent JSON."""
-    import asyncio
-
-    from maestro.bootstrap import bootstrap
-    from maestro.email_agent import compose_email
-
-    model, _db_url = bootstrap()
-    email = asyncio.get_event_loop().run_until_complete(
-        compose_email(artifact_json, model)
-    )
-    return email.model_dump_json()
-
-
-@DBOS.step()
 def simulate_send_step(journey_id: str, customer_id: str, email_json: str) -> str:
     """Write to sent_emails table, simulating delivery."""
     from maestro.bootstrap import get_lakebase_conn_params
@@ -194,12 +193,12 @@ def rehydrate_journey_step(journey_id: str) -> str:
     return json.dumps(row[0]) if isinstance(row[0], dict) else str(row[0])
 
 
-# ── Unified Workflow ───────────────────────────────────────────────────────
+# ── Unified Async Workflow ─────────────────────────────────────────────────
 
 
 @DBOS.workflow()
-def unified_journey_workflow(event_json: str, delay_seconds: int = 15) -> str:
-    """Complete Beat 2 + 2.5 + 3 workflow.
+async def unified_journey_workflow(event_json: str, delay_seconds: int = 15) -> str:
+    """Complete Beat 2 + 2.5 + 3 workflow (async).
 
     Steps:
       1. Agent reasoning -> DecisionArtifact
@@ -213,14 +212,11 @@ def unified_journey_workflow(event_json: str, delay_seconds: int = 15) -> str:
     Returns: JSON dict with journey_id, decision_id, email_id, evaluation
     """
     # ── Step 1: Agent reasoning ────────────────────────────────────────
-    decision_json = run_agent_step(event_json)
+    decision_json = await run_agent_step(event_json)
     decision = json.loads(decision_json)
     customer_id = decision.get("customer_id", "unknown")
 
-    # ── Step 2: Persist decision ───────────────────────────────────────
-    decision_id = persist_decision_step(decision_json)
-
-    # ── Step 3: Save journey state ─────────────────────────────────────
+    # ── Step 2: Save journey state (before decision — FK constraint) ──
     journey_id = decision.get(
         "journey_id",
         f"jrn_{customer_id}_{uuid.uuid4().hex[:6]}",
@@ -241,8 +237,11 @@ def unified_journey_workflow(event_json: str, delay_seconds: int = 15) -> str:
         state_blob=decision_json,
     )
 
+    # ── Step 3: Persist decision ───────────────────────────────────────
+    decision_id = persist_decision_step(decision_json)
+
     # ── Step 4: Durable sleep ──────────────────────────────────────────
-    DBOS.sleep(delay_seconds)
+    await DBOS.sleep_async(delay_seconds)
 
     # ── Step 5: Re-evaluate context ────────────────────────────────────
     eval_json = re_evaluate_step(journey_id, decision_json)
@@ -257,13 +256,13 @@ def unified_journey_workflow(event_json: str, delay_seconds: int = 15) -> str:
             if evaluation["action"] == "proceed"
             else evaluation.get("updated_artifact", decision_json)
         )
-        email_json = compose_email_step(context)
+        email_json = await compose_email_step(context)
 
         # ── Step 7: Simulate send ──────────────────────────────────────
         email_id = simulate_send_step(journey_id, customer_id, email_json)
-        update_journey_status_step(journey_id, "sent")
+        update_journey_status_step(journey_id, "completed")
     else:
-        update_journey_status_step(journey_id, "cancelled")
+        update_journey_status_step(journey_id, "failed")
 
     return json.dumps({
         "journey_id": journey_id,

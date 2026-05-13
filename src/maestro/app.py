@@ -189,7 +189,7 @@ async def run_agent():
 
 
 @app.post("/api/workflow")
-def start_unified_workflow(body: dict):
+async def start_unified_workflow(body: dict):
     """Start unified Beat 2+2.5+3 workflow: agent -> persist -> sleep -> re-eval -> email -> send."""
     import random
 
@@ -199,7 +199,7 @@ def start_unified_workflow(body: dict):
     event_json = CINDY_EVENT.model_dump_json()
     delay = body.get("delay", random.randint(15, 20))
 
-    handle = DBOS.start_workflow(unified_journey_workflow, event_json, delay)
+    handle = await DBOS.start_workflow_async(unified_journey_workflow, event_json, delay)
     return {
         "workflow_id": handle.get_workflow_id(),
         "delay": delay,
