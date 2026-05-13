@@ -3,25 +3,33 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  /* Brand palette */
+  /* Fluttershy brand palette (Beat 1 store + Beat 3 email) */
   --color-espresso: #2C1810;
   --color-mocha: #7C6353;
   --color-gold: #C4A87A;
   --color-gold-light: #DBC09E;
   --color-cream: #EDE4D8;
   --color-linen: #FAF8F6;
+
+  /* Databricks brand (from brand.databricks.com) */
   --color-databricks-red: #EB1600;
   --color-databricks-navy: #0B2026;
   --color-databricks-cyan: #40D1F5;
+  --color-databricks-blue: #4462C9;
+  --color-databricks-text-secondary: #4A4A4A;
+  --color-databricks-bg: #F9F7F4;
+  --color-databricks-bg-muted: #F1F5FA;
+  --color-databricks-dark-bg: #1B2A32;
+  --color-databricks-dark-card: #0B2026;
 
   /* Status colors (semantic) */
   --color-status-suppressed: #EB1600;
-  --color-status-priority: #C4A87A;
+  --color-status-priority: var(--color-databricks-cyan);
   --color-status-active: #40D1F5;
-  --color-status-dormant: #5A6F77;
+  --color-status-dormant: #4A4A4A;
   --color-status-triggered: #22C55E;
 
-  /* Light mode: Databricks branding */
+  /* Light mode: Databricks branding (brand.databricks.com) */
   --color-background: #F9F7F4;
   --color-foreground: #0B2026;
   --color-card: #FFFFFF;
@@ -30,13 +38,13 @@
   --color-primary-foreground: #FFFFFF;
   --color-secondary: #F1F5FA;
   --color-secondary-foreground: #4A4A4A;
-  --color-accent: var(--color-gold);
+  --color-accent: #40D1F5;
   --color-accent-foreground: #0B2026;
   --color-muted: #F1F5FA;
-  --color-muted-foreground: #5A6F77;
+  --color-muted-foreground: #4A4A4A;
   --color-border: #DCE0E2;
   --color-ring: #EB1600;
-  --color-destructive: #EF4444;
+  --color-destructive: #D0021B;
 
   --radius-sm: 4px;
   --radius-md: 4px;
@@ -46,22 +54,22 @@
   --font-serif: 'DM Serif Display', ui-serif, Georgia, serif;
 }
 
-/* Dark mode: cinematic gold */
+/* Dark mode: Databricks dark navy */
 .dark {
-  --color-background: #0D0B09;
-  --color-foreground: #FAF8F6;
-  --color-card: #1A1612;
-  --color-card-foreground: #FAF8F6;
-  --color-primary: var(--color-gold);
-  --color-primary-foreground: #0D0B09;
-  --color-secondary: #2A2420;
-  --color-secondary-foreground: var(--color-cream);
-  --color-accent: var(--color-gold);
-  --color-accent-foreground: #FAF8F6;
-  --color-muted: #2A2420;
-  --color-muted-foreground: #8A7A68;
-  --color-border: #2A2420;
-  --color-ring: var(--color-gold);
+  --color-background: #0F1C22;
+  --color-foreground: #F1F5FA;
+  --color-card: #142028;
+  --color-card-foreground: #F1F5FA;
+  --color-primary: #40D1F5;
+  --color-primary-foreground: #0B2026;
+  --color-secondary: #1B2A32;
+  --color-secondary-foreground: #DCE0E2;
+  --color-accent: #40D1F5;
+  --color-accent-foreground: #F1F5FA;
+  --color-muted: #1B2A32;
+  --color-muted-foreground: #7A8E98;
+  --color-border: #1F3340;
+  --color-ring: #40D1F5;
 }
 
 @layer base {
@@ -80,15 +88,15 @@
 
 /* Text selection */
 ::selection {
-  background: rgba(196,168,122,0.25);
+  background: rgba(64,209,245,0.2);
   color: inherit;
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(196,168,122,0.3); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(196,168,122,0.5); }
+::-webkit-scrollbar-thumb { background: rgba(64,209,245,0.25); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(64,209,245,0.4); }
 
 /* Landing page keyframe animations */
 @keyframes goldShift { 0% { background-position: 0% } 100% { background-position: 200% } }
