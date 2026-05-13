@@ -123,6 +123,21 @@ CREATE TABLE IF NOT EXISTS propensity_scores (
 
 
 -- ============================================================
+-- 10. sent_emails (Beat 3 — simulated email delivery tracking)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS sent_emails (
+    email_id      VARCHAR(64)  PRIMARY KEY,
+    journey_id    VARCHAR(64)  NOT NULL,
+    customer_id   VARCHAR(64)  NOT NULL,
+    subject       VARCHAR(512) NOT NULL,
+    body_html     TEXT         NOT NULL,
+    channel       VARCHAR(20)  DEFAULT 'email',
+    status        VARCHAR(20)  DEFAULT 'delivered',
+    sent_at       TIMESTAMPTZ  DEFAULT NOW()
+);
+
+
+-- ============================================================
 -- SEED DATA
 -- ============================================================
 
