@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maestro CDP — Architecture Decision</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0B2026;
+    --surface: #0f2d34;
+    --surface2: #143a43;
+    --border: #1e4f5a;
+    --text: #F9F7F4;
+    --text-muted: #8fb5bf;
+    --accent: #40d1f5;
+    --green: #00D4AA;
+    --red: #FF3621;
+    --orange: #FF8C2A;
+    --purple: #4462c9;
+    --db-red: #FF3621;
+    --db-cyan: #40d1f5;
+    --db-navy: #0B2026;
+    --db-cream: #F9F7F4;
+    --wake: #f0883e;
+  }
+
+  /* Databricks Light Mode */
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #F9F7F4;
+      --surface: #FFFFFF;
+      --surface2: #F1F5FA;
+      --border: #D8DEE4;
+      --text: #0B2026;
+      --text-muted: #4A4A4A;
+      --accent: #1B6AC9;
+      --green: #00875A;
+      --red: #D0021B;
+      --orange: #C75300;
+      --purple: #4462c9;
+      --db-red: #FF3621;
+      --db-cyan: #1B6AC9;
+      --db-navy: #0B2026;
+      --db-cream: #F9F7F4;
+      --wake: #C75300;
+    }
+
+    .db-header {
+      background: linear-gradient(135deg, #0B2026 0%, #143a43 100%);
+    }
+    .db-header .db-logo-text,
+    .db-header .db-header-title { color: #F9F7F4; }
+
+    .callout {
+      background: rgba(27,106,201,0.06);
+      border-color: rgba(27,106,201,0.25);
+    }
+
+    .badge-green { background: rgba(0,135,90,0.12); }
+    .badge-red { background: rgba(208,2,27,0.1); }
+    .badge-orange { background: rgba(199,83,0,0.1); }
+
+    .flow-node.event { background: rgba(199,83,0,0.08); }
+    .flow-node.agent { background: rgba(27,106,201,0.08); }
+    .flow-node.tool { background: rgba(68,98,201,0.08); }
+    .flow-node.persist { background: rgba(0,135,90,0.08); }
+    .flow-node.wake { background: rgba(199,83,0,0.08); }
+    .flow-node.action { background: rgba(0,135,90,0.1); }
+
+    .arch-layer.l1 { background: rgba(199,83,0,0.08); }
+    .arch-layer.l2 { background: rgba(27,106,201,0.08); }
+    .arch-layer.l3 { background: rgba(68,98,201,0.08); }
+    .arch-layer.l4 { background: rgba(0,135,90,0.08); }
+    .arch-layer.l5 { background: rgba(208,2,27,0.06); }
+
+    .tl-content { background: var(--surface); }
+    .tl-content.sleep { background: var(--bg); }
+    .tl-dot { background: var(--bg); }
+
+    .sleep-bar {
+      background: linear-gradient(90deg, rgba(199,83,0,0.1), rgba(0,135,90,0.1));
+    }
+
+    code { background: rgba(27,106,201,0.08); }
+    pre { background: #F1F5FA; border-color: var(--border); }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 0;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .db-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 2rem;
+    border-bottom: 2px solid var(--db-red);
+    background: linear-gradient(135deg, #0B2026 0%, #0f2d34 100%);
+    margin-bottom: 0.5rem;
+  }
+  .db-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .db-logo svg { width: 32px; height: 32px; }
+  .db-logo-text { font-size: 1rem; font-weight: 700; color: var(--db-cream); letter-spacing: 0.02em; }
+  .db-header-divider { width: 1px; height: 24px; background: var(--border); }
+  .db-header-title { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+  .content-wrap { padding: 1.5rem 2rem 2rem; }
+  h1 { font-size: 2rem; margin-bottom: 0.25rem; font-weight: 700; }
+  h2 { font-size: 1.4rem; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--db-cyan); border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; font-weight: 700; }
+  h3 { font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.75rem; color: var(--purple); font-weight: 700; }
+  .subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+  th { background: var(--surface2); color: var(--accent); text-align: left; padding: 0.6rem 0.8rem; border: 1px solid var(--border); }
+  td { padding: 0.6rem 0.8rem; border: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: var(--surface); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin: 1rem 0; }
+  .card-green { border-left: 4px solid var(--green); }
+  .card-red { border-left: 4px solid var(--red); }
+  .card-orange { border-left: 4px solid var(--orange); }
+  .card-blue { border-left: 4px solid var(--accent); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+  .badge-green { background: rgba(0,212,170,0.2); color: var(--green); }
+  .badge-red { background: rgba(255,54,33,0.2); color: var(--red); }
+  .badge-orange { background: rgba(255,140,42,0.2); color: var(--orange); }
+  .score { font-size: 2rem; font-weight: 700; }
+  .score-green { color: var(--green); }
+  .score-red { color: var(--red); }
+  .score-orange { color: var(--orange); }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1rem 0; }
+  code { background: var(--surface2); padding: 2px 6px; border-radius: 4px; font-size: 0.85rem; font-family: 'DM Mono', monospace; }
+  pre { background: var(--surface2); padding: 1rem; border-radius: 8px; overflow-x: auto; font-size: 0.85rem; margin: 1rem 0; border: 1px solid var(--border); font-family: 'DM Mono', monospace; }
+  .verdict { font-size: 1.1rem; font-weight: 600; margin-top: 0.5rem; }
+  .callout { background: rgba(64,209,245,0.08); border: 1px solid rgba(64,209,245,0.3); border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; }
+  .fatal { color: var(--red); font-weight: 600; }
+  ul, ol { margin: 0.5rem 0 0.5rem 1.5rem; }
+  li { margin-bottom: 0.3rem; }
+
+  /* Flow Diagram */
+  .flow-container { margin: 2rem 0; }
+  .flow-diagram {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    align-items: center;
+    padding: 2rem 1rem;
+  }
+  .flow-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    max-width: 900px;
+  }
+  .flow-node {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    text-align: center;
+    font-size: 0.85rem;
+    min-width: 140px;
+    position: relative;
+  }
+  .flow-node.event { border-color: var(--orange); background: rgba(255,140,42,0.1); }
+  .flow-node.agent { border-color: var(--accent); background: rgba(64,209,245,0.1); }
+  .flow-node.tool { border-color: var(--purple); background: rgba(68,98,201,0.12); font-size: 0.8rem; min-width: 110px; }
+  .flow-node.persist { border-color: var(--green); background: rgba(0,212,170,0.1); }
+  .flow-node.wake { border-color: var(--wake); background: rgba(240,136,62,0.1); }
+  .flow-node.action { border-color: var(--green); background: rgba(0,212,170,0.15); }
+  .flow-node-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
+  .flow-node-title { font-weight: 600; }
+  .flow-node-detail { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; }
+  .flow-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.25rem 0;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+  }
+  .flow-arrow svg { width: 24px; height: 32px; }
+  .flow-arrow-label { font-size: 0.7rem; color: var(--text-muted); font-style: italic; }
+  .flow-arrow-h { display: flex; align-items: center; color: var(--text-muted); }
+  .flow-arrow-h svg { width: 32px; height: 24px; }
+  .flow-tools-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 500px;
+  }
+  .flow-section {
+    width: 100%;
+    max-width: 900px;
+    margin: 0.5rem 0;
+  }
+  .flow-section-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.4rem 0.8rem;
+    background: var(--surface2);
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 0.5rem;
+  }
+  .flow-bracket {
+    border-left: 2px dashed var(--border);
+    padding-left: 1.5rem;
+    margin-left: 1rem;
+  }
+  .sleep-bar {
+    width: 100%;
+    max-width: 900px;
+    background: linear-gradient(90deg, rgba(255,140,42,0.2), rgba(0,212,170,0.2));
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 0.6rem 1.25rem;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0.25rem 0;
+  }
+  .sleep-bar strong { color: var(--orange); }
+
+  /* Timeline flow */
+  .timeline {
+    position: relative;
+    max-width: 900px;
+    width: 100%;
+    margin: 1rem auto;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 28px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+  .tl-item {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+    position: relative;
+  }
+  .tl-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: var(--bg);
+    flex-shrink: 0;
+    margin-top: 0.55rem;
+    margin-left: 21px;
+    z-index: 1;
+  }
+  .tl-dot.event { border-color: var(--orange); background: var(--orange); }
+  .tl-dot.agent { border-color: var(--accent); background: var(--accent); }
+  .tl-dot.tool { border-color: var(--purple); background: var(--purple); }
+  .tl-dot.persist { border-color: var(--green); background: var(--green); }
+  .tl-dot.sleep { border-color: var(--orange); background: transparent; }
+  .tl-dot.wake { border-color: var(--wake); background: var(--wake); }
+  .tl-dot.action { border-color: var(--green); background: var(--green); }
+  .tl-content {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    flex: 1;
+  }
+  .tl-content.event { border-left: 3px solid var(--orange); }
+  .tl-content.agent { border-left: 3px solid var(--accent); }
+  .tl-content.tool { border-left: 3px solid var(--purple); }
+  .tl-content.persist { border-left: 3px solid var(--green); }
+  .tl-content.sleep { border-left: 3px dashed var(--orange); background: transparent; border: 1px dashed var(--border); }
+  .tl-content.wake { border-left: 3px solid var(--wake); }
+  .tl-content.action { border-left: 3px solid var(--green); }
+  .tl-title { font-weight: 600; font-size: 0.9rem; }
+  .tl-detail { font-size: 0.8rem; color: var(--text-muted); }
+  .tl-time { font-size: 0.7rem; color: var(--text-muted); font-family: 'DM Sans', sans-serif; font-weight: 400; }
+
+  .arch-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    max-width: 700px;
+    margin: 1.5rem auto;
+  }
+  .arch-layer {
+    width: 100%;
+    padding: 0.75rem 1.25rem;
+    text-align: center;
+    border: 1px solid var(--border);
+    font-size: 0.85rem;
+  }
+  .arch-layer:first-child { border-radius: 10px 10px 0 0; }
+  .arch-layer:last-child { border-radius: 0 0 10px 10px; }
+  .arch-layer.l1 { background: rgba(255,140,42,0.12); border-color: var(--orange); }
+  .arch-layer.l2 { background: rgba(64,209,245,0.1); border-color: var(--db-cyan); }
+  .arch-layer.l3 { background: rgba(68,98,201,0.12); border-color: var(--purple); }
+  .arch-layer.l4 { background: rgba(0,212,170,0.1); border-color: var(--green); }
+  .arch-layer.l5 { background: rgba(255,54,33,0.08); border-color: var(--db-red); }
+  .arch-label { font-weight: 600; }
+  .arch-detail { font-size: 0.75rem; color: var(--text-muted); }
+
+  @media (max-width: 768px) {
+    .grid-3 { grid-template-columns: 1fr; }
+    .flow-tools-grid { grid-template-columns: repeat(2, 1fr); }
+    body { padding: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="db-header">
+  <div class="db-logo">
+    <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M18 2L4 10v4.5l14 8 14-8V10L18 2z" fill="#FF3621"/>
+      <path d="M4 14.5v4.5l14 8 14-8v-4.5l-14 8-14-8z" fill="#FF3621" opacity="0.7"/>
+      <path d="M4 19v4.5l14 8 14-8V19l-14 8-14-8z" fill="#FF3621" opacity="0.4"/>
+    </svg>
+    <span class="db-logo-text">Databricks</span>
+  </div>
+  <div class="db-header-divider"></div>
+  <div class="db-header-title">Maestro CDP &middot; Architecture Decision Record</div>
+</div>
+
+<div class="content-wrap">
+
+<h1>Maestro CDP — Architecture Decision</h1>
+<p class="subtitle">CTO-level assessment &middot; 2026-05-10 &middot; Durable Agent Execution</p>
+
+<!-- ───────────────────────────── THE QUESTION ───────────────────────────── -->
+<h2>The Question</h2>
+<p>Which path delivers <strong>durable agent execution</strong> — agents that start, stop, and whose state can be durably acted upon?</p>
+
+<table>
+  <tr><th>Path</th><th>Stack</th><th>Core Durability Mechanism</th></tr>
+  <tr><td><strong>1</strong></td><td>Pydantic AI + DBOS on Lakebase</td><td>Transactional workflow persistence (Postgres inside Databricks)</td></tr>
+  <tr><td><strong>2</strong></td><td>pydantic-deepagents</td><td>Conversation checkpointing to local files</td></tr>
+  <tr><td><strong>3</strong></td><td>Expanded vstorm ecosystem</td><td>File checkpoints + multi-agent + context compression</td></tr>
+</table>
+
+<div class="callout">
+  <strong>The requirement:</strong> "The agent itself is not long-running, but it can be started, stopped, and resumed &mdash; with durable state that can be acted upon independently."<br>
+  This is <strong>workflow durability</strong>, not conversation checkpointing. The distinction is fatal to Paths 2 and 3.
+</div>
+
+<!-- ───────────────────────────── DEMO BEATS ───────────────────────────── -->
+<h2>Demo Beats (15-minute scripted demo)</h2>
+
+<table>
+  <tr><th style="width:100px;">Phase</th><th>What Happens</th><th style="width:80px;">Length</th></tr>
+  <tr><td><strong>Browser</strong></td><td><strong>Recognition</strong> — Recognize Cindy in real-time, serve multimodal personalization (photo &rarr; embedding &rarr; re-rank)</td><td>3:00</td></tr>
+  <tr><td><strong>Agent Reasoning</strong></td><td><strong>Reasoning</strong> — Agent reasons across 9 domains (profile, cart, campaigns, frequency caps, support, propensity) to produce a cross-campaign disposition decision</td><td>5:45</td></tr>
+  <tr><td><strong>Durable Execution</strong></td><td><strong>Persistence</strong> — Journey state persisted via DBOS on Lakebase; agent rehydrates after durable sleep to execute the decision</td><td>0:45</td></tr>
+  <tr><td><strong>Email Activation</strong></td><td><strong>Activation</strong> — Segment-of-1 personalized email with Whiskers photo match, composed by Copywriter Agent and simulated via sent_emails table</td><td>3:30</td></tr>
+</table>
+
+<p style="color:var(--text-muted); font-size:0.85rem; margin-top:0.5rem;">Agent Reasoning is the only differentiation moment. Everything else is setup or payoff. This document decides the architecture for Agent Reasoning + Durable Execution.</p>
+
+<!-- ───────────────────────────── SCORE CARDS ───────────────────────────── -->
+<h2>Score Cards</h2>
+
+<div class="grid-3">
+  <div class="card card-green">
+    <div class="flow-node-label">Path 1 — Current</div>
+    <div class="score score-green">9.3</div>
+    <div class="verdict" style="color:var(--green);">RECOMMENDED</div>
+    <p style="margin-top:0.5rem; font-size:0.85rem;">Pydantic AI + Skills + DBOS on Lakebase + MLflow</p>
+    <ul style="font-size:0.8rem; color:var(--text-muted);">
+      <li>SkillsCapability from day one</li>
+      <li>ACID durable state</li>
+      <li>Native workflow wake-up</li>
+      <li>All state inside governance plane</li>
+      <li>Infrastructure verified & working</li>
+    </ul>
+  </div>
+  <div class="card card-red">
+    <div class="flow-node-label">Path 2 — DeepAgents</div>
+    <div class="score score-red">3.1</div>
+    <div class="verdict" style="color:var(--red);">NOT RECOMMENDED</div>
+    <p style="margin-top:0.5rem; font-size:0.85rem;">pydantic-deepagents v0.3.1</p>
+    <ul style="font-size:0.8rem; color:var(--text-muted);">
+      <li class="fatal">No ACID durability</li>
+      <li class="fatal">State on local filesystem</li>
+      <li class="fatal">Breaks governance thesis</li>
+      <li>No MLflow integration</li>
+    </ul>
+  </div>
+  <div class="card card-red">
+    <div class="flow-node-label">Path 3 — Full Ecosystem</div>
+    <div class="score score-red">2.6</div>
+    <div class="verdict" style="color:var(--red);">NOT RECOMMENDED</div>
+    <p style="margin-top:0.5rem; font-size:0.85rem;">deepagents + subagents + summarization + backend + template</p>
+    <ul style="font-size:0.8rem; color:var(--text-muted);">
+      <li class="fatal">Still no ACID durability</li>
+      <li>5 packages at v0.x</li>
+      <li>Docker dependency (no serverless)</li>
+      <li>Wrong web stack for Databricks Apps</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ───────────────────────────── DECISION MATRIX ───────────────────────────── -->
+<h2>Decision Matrix</h2>
+
+<table>
+  <tr><th>Criterion</th><th>Weight</th><th>Path 1</th><th>Path 2</th><th>Path 3</th></tr>
+  <tr><td>Durable state persistence (ACID)</td><td>30%</td><td><span class="badge badge-green">10</span></td><td><span class="badge badge-red">2</span></td><td><span class="badge badge-red">2</span></td></tr>
+  <tr><td>Workflow wake-up / scheduled resume</td><td>20%</td><td><span class="badge badge-green">9</span></td><td><span class="badge badge-red">2</span></td><td><span class="badge badge-red">2</span></td></tr>
+  <tr><td>Demo thesis alignment (governance)</td><td>20%</td><td><span class="badge badge-green">10</span></td><td><span class="badge badge-red">3</span></td><td><span class="badge badge-red">2</span></td></tr>
+  <tr><td>Infrastructure readiness</td><td>10%</td><td><span class="badge badge-green">10</span></td><td><span class="badge badge-red">2</span></td><td><span class="badge badge-red">1</span></td></tr>
+  <tr><td>Dependency risk</td><td>10%</td><td><span class="badge badge-green">9</span></td><td><span class="badge badge-orange">5</span></td><td><span class="badge badge-red">2</span></td></tr>
+  <tr><td>Future extensibility</td><td>10%</td><td><span class="badge badge-orange">6</span></td><td><span class="badge badge-green">8</span></td><td><span class="badge badge-green">9</span></td></tr>
+</table>
+
+<!-- ───────────────────────────── ARCHITECTURE STACK ───────────────────────────── -->
+<h2>Path 1 — Architecture Stack</h2>
+
+<div class="arch-stack">
+  <div class="arch-layer l1">
+    <div class="arch-label">Event Trigger</div>
+    <div class="arch-detail">cart_abandoned → Databricks Streaming / Webhook</div>
+  </div>
+  <div class="arch-layer l2">
+    <div class="arch-label">Agent Layer — Pydantic AI + Skills</div>
+    <div class="arch-detail">@agent.tool (9 tools) &middot; SkillsCapability for domain best practices &middot; Claude via AI Gateway &middot; structured output_type &middot; RunContext deps</div>
+  </div>
+  <div class="arch-layer l3">
+    <div class="arch-label">Observability — MLflow Tracing</div>
+    <div class="arch-detail">mlflow.pydantic_ai.autolog() &middot; tool calls, tokens, latency</div>
+  </div>
+  <div class="arch-layer l4">
+    <div class="arch-label">Durability — DBOS on Lakebase</div>
+    <div class="arch-detail">ACID state persistence &middot; DBOS.sleep_async() durable wake-up &middot; Postgres inside Databricks</div>
+  </div>
+  <div class="arch-layer l5">
+    <div class="arch-label">Governance — Unity Catalog</div>
+    <div class="arch-detail">Single audit plane &middot; UC Functions + MCP tools &middot; AI Gateway logging</div>
+  </div>
+</div>
+
+<!-- ───────────────────────────── FLOW DIAGRAM ───────────────────────────── -->
+<h2>Durable Agent Flow — Agent Reasoning → Durable Execution → Email Activation</h2>
+
+<p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1rem;">
+  This is the core pattern: Agent 1 reasons and decides, persists state transactionally, DBOS sleeps durably, Agent 2 composes and activates.
+</p>
+
+<div class="timeline">
+
+  <!-- Event -->
+  <div class="tl-item">
+    <div class="tl-dot event"></div>
+    <div class="tl-content event">
+      <div class="tl-time">T+0s &middot; 8:18 PM CT</div>
+      <div class="tl-title">cart_abandoned event fires</div>
+      <div class="tl-detail">Cindy (cust_88241) abandons "Welcome Home, Whiskers" photo book — $42</div>
+    </div>
+  </div>
+
+  <!-- Agent 1 starts -->
+  <div class="tl-item">
+    <div class="tl-dot agent"></div>
+    <div class="tl-content agent">
+      <div class="tl-time">T+0.01s</div>
+      <div class="tl-title">Agent 1 (Reasoning) starts — Pydantic AI supervisor</div>
+      <div class="tl-detail">System prompt loaded &middot; 9 tools available &middot; SkillsCapability loaded &middot; MLflow trace span opens</div>
+    </div>
+  </div>
+
+  <!-- Tools -->
+  <div class="tl-item">
+    <div class="tl-dot tool"></div>
+    <div class="tl-content tool">
+      <div class="tl-time">T+0.05s → T+5s</div>
+      <div class="tl-title">Agent 1 reasons across 9 domains (tool calls)</div>
+      <div class="tl-detail">
+        read_profile → read_cart → list_active_campaigns → check_frequency_cap <span class="badge badge-red">BREACH</span>
+        → score_propensity (0.81) → optimal_send_time (8 AM CT)
+        <br>
+        <em>Skipped: read_support_tickets (propensity high enough), check_production_feasibility (standard item)</em>
+        <br>
+        <em>AI Gateway latency: ~5–10s total through Claude</em>
+      </div>
+    </div>
+  </div>
+
+  <!-- Decision -->
+  <div class="tl-item">
+    <div class="tl-dot agent"></div>
+    <div class="tl-content agent">
+      <div class="tl-time">T+7s</div>
+      <div class="tl-title">Agent 1 produces DecisionArtifact</div>
+      <div class="tl-detail">
+        Verdict: <strong>re-prioritize</strong> &middot;
+        Suppress Spring Seasonal &middot;
+        Prioritize Cart Recovery &middot;
+        Warm tone (Whiskers) &middot;
+        Email at 8 AM CT
+      </div>
+    </div>
+  </div>
+
+  <!-- Persist -->
+  <div class="tl-item">
+    <div class="tl-dot persist"></div>
+    <div class="tl-content persist">
+      <div class="tl-time">T+7.5s — Steps 1–3 of DBOS workflow</div>
+      <div class="tl-title">run_agent_step → save_journey_step → persist_decision_step</div>
+      <div class="tl-detail">
+        <code>customer_id: cust_88241</code> &middot;
+        <code>send_time: 2026-05-10T08:00:00-05:00</code>
+        <br>
+        Journey state → Lakebase <code>journey_state</code> table &middot;
+        Decision artifact → <code>decisions</code> table (Delta + Lakebase mirror)
+        <br>
+        <strong>ACID transaction committed. Durable sleep begins.</strong> Workflow survives process death.
+      </div>
+    </div>
+  </div>
+
+  <!-- Agent 1 stops -->
+  <div class="tl-item">
+    <div class="tl-dot agent"></div>
+    <div class="tl-content agent">
+      <div class="tl-time">T+8s</div>
+      <div class="tl-title">Agent 1 stops. MLflow trace closes.</div>
+      <div class="tl-detail">Agent reasoning: ~5–10s &middot; 6 reasoning calls + 2 persistence steps &middot; 2 tools skipped with justification</div>
+    </div>
+  </div>
+
+  <!-- Sleep -->
+  <div class="tl-item">
+    <div class="tl-dot sleep"></div>
+    <div class="tl-content sleep">
+      <div class="tl-time">T+8s → T+~25s (demo) &mdash; Step 4</div>
+      <div class="tl-title">await DBOS.sleep_async(delay) — durable pause</div>
+      <div class="tl-detail">
+        No compute running. Wake-up time persisted to Lakebase (Postgres) via <code>DBOS.sleep_async(delay)</code>.
+        <br>Process can restart, crash, scale to zero — workflow resumes automatically at <code>send_time</code>.
+        <br><em>15–20s simulated delay in demo (production: hours)</em>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wake + Re-evaluate -->
+  <div class="tl-item">
+    <div class="tl-dot wake"></div>
+    <div class="tl-content wake">
+      <div class="tl-time">T+~25s &mdash; Step 5</div>
+      <div class="tl-title">DBOS.sleep_async() completes — re_evaluate_step()</div>
+      <div class="tl-detail">
+        Re-evaluates context — checks if customer converted, new tickets, cap changes since Agent 1's decision &middot;
+        Reads journey_state from Lakebase &middot;
+        Rehydrates full context: DecisionArtifact, customer profile, cart, tone
+      </div>
+    </div>
+  </div>
+
+  <!-- Agent 2 Copywriter -->
+  <div class="tl-item">
+    <div class="tl-dot agent"></div>
+    <div class="tl-content agent">
+      <div class="tl-time">T+~30s &mdash; Step 6</div>
+      <div class="tl-title">compose_email_step() — Agent 2 (Copywriter) runs</div>
+      <div class="tl-detail">
+        Dedicated Pydantic AI agent composes personalized email &middot;
+        Gets full context from Agent 1's DecisionArtifact + Profile + Cart &middot;
+        <code>output_type=EmailContent</code> &middot;
+        Personalized: "Welcome home, Whiskers!" + warm tone + cat photo match via Vector Search
+      </div>
+    </div>
+  </div>
+
+  <!-- Simulate Send -->
+  <div class="tl-item">
+    <div class="tl-dot action"></div>
+    <div class="tl-content action">
+      <div class="tl-time">T+~35s &mdash; Step 7</div>
+      <div class="tl-title">simulate_send_step() — journey complete</div>
+      <div class="tl-detail">
+        Writes to <code>sent_emails</code> table &middot;
+        Marks journey_state → <code>status: completed</code> &middot;
+        Email composition: ~5–10s additional
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ───────────────────────────── PATH 2 ANALYSIS ───────────────────────────── -->
+<h2>Path 2 — pydantic-deepagents: Why It Doesn't Fit</h2>
+
+<div class="card card-red">
+  <h3 style="color:var(--red); margin-top:0;">Three Fatal Problems</h3>
+
+  <p><strong>1. Not durable execution.</strong> Checkpoints are conversation snapshots stored on local disk (<code>.pydantic-deep/sessions/{id}/</code>). No ACID guarantees — if the process dies mid-checkpoint, state corrupts. No scheduled wake-up mechanism exists. You would still need DBOS for Durable Execution.</p>
+
+  <p><strong>2. Breaks the governance story.</strong> State lives on local filesystem, outside Unity Catalog. The "all durable agent state lives inside Databricks" thesis — the structural moat of the demo — collapses.</p>
+
+  <p><strong>3. No MLflow integration.</strong> Uses Logfire for tracing. Would require ripping out the verified MLflow setup. v0.3.1 with known security vulnerabilities including command injection and URI exposure.</p>
+
+  <div class="callout" style="margin-top:1rem;">
+    <strong>The fundamental mismatch:</strong><br>
+    pydantic-deepagents solves: <em>"How do I manage a long-running AI conversation with checkpoints?"</em><br>
+    Maestro needs: <em>"How do I persist a business decision durably, wake up 11 hours later, and act on it — all inside Databricks?"</em><br>
+    <strong>These are fundamentally different problem domains.</strong>
+  </div>
+</div>
+
+<!-- ───────────────────────────── PATH 3 ANALYSIS ───────────────────────────── -->
+<h2>Path 3 — Full Ecosystem: Why It's Worse</h2>
+
+<div class="card card-red">
+  <h3 style="color:var(--red); margin-top:0;">Adds complexity without solving the core gap</h3>
+
+  <table>
+    <tr><th>Package</th><th>What It Adds</th><th>Why It Doesn't Help</th></tr>
+    <tr><td>subagents-pydantic-ai</td><td>Multi-agent orchestration</td><td>Agent Reasoning uses a single supervisor. No multi-agent needed yet.</td></tr>
+    <tr><td>pydantic-ai-summarization</td><td>Context compression</td><td>Agent Reasoning is single-turn (~5–10s). No long context to compress.</td></tr>
+    <tr><td>pydantic-ai-backend</td><td>Docker sandboxing</td><td>Databricks Apps is serverless. Docker is incompatible.</td></tr>
+    <tr><td>full-stack-ai-agent-template</td><td>FastAPI + Next.js scaffold</td><td>Demo uses Databricks Apps, not a custom web stack.</td></tr>
+  </table>
+
+  <p style="margin-top:1rem;">Five v0.x packages create integration risk. Each integration point introduces potential failure modes. Critically, <strong>Path 3 still requires DBOS for actual durable state persistence</strong>.</p>
+</div>
+
+<!-- ───────────────────────────── WIRING DIAGRAM ───────────────────────────── -->
+<h2>How to Wire It Up — Component Diagram</h2>
+
+<p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1rem;">
+  End-to-end wiring from event trigger through agent reasoning to durable persistence and scheduled resumption.
+</p>
+
+<div style="overflow-x:auto;">
+<pre style="font-size:0.8rem; line-height:1.8;">
+                         ┌──────────────────────────────────────────────────────────┐
+                         │                    DATABRICKS PLATFORM                    │
+                         │                                                          │
+  cart_abandoned ────────►│  ┌─────────────────────────────────────────────────┐     │
+  (webhook/stream)       │  │     REASONING AGENT — Agent 1 (9 tools)          │     │
+                         │  │                                                   │     │
+                         │  │  ┌──────────┐    ┌──────────┐    ┌──────────┐   │     │
+                         │  │  │  System   │───►│ Tool     │───►│ Decision │   │     │
+                         │  │  │  Prompt   │    │ Reasoning│    │ Artifact │   │     │
+                         │  │  └──────────┘    └────┬─────┘    └────┬─────┘   │     │
+                         │  │                       │               │          │     │
+                         │  └───────────────────────┼───────────────┼──────────┘     │
+                         │                          │               │                │
+                         │         ┌────────────────┘               │                │
+                         │         │                                │                │
+                         │         ▼                                ▼                │
+                         │  ┌─────────────┐                ┌──────────────┐          │
+                         │  │  UC TOOLS    │                │    DBOS WORKFLOW     │  │
+                         │  │             │                │   (7 steps)   │          │
+                         │  │ • customers │                │              │          │
+                         │  │ • orders    │                │ 1.run_agent  ┼────┐     │
+                         │  │ • campaigns │                │ 2.save_jrny  │    │     │
+                         │  │ • production│                │ 3.persist_dec│    │     │
+                         │  │ • support   │                │ 4.DBOS.sleep ┼──┐ │     │
+                         │  └──────┬──────┘                │ 5.re_evaluate│  │ │     │
+                         │         │                       │ 6.compose_em │  │ │     │
+                         │         │                       │ 7.sim_send ──┼─┐│ │     │
+                         │         │                       └──────────────┘ ││ │     │
+                         │         │                       │              │  │ │     │
+                         │         │                       └──────────────┘  │ │     │
+                         │         │                                        │ │     │
+                         │         ▼                                        │ │     │
+                         │  ┌─────────────┐       ┌──────────────────┐      │ │     │
+                         │  │ AI GATEWAY  │       │    LAKEBASE      │◄─────┘ │     │
+                         │  │             │       │  (Postgres)      │◄───────┘     │
+                         │  │ Claude /    │       │                  │              │
+                         │  │ Llama       │       │ • journey_state  │              │
+                         │  └─────────────┘       │ • decisions      │              │
+                         │                        │   (Delta mirror) │              │
+                         │                        │ • sent_emails    │              │
+                         │         ┌──────────────┤                  │              │
+                         │         │              └──────────────────┘              │
+                         │         ▼                        ▲                       │
+                         │  ┌─────────────┐                │                       │
+                         │  │   MLFLOW    │                │  DBOS.sleep() wakes    │
+                         │  │   TRACING   │                │  re-evaluate context   │
+                         │  │             │                │                        │
+                         │  │ autolog()   │        ┌───────┴────────┐               │
+                         │  │ tool spans  │        │  DBOS.sleep()  │               │
+                         │  │ model spans │        │  durable pause │               │
+                         │  └─────────────┘        │  15-20s (demo) │               │
+                         │                         │  then re-eval  │               │
+                         │                         └────────────────┘               │
+                         │                                 │                        │
+                         │                                 ▼                        │
+                         │                         ┌────────────────┐               │
+                         │                         │ COPYWRITER     │               │
+                         │                         │ AGENT (Agent 2)│               │
+                         │                         │ output=Email   │               │
+                         │                         │ sent_emails tbl│               │
+                         │                         └────────────────┘               │
+                         │                                                          │
+                         │  ┌──────────────────────────────────────────────────┐    │
+                         │  │              UNITY CATALOG GOVERNANCE             │    │
+                         │  │  All tool calls · All model calls · All state     │    │
+                         │  └──────────────────────────────────────────────────┘    │
+                         └──────────────────────────────────────────────────────────┘
+</pre>
+</div>
+
+<div style="margin:2rem 0;">
+<svg viewBox="0 0 900 910" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:900px;display:block;margin:0 auto;" font-family="'DM Sans', -apple-system, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8fb5bf"/>
+    </marker>
+    <marker id="arrow-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#40d1f5"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#00D4AA"/>
+    </marker>
+    <marker id="arrow-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#4462c9"/>
+    </marker>
+    <marker id="arrow-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#f0883e"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#FF3621"/>
+    </marker>
+    <!-- Dashed pattern for sleep -->
+    <pattern id="sleep-hatch" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="rgba(240,136,62,0.3)" stroke-width="2"/>
+    </pattern>
+  </defs>
+
+
+  <!-- Light mode overrides -->
+  <style>
+    @media (prefers-color-scheme: light) {
+      /* Text: light text on dark bg → dark text on light bg */
+      [fill="#F9F7F4"] { fill: #1A1A1A; }
+      [fill="#8fb5bf"] { fill: #4A5568; }
+      [fill="#5a7a82"] { fill: #718096; }
+
+      /* Background fills used for label backing rects */
+      [fill="#0B2026"] { fill: #F9F7F4; }
+
+      /* Borders and structural lines */
+      [stroke="#1e4f5a"] { stroke: #CBD5E0; }
+      [stroke="#8fb5bf"] { stroke: #718096; }
+
+      /* Accent: cyan → deeper blue */
+      [fill="#40d1f5"] { fill: #1B6AC9; }
+      [stroke="#40d1f5"] { stroke: #1B6AC9; }
+
+      /* Green → deeper green */
+      [fill="#00D4AA"] { fill: #00875A; }
+      [stroke="#00D4AA"] { stroke: #00875A; }
+
+      /* Red → deeper red */
+      [fill="#FF3621"] { fill: #D0021B; }
+      [stroke="#FF3621"] { stroke: #D0021B; }
+
+      /* Orange → deeper orange */
+      [fill="#FF8C2A"] { fill: #C75300; }
+      [stroke="#FF8C2A"] { stroke: #C75300; }
+
+      /* Wake orange → deeper */
+      [fill="#f0883e"] { fill: #C75300; }
+      [stroke="#f0883e"] { stroke: #C75300; }
+
+      /* Purple stays readable in both modes */
+
+      /* Marker arrow fills */
+      marker[id="arrow"] path { fill: #718096; }
+      marker[id="arrow-cyan"] path { fill: #1B6AC9; }
+      marker[id="arrow-green"] path { fill: #00875A; }
+      marker[id="arrow-purple"] path { fill: #4462c9; }
+      marker[id="arrow-orange"] path { fill: #C75300; }
+      marker[id="arrow-red"] path { fill: #D0021B; }
+
+      /* Semi-transparent node fills — lighter for white bg */
+      [fill="rgba(64,209,245,0.08)"] { fill: rgba(27,106,201,0.06); }
+      [fill="rgba(64,209,245,0.12)"] { fill: rgba(27,106,201,0.08); }
+      [fill="rgba(68,98,201,0.1)"] { fill: rgba(68,98,201,0.06); }
+      [fill="rgba(68,98,201,0.12)"] { fill: rgba(68,98,201,0.08); }
+      [fill="rgba(68,98,201,0.15)"] { fill: rgba(68,98,201,0.1); }
+      [fill="rgba(68,98,201,0.08)"] { fill: rgba(68,98,201,0.05); }
+      [fill="rgba(0,212,170,0.1)"] { fill: rgba(0,135,90,0.08); }
+      [fill="rgba(0,212,170,0.12)"] { fill: rgba(0,135,90,0.1); }
+      [fill="rgba(0,212,170,0.08)"] { fill: rgba(0,135,90,0.06); }
+      [fill="rgba(255,54,33,0.1)"] { fill: rgba(208,2,27,0.06); }
+      [fill="rgba(255,54,33,0.08)"] { fill: rgba(208,2,27,0.05); }
+      [fill="rgba(255,140,42,0.15)"] { fill: rgba(199,83,0,0.08); }
+      [fill="rgba(240,136,62,0.08)"] { fill: rgba(199,83,0,0.06); }
+      [fill="rgba(240,136,62,0.3)"] { fill: rgba(199,83,0,0.2); }
+
+      /* Sleep hatch pattern line */
+      pattern[id="sleep-hatch"] line { stroke: rgba(199,83,0,0.25); }
+
+      /* Dashed platform border */
+      svg > rect:first-of-type { stroke: #CBD5E0; }
+    }
+  </style>
+
+  <!-- ═══════ DATABRICKS PLATFORM BOUNDARY ═══════ -->
+  <rect x="15" y="15" width="870" height="880" rx="12" fill="none" stroke="#1e4f5a" stroke-width="2" stroke-dasharray="6,3"/>
+  <rect x="300" y="2" width="300" height="26" rx="4" fill="#0B2026"/>
+  <text x="450" y="19" text-anchor="middle" fill="#8fb5bf" font-size="11" font-weight="600" letter-spacing="0.1em">DATABRICKS PLATFORM</text>
+
+  <!-- ═══════ EVENT TRIGGER (external) ═══════ -->
+  <rect x="30" y="95" width="150" height="55" rx="8" fill="rgba(255,140,42,0.15)" stroke="#FF8C2A" stroke-width="2"/>
+  <text x="105" y="117" text-anchor="middle" fill="#FF8C2A" font-size="10" font-weight="600" letter-spacing="0.05em">EVENT TRIGGER</text>
+  <text x="105" y="137" text-anchor="middle" fill="#F9F7F4" font-size="12" font-weight="600">cart_abandoned</text>
+
+  <!-- Arrow: Event → Agent -->
+  <line x1="180" y1="122" x2="218" y2="122" stroke="#FF8C2A" stroke-width="2" marker-end="url(#arrow-orange)"/>
+  <text x="199" y="114" text-anchor="middle" fill="#8fb5bf" font-size="9" font-style="italic">webhook</text>
+
+  <!-- ═══════ REASONING AGENT — Agent 1 (large box) ═══════ -->
+  <rect x="225" y="55" width="430" height="190" rx="10" fill="rgba(64,209,245,0.08)" stroke="#40d1f5" stroke-width="2"/>
+  <text x="380" y="75" text-anchor="middle" fill="#40d1f5" font-size="13" font-weight="700">REASONING AGENT (Agent 1)</text>
+  <text x="380" y="90" text-anchor="middle" fill="#8fb5bf" font-size="9" font-style="italic">9 tools · output=DecisionArtifact · SkillsCapability</text>
+
+  <!-- System Prompt (inside agent) -->
+  <rect x="242" y="92" width="115" height="50" rx="6" fill="rgba(64,209,245,0.12)" stroke="#40d1f5" stroke-width="1.5"/>
+  <text x="300" y="112" text-anchor="middle" fill="#8fb5bf" font-size="9" font-weight="500">SYSTEM</text>
+  <text x="300" y="128" text-anchor="middle" fill="#F9F7F4" font-size="11" font-weight="600">Prompt</text>
+
+  <!-- SkillsCapability (inside agent) -->
+  <rect x="370" y="92" width="135" height="50" rx="6" fill="rgba(68,98,201,0.15)" stroke="#4462c9" stroke-width="1.5"/>
+  <text x="438" y="108" text-anchor="middle" fill="#4462c9" font-size="9" font-weight="500">SKILLS</text>
+  <text x="438" y="128" text-anchor="middle" fill="#F9F7F4" font-size="11" font-weight="600">SkillsCapability</text>
+
+  <!-- Arrow: Prompt → Skills -->
+  <line x1="357" y1="117" x2="368" y2="117" stroke="#8fb5bf" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Tool Reasoning (inside agent) -->
+  <rect x="242" y="155" width="115" height="50" rx="6" fill="rgba(68,98,201,0.12)" stroke="#4462c9" stroke-width="1.5"/>
+  <text x="300" y="175" text-anchor="middle" fill="#4462c9" font-size="9" font-weight="500">@agent.tool</text>
+  <text x="300" y="191" text-anchor="middle" fill="#F9F7F4" font-size="11" font-weight="600">Tool Reasoning</text>
+
+  <!-- Arrow: Skills → Tool Reasoning -->
+  <line x1="438" y1="142" x2="438" y2="148" stroke="#8fb5bf" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="438" y1="148" x2="357" y2="148" stroke="#8fb5bf" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="357" y1="148" x2="357" y2="155" stroke="#8fb5bf" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arrow)"/>
+
+  <!-- Decision Artifact (inside agent) -->
+  <rect x="370" y="155" width="135" height="50" rx="6" fill="rgba(0,212,170,0.12)" stroke="#00D4AA" stroke-width="1.5"/>
+  <text x="438" y="175" text-anchor="middle" fill="#00D4AA" font-size="9" font-weight="500">OUTPUT</text>
+  <text x="438" y="191" text-anchor="middle" fill="#F9F7F4" font-size="11" font-weight="600">DecisionArtifact</text>
+
+  <!-- Arrow: Tool Reasoning → Decision -->
+  <line x1="357" y1="180" x2="368" y2="180" stroke="#8fb5bf" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- RunContext badge -->
+  <rect x="520" y="155" width="120" height="28" rx="4" fill="rgba(64,209,245,0.08)" stroke="#1e4f5a" stroke-width="1"/>
+  <text x="580" y="173" text-anchor="middle" fill="#8fb5bf" font-size="9">RunContext[CDPDeps]</text>
+
+  <!-- structured output badge -->
+  <rect x="520" y="190" width="120" height="28" rx="4" fill="rgba(0,212,170,0.08)" stroke="#1e4f5a" stroke-width="1"/>
+  <text x="580" y="208" text-anchor="middle" fill="#8fb5bf" font-size="9">structured output_type</text>
+
+  <!-- ═══════ AI GATEWAY (right, model source) ═══════ -->
+  <rect x="690" y="70" width="180" height="105" rx="10" fill="rgba(255,54,33,0.1)" stroke="#FF3621" stroke-width="2"/>
+  <text x="780" y="93" text-anchor="middle" fill="#FF3621" font-size="10" font-weight="600" letter-spacing="0.05em">AI GATEWAY</text>
+  <text x="780" y="115" text-anchor="middle" fill="#F9F7F4" font-size="12" font-weight="600">Claude</text>
+  <text x="780" y="133" text-anchor="middle" fill="#8fb5bf" font-size="9">databricks-claude-</text>
+  <text x="780" y="146" text-anchor="middle" fill="#8fb5bf" font-size="9">sonnet-4-6</text>
+  <text x="780" y="166" text-anchor="middle" fill="#8fb5bf" font-size="8" font-style="italic">AsyncDatabricksOpenAI</text>
+
+  <!-- Bidirectional arrow: Agent ↔ AI Gateway -->
+  <line x1="655" y1="112" x2="688" y2="112" stroke="#FF3621" stroke-width="2" marker-end="url(#arrow-red)"/>
+  <line x1="688" y1="128" x2="655" y2="128" stroke="#FF3621" stroke-width="2" marker-end="url(#arrow-red)"/>
+  <text x="672" y="105" text-anchor="middle" fill="#8fb5bf" font-size="8">prompts</text>
+  <text x="672" y="144" text-anchor="middle" fill="#8fb5bf" font-size="8">responses</text>
+
+  <!-- ═══════ UC FUNCTIONS / HOSTED MCPs (below-left) ═══════ -->
+  <rect x="40" y="310" width="280" height="190" rx="10" fill="rgba(68,98,201,0.1)" stroke="#4462c9" stroke-width="2"/>
+  <text x="180" y="333" text-anchor="middle" fill="#4462c9" font-size="11" font-weight="700">UC FUNCTIONS / HOSTED MCPs</text>
+  <text x="180" y="350" text-anchor="middle" fill="#8fb5bf" font-size="9" font-style="italic">Unity Catalog governed data + tool access</text>
+
+  <!-- UC tool items -->
+  <text x="70" y="375" fill="#8fb5bf" font-size="10">• customers</text>
+  <text x="190" y="375" fill="#5a7a82" font-size="9">(Delta table)</text>
+  <text x="70" y="393" fill="#8fb5bf" font-size="10">• orders + order_items</text>
+  <text x="225" y="393" fill="#5a7a82" font-size="9">(Delta)</text>
+  <text x="70" y="411" fill="#8fb5bf" font-size="10">• campaigns + membership</text>
+  <text x="250" y="411" fill="#5a7a82" font-size="9">(Delta)</text>
+  <text x="70" y="429" fill="#8fb5bf" font-size="10">• production_calendar</text>
+  <text x="215" y="429" fill="#5a7a82" font-size="9">(Delta)</text>
+  <text x="70" y="447" fill="#8fb5bf" font-size="10">• support_tickets</text>
+  <text x="200" y="447" fill="#5a7a82" font-size="9">(Delta)</text>
+  <text x="70" y="465" fill="#8fb5bf" font-size="10">• score_propensity</text>
+  <text x="205" y="465" fill="#5a7a82" font-size="9">(Model Serving)</text>
+  <text x="70" y="483" fill="#8fb5bf" font-size="10">• optimal_send_time</text>
+  <text x="210" y="483" fill="#5a7a82" font-size="9">(Model Serving)</text>
+
+  <!-- Arrow: Agent → UC Tools -->
+  <line x1="300" y1="245" x2="300" y2="270" stroke="#4462c9" stroke-width="2"/>
+  <line x1="300" y1="270" x2="180" y2="270" stroke="#4462c9" stroke-width="2"/>
+  <line x1="180" y1="270" x2="180" y2="308" stroke="#4462c9" stroke-width="2" marker-end="url(#arrow-purple)"/>
+  <rect x="200" y="257" width="90" height="18" rx="3" fill="#0B2026"/>
+  <text x="245" y="270" text-anchor="middle" fill="#4462c9" font-size="9" font-weight="600">@agent.tool</text>
+
+  <!-- ═══════ DBOS WORKFLOW (below-right) ═══════ -->
+  <rect x="490" y="310" width="280" height="190" rx="10" fill="rgba(0,212,170,0.1)" stroke="#00D4AA" stroke-width="2"/>
+  <text x="630" y="333" text-anchor="middle" fill="#00D4AA" font-size="11" font-weight="700">DBOS WORKFLOW (7 steps)</text>
+  <text x="630" y="350" text-anchor="middle" fill="#8fb5bf" font-size="9" font-style="italic">Durable execution on Lakebase</text>
+
+  <text x="508" y="370" fill="#F9F7F4" font-size="9" font-weight="500">1. run_agent_step() — Agent 1 reasons (9 tools)</text>
+  <text x="508" y="386" fill="#F9F7F4" font-size="9" font-weight="500">2. save_journey_step() — persist journey state</text>
+  <text x="508" y="402" fill="#F9F7F4" font-size="9" font-weight="500">3. persist_decision_step() — persist DecisionArtifact</text>
+  <text x="508" y="418" fill="#f0883e" font-size="9" font-weight="500">4. await DBOS.sleep_async(delay) — durable sleep</text>
+  <text x="508" y="434" fill="#F9F7F4" font-size="9" font-weight="500">5. re_evaluate_step() — check context changes</text>
+  <text x="508" y="450" fill="#F9F7F4" font-size="9" font-weight="500">6. compose_email_step() — Agent 2 composes email</text>
+  <text x="508" y="466" fill="#00D4AA" font-size="9" font-weight="500">7. simulate_send_step() — write sent_emails, complete</text>
+  <text x="508" y="488" fill="#8fb5bf" font-size="8" font-style="italic">delay = seconds, NOT datetime</text>
+
+  <!-- Arrow: Agent → DBOS -->
+  <line x1="438" y1="245" x2="438" y2="270" stroke="#00D4AA" stroke-width="2"/>
+  <line x1="438" y1="270" x2="630" y2="270" stroke="#00D4AA" stroke-width="2"/>
+  <line x1="630" y1="270" x2="630" y2="308" stroke="#00D4AA" stroke-width="2" marker-end="url(#arrow-green)"/>
+  <rect x="475" y="257" width="100" height="18" rx="3" fill="#0B2026"/>
+  <text x="525" y="270" text-anchor="middle" fill="#00D4AA" font-size="9" font-weight="600">persist + sleep</text>
+
+  <!-- ═══════ LAKEBASE (below DBOS) ═══════ -->
+  <rect x="490" y="510" width="280" height="115" rx="10" fill="rgba(0,212,170,0.08)" stroke="#00D4AA" stroke-width="1.5"/>
+  <text x="630" y="533" text-anchor="middle" fill="#00D4AA" font-size="11" font-weight="700">LAKEBASE (Postgres)</text>
+  <text x="630" y="550" text-anchor="middle" fill="#8fb5bf" font-size="9" font-style="italic">Postgres inside Databricks</text>
+  <text x="508" y="570" fill="#8fb5bf" font-size="10">• journey_state</text>
+  <text x="508" y="587" fill="#8fb5bf" font-size="10">• decisions <tspan fill="#5a7a82" font-size="9">(Delta mirror)</tspan></text>
+  <text x="508" y="604" fill="#8fb5bf" font-size="10">• sent_emails <tspan fill="#5a7a82" font-size="9">(simulated delivery)</tspan></text>
+
+  <!-- Arrow: DBOS → Lakebase -->
+  <line x1="630" y1="500" x2="630" y2="508" stroke="#00D4AA" stroke-width="2" marker-end="url(#arrow-green)"/>
+  <text x="645" y="506" fill="#8fb5bf" font-size="9">ACID txn</text>
+
+  <!-- ═══════ MLFLOW TRACING (left-center) ═══════ -->
+  <rect x="40" y="535" width="280" height="75" rx="10" fill="rgba(68,98,201,0.08)" stroke="#4462c9" stroke-width="1.5"/>
+  <text x="180" y="558" text-anchor="middle" fill="#4462c9" font-size="11" font-weight="700">MLFLOW TRACING</text>
+  <text x="180" y="578" text-anchor="middle" fill="#F9F7F4" font-size="10">mlflow.pydantic_ai.autolog()</text>
+  <text x="180" y="596" text-anchor="middle" fill="#8fb5bf" font-size="9">tool spans · model spans · tokens · latency</text>
+
+  <!-- Dotted connection: MLflow observes everything -->
+  <line x1="180" y1="500" x2="180" y2="533" stroke="#4462c9" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="320" y1="535" x2="500" y2="535" stroke="#4462c9" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="410" y="530" text-anchor="middle" fill="#4462c9" font-size="8" font-style="italic">traces all spans</text>
+
+  <!-- ═══════ DURABLE SLEEP (visual break) ═══════ -->
+  <rect x="490" y="640" width="280" height="36" rx="6" fill="url(#sleep-hatch)" stroke="#f0883e" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="630" y="662" text-anchor="middle" fill="#f0883e" font-size="10" font-weight="600">DBOS.sleep_async() — 15–20s simulated (production: hours)</text>
+
+  <!-- Arrow: Lakebase → Sleep -->
+  <line x1="630" y1="625" x2="630" y2="638" stroke="#f0883e" stroke-width="1.5" marker-end="url(#arrow-orange)"/>
+
+  <!-- ═══════ COPYWRITER AGENT + SEND (bottom) ═══════ -->
+  <rect x="490" y="698" width="280" height="80" rx="8" fill="rgba(0,212,170,0.12)" stroke="#00D4AA" stroke-width="2"/>
+  <text x="630" y="718" text-anchor="middle" fill="#00D4AA" font-size="10" font-weight="600">COPYWRITER AGENT (Agent 2)</text>
+  <text x="630" y="733" text-anchor="middle" fill="#8fb5bf" font-size="9">Pydantic AI Agent 2 · output_type=EmailContent</text>
+  <text x="630" y="748" text-anchor="middle" fill="#F9F7F4" font-size="10">Composes personalized email</text>
+  <text x="630" y="763" text-anchor="middle" fill="#8fb5bf" font-size="9">sent_emails table (simulated delivery)</text>
+
+  <!-- Arrow: Sleep → Copywriter -->
+  <line x1="630" y1="676" x2="630" y2="696" stroke="#00D4AA" stroke-width="2" marker-end="url(#arrow-green)"/>
+  <text x="655" y="689" fill="#8fb5bf" font-size="8" font-style="italic">wake &amp; compose</text>
+
+  <!-- ═══════ UNITY CATALOG GOVERNANCE (bottom bar) ═══════ -->
+  <rect x="30" y="848" width="840" height="38" rx="6" fill="rgba(255,54,33,0.08)" stroke="#FF3621" stroke-width="2"/>
+  <text x="450" y="871" text-anchor="middle" fill="#FF3621" font-size="11" font-weight="700" letter-spacing="0.05em">UNITY CATALOG GOVERNANCE</text>
+  <text x="450" y="883" text-anchor="middle" fill="#8fb5bf" font-size="9">All tool calls · All model calls · All state · Single audit plane</text>
+
+  <!-- ═══════ ANNOTATION LABELS ═══════ -->
+  <!-- Agent Reasoning label -->
+  <rect x="690" y="230" width="175" height="55" rx="6" fill="rgba(64,209,245,0.08)" stroke="#1e4f5a" stroke-width="1"/>
+  <text x="777" y="248" text-anchor="middle" fill="#40d1f5" font-size="10" font-weight="600">Agent Reasoning: ~5–10s</text>
+  <text x="777" y="263" text-anchor="middle" fill="#8fb5bf" font-size="9">Agent 1 reasons, decides, persists</text>
+  <text x="777" y="276" text-anchor="middle" fill="#8fb5bf" font-size="9">Email composition: ~5–10s</text>
+
+  <!-- Durable Execution label -->
+  <rect x="290" y="660" width="175" height="55" rx="6" fill="rgba(240,136,62,0.08)" stroke="#1e4f5a" stroke-width="1"/>
+  <text x="377" y="678" text-anchor="middle" fill="#f0883e" font-size="10" font-weight="600">Durable Execution: Wake</text>
+  <text x="377" y="693" text-anchor="middle" fill="#8fb5bf" font-size="9">Re-evaluate &amp; Agent 2 composes</text>
+  <text x="377" y="707" text-anchor="middle" fill="#8fb5bf" font-size="9">15–20s simulated</text>
+
+  <!-- Arrow: Durable Execution label → Copywriter -->
+  <line x1="465" y1="690" x2="488" y2="720" stroke="#1e4f5a" stroke-width="1" stroke-dasharray="3,2"/>
+
+</svg>
+</div>
+
+<!-- ───────────────────────────── KEY WIRING DETAILS ───────────────────────────── -->
+<h2>Wiring Details</h2>
+
+<div class="grid-3">
+  <div class="card card-blue">
+    <h3 style="margin-top:0;">Agent → LLM</h3>
+    <pre style="font-size:0.75rem; border:none; padding:0.5rem;">client = AsyncDatabricksOpenAI(
+  workspace_client=w
+)
+provider = OpenAIProvider(
+  openai_client=client
+)
+model = OpenAIChatModel(
+  "databricks-claude-sonnet-4-6",
+  provider=provider
+)</pre>
+  </div>
+  <div class="card card-blue">
+    <h3 style="margin-top:0;">Agent → DBOS (7-step workflow)</h3>
+    <pre style="font-size:0.75rem; border:none; padding:0.5rem;">@DBOS.workflow()
+async def cart_recovery(customer_id):
+  # 1. Agent 1 reasons across 9 domains
+  decision = await run_agent_step(
+    customer_id)
+  # 2. Persist journey state
+  await save_journey_step(
+    customer_id, decision)
+  # 3. Persist DecisionArtifact
+  await persist_decision_step(decision)
+  # 4. Durable sleep until send time
+  delay = compute_delay(decision)
+  await DBOS.sleep_async(delay)
+  # 5. Re-evaluate context on wake
+  ctx = await re_evaluate_step(
+    customer_id)
+  # 6. Agent 2 composes email
+  email = await compose_email_step(
+    decision, ctx)
+  # 7. Simulate send
+  await simulate_send_step(
+    customer_id, email)</pre>
+  </div>
+  <div class="card card-blue">
+    <h3 style="margin-top:0;">DBOS Durable Sleep</h3>
+    <pre style="font-size:0.75rem; border:none; padding:0.5rem;"># DBOS.sleep_async(seconds) persists
+# wake time to Lakebase (Postgres).
+# Process can crash, restart, scale
+# to zero — workflow resumes.
+# NOTE: takes seconds, NOT datetime.
+
+@DBOS.step()
+async def re_evaluate_step(cust_id):
+  # Check if customer converted,
+  # new tickets, cap changes
+  return await rehydrate_ctx(cust_id)
+
+@DBOS.step()
+async def simulate_send_step(
+    cust_id, email):
+  # Write to sent_emails table
+  # Mark journey → completed</pre>
+  </div>
+</div>
+
+<!-- ───────────────────────────── RECOMMENDATION ───────────────────────────── -->
+<h2>Recommendation</h2>
+
+<div class="card card-green" style="text-align:center; padding:2rem;">
+  <div style="font-size:1.5rem; font-weight:700; color:var(--green); margin-bottom:0.5rem;">PATH 1 — Stay the Course</div>
+  <p style="font-size:1rem; max-width:600px; margin:0 auto;">Pydantic AI + Skills + DBOS on Lakebase + MLflow Tracing</p>
+  <p style="color:var(--text-muted); font-size:0.9rem; max-width:600px; margin:0.75rem auto 0;">
+    The requirement is workflow durability, not conversation checkpointing.
+    The demo's core thesis is the governance plane.
+    Infrastructure is verified.
+    Simplicity wins for a 15-minute demo.
+  </p>
+</div>
+
+<h3>Five Reasons (CEO lens)</h3>
+<ol>
+  <li><strong>Workflow durability ≠ conversation checkpointing.</strong> DBOS provides ACID state + durable sleep with automatic wake-up. pydantic-deepagents checkpoints conversations — different abstraction.</li>
+  <li><strong>The demo's core thesis is the governance plane.</strong> "All durable agent state lives inside Databricks." State on local files undermines this entirely.</li>
+  <li><strong>Infrastructure is verified.</strong> Switching means redoing weeks of validation work against v0.3.x packages.</li>
+  <li><strong>Simplicity wins.</strong> Agent Reasoning uses a single supervisor. It needs 9 tools organized as skills, durable state, a beautiful trace. Path 1 delivers all with minimal parts.</li>
+  <li><strong>Extensibility built-in.</strong> Skills are in Phase A from day one, packaging domain best practices. Sub-agents and context compression layer on for Phase B/C without replacing the foundation.</li>
+</ol>
+
+<h3>Nice-to-Have: Long-Running Agents (Phase B/C — Additive)</h3>
+<ul>
+  <li><code>pydantic-ai-summarization</code> for context compression — layer on top, don't replace DBOS</li>
+  <li>Custom conversation checkpointing to Lakebase — store history in a table, not files</li>
+  <li>DBOS step functions for multi-step workflows with per-step durability</li>
+</ul>
+
+<div class="callout" style="margin-top:2rem;">
+  <strong>Final word:</strong> Features without architectural alignment introduce unnecessary complexity. The question is not "what does it offer?" but "does it solve our specific problem?"
+  Our problem: durable business state inside the Databricks governance plane. Path 1 solves it. Paths 2 and 3 do not.
+  <br><br>
+  <strong>Recommendation: implement Path 1, build Agent Reasoning, and prioritize simplicity.</strong>
+</div>
+
+<!-- ───────────────────────────── EXTENSIBILITY: SKILLS + MULTI-AGENT ───────────────────────────── -->
+<h2>Extensibility: Skills + Multi-Agent Patterns</h2>
+
+<p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1rem;">
+  Skills are part of Path 1 from day one, packaging domain best practices for the 9 tools. This section details how skills work, and how multi-agent coordination layers on in Phase B/C.
+</p>
+
+<div class="callout">
+  <strong>Key insight:</strong> Skills are part of the Path 1 foundation. Multi-agent patterns are <strong>additive</strong> for Phase B/C. The foundation (Pydantic AI + Skills + DBOS on Lakebase + MLflow) stays intact — sub-agents extend how agents coordinate without replacing any of it.
+</div>
+
+<!-- ─── Three Options Assessed ─── -->
+<h3>Three Capabilities Assessed</h3>
+
+<table>
+  <tr><th>Capability</th><th>Package</th><th>What It Adds</th><th>Maturity</th></tr>
+  <tr>
+    <td><strong>Native Delegation</strong></td>
+    <td>Pydantic AI (built-in)</td>
+    <td>Agent calls another agent inside <code>@agent.tool</code>; shared deps and usage tracking</td>
+    <td><span class="badge badge-green">Stable</span></td>
+  </tr>
+  <tr>
+    <td><strong>Skills</strong></td>
+    <td><a href="https://github.com/DougTrajano/pydantic-ai-skills" style="color:var(--accent);">pydantic-ai-skills</a> v0.10.0</td>
+    <td>Modular domain packages with progressive disclosure; follows Anthropic's agent skills pattern</td>
+    <td><span class="badge badge-orange">Alpha (well-tested)</span></td>
+  </tr>
+  <tr>
+    <td><strong>Sub-agents</strong></td>
+    <td><a href="https://github.com/vstorm-co/subagents-pydantic-ai" style="color:var(--accent);">subagents-pydantic-ai</a> v0.2.2</td>
+    <td>Multi-agent delegation with sync/async/auto modes, token tracking, dynamic agent creation</td>
+    <td><span class="badge badge-orange">Beta (100% tested)</span></td>
+  </tr>
+</table>
+
+<!-- ─── Pydantic AI Native Multi-Agent ─── -->
+<h3>Pydantic AI Native Multi-Agent (Built-in)</h3>
+
+<p>Pydantic AI natively supports two multi-agent patterns without any additional packages:</p>
+
+<div class="grid-3">
+  <div class="card card-blue">
+    <h3 style="margin-top:0;">Agent Delegation</h3>
+    <p style="font-size:0.85rem;">One agent calls another inside a tool. Supervisor/worker pattern with shared deps and cost aggregation.</p>
+    <pre style="font-size:0.75rem; border:none; padding:0.5rem;">@supervisor.tool
+async def analyze_campaigns(
+  ctx: RunContext[CDPDeps],
+  customer_id: str
+) -> CampaignAnalysis:
+  r = await campaign_agent.run(
+    f"Analyze {customer_id}",
+    deps=ctx.deps,
+    usage=ctx.usage,  # aggregate cost
+  )
+  return r.output</pre>
+  </div>
+  <div class="card card-blue">
+    <h3 style="margin-top:0;">Programmatic Hand-off</h3>
+    <p style="font-size:0.85rem;">Application code decides which agent runs next. Useful for multi-step workflows with human-in-the-loop.</p>
+    <pre style="font-size:0.75rem; border:none; padding:0.5rem;"># Application code orchestrates
+result1 = await reasoning_agent.run(
+  "Analyze cart abandonment",
+  usage=usage,
+)
+# Hand off to activation agent
+result2 = await activation_agent.run(
+  f"Execute: {result1.output}",
+  usage=usage,
+)</pre>
+  </div>
+  <div class="card card-blue">
+    <h3 style="margin-top:0;">Limitations</h3>
+    <p style="font-size:0.85rem;">Native approach is sufficient for Agent Reasoning but has gaps for complex orchestration:</p>
+    <ul style="font-size:0.8rem; color:var(--text-muted);">
+      <li>No async background tasks</li>
+      <li>No dynamic agent creation</li>
+      <li>No built-in task lifecycle</li>
+      <li>No progressive disclosure</li>
+      <li>Deps must be same type or subset</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ─── Skills ─── -->
+<h3>pydantic-ai-skills: Domain Expansion Without Code Changes</h3>
+
+<p>Skills solve the extensibility problem: how do you go from 9 tools to 50+ without rewriting the agent? Skills are modular domain packages with instructions, resources, and executable scripts.</p>
+
+<div class="card card-green">
+  <h3 style="margin-top:0; color:var(--green);">Why Skills Matter for Maestro</h3>
+  <table>
+    <tr><th>Dimension</th><th>Without Skills</th><th>With Skills (Phase A)</th></tr>
+    <tr><td>Add new domain</td><td>Write <code>@agent.tool</code>, update system prompt, redeploy</td><td>Drop a folder in <code>skills/</code>, agent auto-discovers</td></tr>
+    <tr><td>Token overhead</td><td>All 9 tool schemas always loaded</td><td>Progressive disclosure: load details only when needed</td></tr>
+    <tr><td>Documentation</td><td>Docstrings + external docs</td><td><code>SKILL.md</code> is both agent instruction and developer doc</td></tr>
+    <tr><td>Sharing</td><td>Copy Python functions</td><td>Git-based registries, composable across agents</td></tr>
+    <tr><td>Scale to 50 domains</td><td>Unwieldy system prompt</td><td>Agent sees skill names; loads details on demand</td></tr>
+  </table>
+</div>
+
+<p><strong>How it works:</strong> 4 tools are added to the agent &mdash; <code>list_skills</code>, <code>load_skill</code>, <code>read_skill_resource</code>, <code>run_skill_script</code>. Skills live as directories with a <code>SKILL.md</code> and optional scripts/resources. The agent discovers available skills via metadata in the system prompt, then loads full instructions only when a task requires that domain.</p>
+
+<p><strong>CDP skill structure (illustrative):</strong></p>
+<pre style="font-size:0.8rem;">
+maestro/skills/
+├── customer-profile/
+│   ├── SKILL.md              # When to use, instructions, field reference
+│   └── scripts/
+│       └── lookup.py         # read_profile, read_preferences
+├── campaign-management/
+│   ├── SKILL.md
+│   ├── REFERENCE.md          # Campaign schema, priority rules
+│   └── scripts/
+│       ├── list_campaigns.py
+│       └── check_frequency.py
+├── cart-recovery/
+│   ├── SKILL.md
+│   └── scripts/
+│       ├── read_cart.py
+│       └── score_propensity.py
+├── support-history/
+│   ├── SKILL.md
+│   └── scripts/
+│       └── read_tickets.py
+├── production-ops/            # NEW domain — just drop folder
+│   ├── SKILL.md
+│   └── scripts/
+│       └── check_feasibility.py
+└── loyalty/                   # FUTURE domain — zero code changes
+    ├── SKILL.md
+    └── scripts/
+        └── check_points.py
+</pre>
+
+<!-- ─── Sub-agents ─── -->
+<h3>subagents-pydantic-ai: Multi-Agent Orchestration</h3>
+
+<p>For Phase B/C, when the agent needs to delegate to specialist sub-agents (e.g., a campaign optimizer that runs in the background while the supervisor handles other work).</p>
+
+<div class="card card-blue">
+  <h3 style="margin-top:0;">What It Adds Beyond Native Delegation</h3>
+  <table>
+    <tr><th>Feature</th><th>Native Pydantic AI</th><th>subagents-pydantic-ai</th></tr>
+    <tr><td>Background execution</td><td>No</td><td>Async mode with <code>check_task()</code> polling</td></tr>
+    <tr><td>Dynamic agent creation</td><td>No</td><td><code>DynamicAgentRegistry</code> + factory toolset</td></tr>
+    <tr><td>Task lifecycle</td><td>No</td><td>Create, monitor, cancel (soft/hard)</td></tr>
+    <tr><td>Sub-agent Q&amp;A</td><td>No</td><td>Bidirectional <code>answer_subagent()</code></td></tr>
+    <tr><td>Token tracking</td><td>Via <code>usage=ctx.usage</code></td><td>Aggregated per-agent + <code>get_total_usage()</code></td></tr>
+    <tr><td>Nesting control</td><td>No limit</td><td><code>max_nesting_depth</code> prevents recursion</td></tr>
+  </table>
+</div>
+
+<!-- ─── Phased Adoption ─── -->
+<h3>Recommended Adoption Timeline</h3>
+
+<div class="timeline">
+  <div class="tl-item">
+    <div class="tl-dot persist"></div>
+    <div class="tl-content persist">
+      <div class="tl-time">Phase A (now) &middot; Agent Reasoning</div>
+      <div class="tl-title">@agent.tool + SkillsCapability from day one</div>
+      <div class="tl-detail">
+        9 tools as <code>@agent.tool</code> with <code>SkillsCapability</code> packaging domain best practices. Tools stay as tools — skills don’t replace them, they codify <em>how</em> to use them well for each use case.
+        <br><strong>Rationale:</strong> Skills are the extensibility architecture, not an afterthought. Starting with skills establishes the pattern from the beginning, avoids a rewrite, and enables a live demo moment: “drop a folder, agent discovers a new domain.” <code>SKILL.md</code> files double as agent instructions and developer documentation.
+        <br><strong>Swarm note:</strong> 3/3 agents flagged alpha-dependency risk. Mitigate by pinning <code>0.10.x</code> and maintaining a fallback to plain <code>@agent.tool</code> if integration issues arise.
+        <br><code>uv add pydantic-ai-skills</code> &middot; Pin to <code>0.10.x</code>
+      </div>
+    </div>
+  </div>
+
+  <div class="tl-item">
+    <div class="tl-dot agent"></div>
+    <div class="tl-content agent">
+      <div class="tl-time">Phase B &middot; Multi-agent coordination</div>
+      <div class="tl-title">Add native delegation for specialist agents</div>
+      <div class="tl-detail">
+        Skills foundation already in place from Phase A. Add Pydantic AI’s built-in agent-in-tool delegation (<code>usage=ctx.usage</code>) for supervisor &rarr; specialist patterns. Expand skill directories for new domains (loyalty, returns, etc.).
+        <br><strong>Rationale:</strong> Native delegation covers 80% of multi-agent needs with zero additional dependencies. Skills scale naturally as domains grow.
+      </div>
+    </div>
+  </div>
+
+  <div class="tl-item">
+    <div class="tl-dot wake"></div>
+    <div class="tl-content wake">
+      <div class="tl-time">Phase C &middot; Advanced orchestration (if needed)</div>
+      <div class="tl-title">Layer on subagents-pydantic-ai for async tasks and dynamic agents</div>
+      <div class="tl-detail">
+        If you need background task execution, dynamic agent creation, or task lifecycle management (cancel, monitor, Q&amp;A).
+        <br><strong>Rationale:</strong> Only adopt when native delegation proves insufficient. The package adds async modes, <code>DynamicAgentRegistry</code>, and per-agent token tracking.
+        <br><code>uv add subagents-pydantic-ai</code> &middot; Pin to <code>0.2.x</code>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Combined Architecture ─── -->
+<h3>Combined Architecture (Full Vision — Skills from Phase A, Multi-Agent from Phase B)</h3>
+
+<div class="arch-stack">
+  <div class="arch-layer l1">
+    <div class="arch-label">Event Triggers</div>
+    <div class="arch-detail">cart_abandoned, loyalty_milestone, return_initiated, reactivation_timer</div>
+  </div>
+  <div class="arch-layer l2">
+    <div class="arch-label">Supervisor Agent &mdash; Pydantic AI + Skills</div>
+    <div class="arch-detail">SkillsCapability (Phase A) &middot; Delegates to specialists via native delegation (Phase B) or subagents (Phase C)</div>
+  </div>
+  <div class="arch-layer l3">
+    <div class="arch-label">Skills Layer &mdash; pydantic-ai-skills</div>
+    <div class="arch-detail">Domain packages: customer, campaigns, cart, support, loyalty, returns, production &middot; Progressive disclosure</div>
+  </div>
+  <div class="arch-layer l4">
+    <div class="arch-label">Durability &mdash; DBOS on Lakebase</div>
+    <div class="arch-detail">DBOS.sleep_async() durable wake-up &middot; ACID state &middot; Unchanged from Path 1</div>
+  </div>
+  <div class="arch-layer l5">
+    <div class="arch-label">Governance &mdash; Unity Catalog + MLflow</div>
+    <div class="arch-detail">All tools governed under UC &middot; All traces in MLflow &middot; Single audit plane</div>
+  </div>
+</div>
+
+<div class="callout">
+  <strong>The principle:</strong> Skills extend <em>what</em> the agent can reason about. Sub-agents extend <em>how</em> the agent coordinates work. DBOS ensures <em>durability</em> of decisions. These are orthogonal concerns. Layer them independently.
+</div>
+
+
+<!-- ───────────────────────────── PRE-EXECUTION CHECKLIST ───────────────────────────── -->
+<h2>Pre-Execution Checklist</h2>
+
+<p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1rem;">
+  Validated by 3-agent swarm (architect, critic, analyst) on 2026-05-10. These items must be addressed before or during Week 1 execution.
+</p>
+
+<h3>Must Test (Blockers)</h3>
+
+<table>
+  <tr><th style="width:40px;">#</th><th>Item</th><th style="width:100px;">Status</th><th>Why It Matters</th></tr>
+  <tr>
+    <td>1</td>
+    <td><strong><code>DBOS.sleep_async()</code> across process restart on Lakebase</strong><br>Current test (<code>scripts/test_lakebase_dbos.py</code>) validates persist-and-read, not durable sleep recovery. Write a test that: starts a workflow with <code>DBOS.sleep_async(30)</code>, kills the process mid-sleep, restarts, and verifies the workflow resumes and completes.</td>
+    <td><span class="badge badge-red">NOT TESTED</span></td>
+    <td>If durable sleep recovery fails on Lakebase, Durable Execution collapses entirely.</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td><strong>Lakebase credential TTL vs. 11h durable sleep</strong><br>The <code>databricks postgres generate-database-credential</code> token has an unknown lifetime. If it expires before the wake-up step, the resumed workflow will fail with an auth error. Validate TTL; implement token refresh if needed.</td>
+    <td><span class="badge badge-red">NOT TESTED</span></td>
+    <td>A silent auth failure 11 hours into a durable sleep is unrecoverable without token refresh logic.</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td><strong>AI Gateway &rarr; Claude round-trip latency baseline</strong><br>Measure actual p50/p95 latency for <code>databricks-claude-sonnet-4-6</code> via AI Gateway. The 1.5s target assumes 200-600ms per LLM call but no measured baseline exists.</td>
+    <td><span class="badge badge-orange">UNMEASURED</span></td>
+    <td>Two LLM round-trips consume 400-1200ms of the 1.5s budget. If Gateway latency is high, the target is unachievable without parallel tool calls.</td>
+  </tr>
+</table>
+
+<h3>Must Build (Undefined Components)</h3>
+
+<table>
+  <tr><th style="width:40px;">#</th><th>Item</th><th style="width:100px;">Status</th><th>Why It Matters</th></tr>
+  <tr>
+    <td>4</td>
+    <td><strong>Custom MLflow trace renderer</strong><br>The demo&rsquo;s emotional peak is a readable reasoning trace. <code>autolog()</code> captures spans, but the native MLflow UI shows raw spans, not a story. A non-technical viewer must articulate the reasoning unprompted. Define: custom React component over MLflow data, or embedded MLflow UI with CSS overrides?</td>
+    <td><span class="badge badge-red">UNDEFINED</span></td>
+    <td>Build brief open question #5 flags this as highest-risk component. Data exists; presentation layer does not.</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td><strong>Durable Execution UI wake event contract</strong><br>When <code>DBOS.sleep_async()</code> completes and <code>re_evaluate_step()</code> fires, how does the frontend know? No WebSocket, SSE, or polling contract is specified.</td>
+    <td><span class="badge badge-red">UNDEFINED</span></td>
+    <td>Without this, Durable Execution cannot render live. The build brief says replay mode must be indistinguishable from live.</td>
+  </tr>
+</table>
+
+<h3>Already Fixed (This Revision)</h3>
+
+<table>
+  <tr><th style="width:40px;">#</th><th>Item</th><th style="width:100px;">Status</th><th>Detail</th></tr>
+  <tr>
+    <td>6</td>
+    <td><strong><code>DBOS.sleep()</code> API signature</strong></td>
+    <td><span class="badge badge-green">FIXED</span></td>
+    <td>Was <code>DBOS.sleep(decision.send_time)</code> (datetime). Corrected to <code>await DBOS.sleep_async(delay)</code> (seconds). Must use async variant in async workflows.</td>
+  </tr>
+  <tr>
+    <td>7</td>
+    <td><strong>Skills confirmed for Phase A</strong></td>
+    <td><span class="badge badge-green">DECIDED</span></td>
+    <td>Skills are a requirement, not optional. <code>SkillsCapability</code> from day one packages domain best practices. Tools stay as <code>@agent.tool</code> — skills codify how to use them. Swarm flagged alpha-dependency risk; mitigate by pinning <code>0.10.x</code> with plain <code>@agent.tool</code> fallback.</td>
+  </tr>
+  <tr>
+    <td>8</td>
+    <td><strong>Score differential acknowledged</strong></td>
+    <td><span class="badge badge-orange">ACKNOWLEDGED</span></td>
+    <td>9.3 vs 3.1 vs 2.6 overstates the gap. Fairer: ~8.5 vs 4.5 vs 3.5. Outcome unchanged &mdash; Paths 2/3 cannot do ACID state inside Databricks. The killer argument is structural, not numerical.</td>
+  </tr>
+</table>
+
+<h3>Swarm Validation Summary</h3>
+
+<div class="grid-3">
+  <div class="card card-green">
+    <div class="flow-node-label">Architect</div>
+    <div class="verdict" style="color:var(--green);">READY FOR EXECUTION</div>
+    <ul style="font-size:0.8rem; color:var(--text-muted);">
+      <li>Stack coherence: PASS</li>
+      <li>Data flow integrity: PASS</li>
+      <li>Skills placement: FLAG &rarr; <s>defer</s> → keeping (overridden)</li>
+      <li>Latency budget: FLAG &rarr; measure</li>
+      <li>DBOS 11h sleep: PASS</li>
+      <li>MLflow tracing: FLAG &rarr; use @agent.tool names</li>
+    </ul>
+  </div>
+  <div class="card card-green">
+    <div class="flow-node-label">Critic</div>
+    <div class="verdict" style="color:var(--green);">DECISION HOLDS</div>
+    <ul style="font-size:0.8rem; color:var(--text-muted);">
+      <li>Scoring fairness: WEAK (theatrical)</li>
+      <li>Path 2/3 treatment: WEAK (minor)</li>
+      <li>Skills adoption: FLAWED &rarr; <s>defer</s> → keeping (overridden)</li>
+      <li>Hidden assumptions: WEAK (token TTL)</li>
+      <li>Missing alternatives: VALID</li>
+      <li>Overengineering: WEAK (skills only)</li>
+    </ul>
+  </div>
+  <div class="card card-green">
+    <div class="flow-node-label">Analyst</div>
+    <div class="verdict" style="color:var(--green);">GAPS EXIST &mdash; ADDRESSABLE</div>
+    <ul style="font-size:0.8rem; color:var(--text-muted);">
+      <li>Agent Reasoning delivery: DELIVERS</li>
+      <li>Durable Execution delivery: PARTIAL (UI event)</li>
+      <li>Skills value: PARTIAL &rarr; <s>defer</s> → keeping (overridden)</li>
+      <li>Trace readability: PARTIAL (renderer)</li>
+      <li>UI alignment: DELIVERS</li>
+      <li>Anti-patterns: DELIVERS</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- end content-wrap -->
+
+</body>
+</html>
