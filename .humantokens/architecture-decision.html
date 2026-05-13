@@ -722,314 +722,228 @@
 </div>
 
 <div style="margin:2rem 0;">
-<svg viewBox="0 0 900 1060" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:900px;display:block;margin:0 auto;" font-family="'DM Sans', -apple-system, sans-serif">
+<svg viewBox="0 0 900 800" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:900px;display:block;margin:0 auto;" font-family="'DM Sans', -apple-system, sans-serif">
   <defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#8fb5bf"/>
     </marker>
-    <marker id="arrow-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="arr-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#40d1f5"/>
     </marker>
-    <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="arr-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#00D4AA"/>
     </marker>
-    <marker id="arrow-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="arr-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#4462c9"/>
     </marker>
-    <marker id="arrow-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#f0883e"/>
+    <marker id="arr-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#FF8C2A"/>
     </marker>
-    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="arr-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#FF3621"/>
     </marker>
-    <!-- Dashed hatch for sleep bar -->
-    <pattern id="sleep-hatch" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
-      <line x1="0" y1="0" x2="0" y2="8" stroke="rgba(240,136,62,0.3)" stroke-width="2"/>
+    <!-- Diagonal hatch for sleep zone -->
+    <pattern id="hatch-sleep" patternUnits="userSpaceOnUse" width="10" height="10" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="10" stroke="rgba(255,140,42,0.25)" stroke-width="3"/>
     </pattern>
   </defs>
 
-  <!-- Light mode overrides -->
-  <style>
-    @media (prefers-color-scheme: light) {
-      [fill="#F9F7F4"] { fill: #1A1A1A; }
-      [fill="#8fb5bf"] { fill: #4A5568; }
-      [fill="#5a7a82"] { fill: #718096; }
-      [fill="#0B2026"] { fill: #F9F7F4; }
-      [stroke="#1e4f5a"] { stroke: #CBD5E0; }
-      [stroke="#8fb5bf"] { stroke: #718096; }
-      [fill="#40d1f5"] { fill: #1B6AC9; }
-      [stroke="#40d1f5"] { stroke: #1B6AC9; }
-      [fill="#00D4AA"] { fill: #00875A; }
-      [stroke="#00D4AA"] { stroke: #00875A; }
-      [fill="#FF3621"] { fill: #D0021B; }
-      [stroke="#FF3621"] { stroke: #D0021B; }
-      [fill="#FF8C2A"] { fill: #C75300; }
-      [stroke="#FF8C2A"] { stroke: #C75300; }
-      [fill="#f0883e"] { fill: #C75300; }
-      [stroke="#f0883e"] { stroke: #C75300; }
-      marker[id="arrow"] path { fill: #718096; }
-      marker[id="arrow-cyan"] path { fill: #1B6AC9; }
-      marker[id="arrow-green"] path { fill: #00875A; }
-      marker[id="arrow-purple"] path { fill: #4462c9; }
-      marker[id="arrow-orange"] path { fill: #C75300; }
-      marker[id="arrow-red"] path { fill: #D0021B; }
-      [fill="rgba(64,209,245,0.08)"] { fill: rgba(27,106,201,0.06); }
-      [fill="rgba(64,209,245,0.12)"] { fill: rgba(27,106,201,0.08); }
-      [fill="rgba(68,98,201,0.1)"] { fill: rgba(68,98,201,0.06); }
-      [fill="rgba(68,98,201,0.12)"] { fill: rgba(68,98,201,0.08); }
-      [fill="rgba(68,98,201,0.15)"] { fill: rgba(68,98,201,0.1); }
-      [fill="rgba(68,98,201,0.08)"] { fill: rgba(68,98,201,0.05); }
-      [fill="rgba(0,212,170,0.06)"] { fill: rgba(0,135,90,0.04); }
-      [fill="rgba(0,212,170,0.1)"] { fill: rgba(0,135,90,0.08); }
-      [fill="rgba(0,212,170,0.12)"] { fill: rgba(0,135,90,0.1); }
-      [fill="rgba(0,212,170,0.08)"] { fill: rgba(0,135,90,0.06); }
-      [fill="rgba(255,54,33,0.1)"] { fill: rgba(208,2,27,0.06); }
-      [fill="rgba(255,54,33,0.08)"] { fill: rgba(208,2,27,0.05); }
-      [fill="rgba(255,140,42,0.15)"] { fill: rgba(199,83,0,0.08); }
-      [fill="rgba(240,136,62,0.08)"] { fill: rgba(199,83,0,0.06); }
-      [fill="rgba(240,136,62,0.3)"] { fill: rgba(199,83,0,0.2); }
-      pattern[id="sleep-hatch"] line { stroke: rgba(199,83,0,0.25); }
-      svg > rect:first-of-type { stroke: #CBD5E0; }
-    }
-  </style>
+  <!-- ═══ DATABRICKS PLATFORM OUTER BOUNDARY ═══ -->
+  <!-- viewBox 900×800 -->
+  <rect x="12" y="12" width="876" height="776" rx="12" fill="none" stroke="#1e4f5a" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <!-- Platform label -->
+  <rect x="310" y="2" width="280" height="22" rx="4" fill="#0B2026"/>
+  <text x="450" y="17" text-anchor="middle" fill="#8fb5bf" font-size="10" font-weight="600" letter-spacing="0.12em">DATABRICKS PLATFORM</text>
 
-  <!-- ═══════ DATABRICKS PLATFORM BOUNDARY ═══════ -->
-  <!-- viewBox 900×1060 -->
-  <rect x="15" y="15" width="870" height="1030" rx="12" fill="none" stroke="#1e4f5a" stroke-width="2" stroke-dasharray="6,3"/>
-  <rect x="275" y="2" width="350" height="26" rx="4" fill="#0B2026"/>
-  <text x="450" y="19" text-anchor="middle" fill="#8fb5bf" font-size="11" font-weight="600" letter-spacing="0.1em">DATABRICKS PLATFORM</text>
+  <!-- ═══════════════════════════════════════════════
+       LEFT COLUMN  (x=20..210)
+       ═══════════════════════════════════════════════ -->
 
-  <!-- ═══════ LEFT COLUMN — external services ═══════ -->
+  <!-- EVENT TRIGGER  y=30 h=50 -->
+  <rect x="20" y="30" width="165" height="50" rx="8" fill="rgba(255,140,42,0.12)" stroke="#FF8C2A" stroke-width="1.5"/>
+  <text x="102" y="50" text-anchor="middle" fill="#FF8C2A" font-size="9" font-weight="700" letter-spacing="0.06em">EVENT TRIGGER</text>
+  <text x="102" y="68" text-anchor="middle" fill="#F9F7F4" font-size="12" font-weight="700">cart_abandoned</text>
 
-  <!-- EVENT TRIGGER: x=25 y=90 w=160 h=55 -->
-  <rect x="25" y="90" width="160" height="55" rx="8" fill="rgba(255,140,42,0.15)" stroke="#FF8C2A" stroke-width="2"/>
-  <text x="105" y="111" text-anchor="middle" fill="#FF8C2A" font-size="10" font-weight="600" letter-spacing="0.05em">EVENT TRIGGER</text>
-  <text x="105" y="131" text-anchor="middle" fill="#F9F7F4" font-size="12" font-weight="600">cart_abandoned</text>
+  <!-- UC FUNCTIONS  y=120 h=280 -->
+  <rect x="20" y="120" width="165" height="280" rx="10" fill="rgba(68,98,201,0.08)" stroke="#4462c9" stroke-width="1.5"/>
+  <text x="102" y="143" text-anchor="middle" fill="#4462c9" font-size="10" font-weight="700">UC FUNCTIONS</text>
+  <text x="102" y="157" text-anchor="middle" fill="#8fb5bf" font-size="8" font-style="italic">UC governed · 9 tools</text>
+  <text x="33" y="178" fill="#8fb5bf" font-size="9">• customers</text>
+  <text x="33" y="196" fill="#8fb5bf" font-size="9">• orders + order_items</text>
+  <text x="33" y="214" fill="#8fb5bf" font-size="9">• campaigns + membership</text>
+  <text x="33" y="232" fill="#8fb5bf" font-size="9">• production_calendar</text>
+  <text x="33" y="250" fill="#8fb5bf" font-size="9">• support_tickets</text>
+  <text x="33" y="268" fill="#8fb5bf" font-size="9">• score_propensity</text>
+  <text x="43" y="282" fill="#5a7a82" font-size="8">  (Model Serving)</text>
+  <text x="33" y="298" fill="#8fb5bf" font-size="9">• optimal_send_time</text>
+  <text x="43" y="312" fill="#5a7a82" font-size="8">  (Model Serving)</text>
+  <text x="33" y="332" fill="#5a7a82" font-size="8" font-style="italic">Agent 1 only</text>
 
-  <!-- UC FUNCTIONS: x=25 y=270 w=200 h=220 -->
-  <rect x="25" y="270" width="200" height="220" rx="10" fill="rgba(68,98,201,0.1)" stroke="#4462c9" stroke-width="2"/>
-  <text x="125" y="293" text-anchor="middle" fill="#4462c9" font-size="10" font-weight="700">UC FUNCTIONS / MCPs</text>
-  <text x="125" y="308" text-anchor="middle" fill="#8fb5bf" font-size="8" font-style="italic">UC governed data + tools</text>
-  <text x="40" y="330" fill="#8fb5bf" font-size="9">• customers</text>
-  <text x="40" y="348" fill="#8fb5bf" font-size="9">• orders + order_items</text>
-  <text x="40" y="366" fill="#8fb5bf" font-size="9">• campaigns + membership</text>
-  <text x="40" y="384" fill="#8fb5bf" font-size="9">• production_calendar</text>
-  <text x="40" y="402" fill="#8fb5bf" font-size="9">• support_tickets</text>
-  <text x="40" y="420" fill="#8fb5bf" font-size="9">• score_propensity <tspan fill="#5a7a82" font-size="8">(Model Serving)</tspan></text>
-  <text x="40" y="438" fill="#8fb5bf" font-size="9">• optimal_send_time <tspan fill="#5a7a82" font-size="8">(Model Serving)</tspan></text>
-  <text x="40" y="456" fill="#5a7a82" font-size="8">(all Delta unless noted)</text>
+  <!-- MLFLOW TRACING  y=438 h=70 -->
+  <rect x="20" y="438" width="165" height="70" rx="8" fill="rgba(68,98,201,0.07)" stroke="#4462c9" stroke-width="1.5"/>
+  <text x="102" y="460" text-anchor="middle" fill="#4462c9" font-size="10" font-weight="700">MLFLOW TRACING</text>
+  <text x="102" y="477" text-anchor="middle" fill="#F9F7F4" font-size="8.5">mlflow.pydantic_ai.autolog()</text>
+  <text x="102" y="493" text-anchor="middle" fill="#8fb5bf" font-size="7.5">tool spans · model spans · tokens</text>
 
-  <!-- MLFLOW TRACING: x=25 y=760 w=200 h=80 -->
-  <rect x="25" y="760" width="200" height="80" rx="10" fill="rgba(68,98,201,0.08)" stroke="#4462c9" stroke-width="1.5"/>
-  <text x="125" y="783" text-anchor="middle" fill="#4462c9" font-size="11" font-weight="700">MLFLOW TRACING</text>
-  <text x="125" y="802" text-anchor="middle" fill="#F9F7F4" font-size="9">mlflow.pydantic_ai.autolog()</text>
-  <text x="125" y="820" text-anchor="middle" fill="#8fb5bf" font-size="8">tool spans · model spans · tokens</text>
+  <!-- ═══════════════════════════════════════════════
+       RIGHT COLUMN  (x=718..880)
+       ═══════════════════════════════════════════════ -->
 
-  <!-- ═══════ RIGHT COLUMN — AI Gateway + Lakebase ═══════ -->
+  <!-- AI GATEWAY  y=30 h=110 -->
+  <rect x="718" y="30" width="162" height="110" rx="10" fill="rgba(255,54,33,0.08)" stroke="#FF3621" stroke-width="1.5"/>
+  <text x="799" y="53" text-anchor="middle" fill="#FF3621" font-size="9" font-weight="700" letter-spacing="0.06em">AI GATEWAY</text>
+  <text x="799" y="72" text-anchor="middle" fill="#F9F7F4" font-size="13" font-weight="700">Claude Sonnet</text>
+  <text x="799" y="89" text-anchor="middle" fill="#8fb5bf" font-size="8">databricks-claude-sonnet-4-6</text>
+  <text x="799" y="104" text-anchor="middle" fill="#8fb5bf" font-size="7.5">AsyncDatabricksOpenAI</text>
+  <text x="799" y="118" text-anchor="middle" fill="#5a7a82" font-size="7" font-style="italic">OpenAIProvider → OpenAIChatModel</text>
+  <text x="799" y="133" text-anchor="middle" fill="#FF3621" font-size="7.5" font-weight="600">Agent 1 + Agent 2</text>
 
-  <!-- AI GATEWAY: x=726 y=90 w=158 h=120 -->
-  <rect x="726" y="90" width="158" height="120" rx="10" fill="rgba(255,54,33,0.1)" stroke="#FF3621" stroke-width="2"/>
-  <text x="805" y="113" text-anchor="middle" fill="#FF3621" font-size="10" font-weight="600" letter-spacing="0.05em">AI GATEWAY</text>
-  <text x="805" y="133" text-anchor="middle" fill="#F9F7F4" font-size="12" font-weight="600">Claude</text>
-  <text x="805" y="151" text-anchor="middle" fill="#8fb5bf" font-size="8">databricks-claude-sonnet-4-6</text>
-  <text x="805" y="167" text-anchor="middle" fill="#8fb5bf" font-size="8">AsyncDatabricksOpenAI</text>
-  <text x="805" y="183" text-anchor="middle" fill="#8fb5bf" font-size="7" font-style="italic">OpenAIProvider → OpenAIChatModel</text>
-  <!-- Used by both agents label -->
-  <text x="805" y="200" text-anchor="middle" fill="#FF3621" font-size="7" font-weight="600">↑ used by Agent 1 and Agent 2</text>
+  <!-- LAKEBASE  y=400 h=120 -->
+  <rect x="718" y="400" width="162" height="120" rx="10" fill="rgba(0,212,170,0.07)" stroke="#00D4AA" stroke-width="1.5"/>
+  <text x="799" y="422" text-anchor="middle" fill="#00D4AA" font-size="10" font-weight="700">LAKEBASE</text>
+  <text x="799" y="437" text-anchor="middle" fill="#8fb5bf" font-size="8" font-style="italic">Managed Postgres</text>
+  <text x="730" y="457" fill="#8fb5bf" font-size="9">• journey_state</text>
+  <text x="730" y="474" fill="#8fb5bf" font-size="9">• decisions <tspan fill="#5a7a82" font-size="8">(Delta mirror)</tspan></text>
+  <text x="730" y="491" fill="#8fb5bf" font-size="9">• sent_emails</text>
+  <text x="799" y="511" text-anchor="middle" fill="#5a7a82" font-size="7.5" font-style="italic">ACID txn · DBOS state store</text>
 
-  <!-- LAKEBASE: x=726 y=680 w=158 h=130 -->
-  <rect x="726" y="680" width="158" height="130" rx="10" fill="rgba(0,212,170,0.08)" stroke="#00D4AA" stroke-width="1.5"/>
-  <text x="805" y="703" text-anchor="middle" fill="#00D4AA" font-size="10" font-weight="700">LAKEBASE</text>
-  <text x="805" y="719" text-anchor="middle" fill="#8fb5bf" font-size="8" font-style="italic">Managed Postgres</text>
-  <text x="740" y="740" fill="#8fb5bf" font-size="9">• journey_state</text>
-  <text x="740" y="758" fill="#8fb5bf" font-size="9">• decisions <tspan fill="#5a7a82" font-size="8">(Delta mirror)</tspan></text>
-  <text x="740" y="776" fill="#8fb5bf" font-size="9">• sent_emails</text>
-  <text x="805" y="800" text-anchor="middle" fill="#8fb5bf" font-size="8" font-style="italic">ACID txn · DBOS state store</text>
+  <!-- ═══════════════════════════════════════════════
+       DBOS DURABLE WORKFLOW  (the dominant container)
+       x=200 y=20  w=510 h=720
+       ═══════════════════════════════════════════════ -->
+  <rect x="200" y="20" width="510" height="720" rx="14" fill="rgba(0,212,170,0.04)" stroke="#00D4AA" stroke-width="2.5" stroke-dasharray="9,4"/>
+  <!-- DBOS banner -->
+  <rect x="258" y="7" width="394" height="24" rx="5" fill="#0B2026"/>
+  <text x="455" y="23" text-anchor="middle" fill="#00D4AA" font-size="10" font-weight="700" letter-spacing="0.06em">DBOS DURABLE WORKFLOW — 7 checkpointed steps</text>
 
-  <!-- ═══════ DBOS WORKFLOW — THE LARGE CONTAINER ═══════ -->
-  <!-- Outer dashed green rect: x=238 y=45 w=480 h=660 → bottom y=705 -->
-  <!-- Contains: Agent1 (y=75), Persist (y=265), Sleep (y=335), Re-evaluate (y=400), Agent2 (y=463), Send (y=633) -->
-  <rect x="238" y="45" width="480" height="660" rx="14" fill="rgba(0,212,170,0.06)" stroke="#00D4AA" stroke-width="2.5" stroke-dasharray="8,4"/>
+  <!-- ─── Step 1: REASONING AGENT (Agent 1)  y=38 h=160 ─── -->
+  <rect x="214" y="38" width="482" height="160" rx="10" fill="rgba(64,209,245,0.08)" stroke="#40d1f5" stroke-width="2"/>
+  <!-- step badge -->
+  <rect x="214" y="38" width="50" height="20" rx="6" fill="#40d1f5"/>
+  <text x="239" y="52" text-anchor="middle" fill="#0B2026" font-size="9" font-weight="700">Step 1</text>
+  <!-- title row -->
+  <text x="455" y="60" text-anchor="middle" fill="#40d1f5" font-size="13" font-weight="700">REASONING AGENT (Agent 1)</text>
+  <text x="455" y="76" text-anchor="middle" fill="#8fb5bf" font-size="9" font-style="italic">Pydantic AI · 9 @agent.tool · SkillsCapability · output = DecisionArtifact · ~60s</text>
+  <!-- sub-labels row -->
+  <rect x="228" y="90" width="138" height="40" rx="6" fill="rgba(64,209,245,0.1)" stroke="#40d1f5" stroke-width="1.2"/>
+  <text x="297" y="107" text-anchor="middle" fill="#8fb5bf" font-size="8.5" font-weight="600">9 @agent.tool</text>
+  <text x="297" y="122" text-anchor="middle" fill="#F9F7F4" font-size="9">UC Functions</text>
+  <rect x="382" y="90" width="138" height="40" rx="6" fill="rgba(68,98,201,0.12)" stroke="#4462c9" stroke-width="1.2"/>
+  <text x="451" y="107" text-anchor="middle" fill="#4462c9" font-size="8.5" font-weight="600">SkillsCapability</text>
+  <text x="451" y="122" text-anchor="middle" fill="#F9F7F4" font-size="9">RunContext[CDPDeps]</text>
+  <rect x="536" y="90" width="148" height="40" rx="6" fill="rgba(0,212,170,0.1)" stroke="#00D4AA" stroke-width="1.2"/>
+  <text x="610" y="107" text-anchor="middle" fill="#00D4AA" font-size="8.5" font-weight="600">OUTPUT</text>
+  <text x="610" y="122" text-anchor="middle" fill="#F9F7F4" font-size="9">DecisionArtifact</text>
+  <!-- internal flow arrows -->
+  <line x1="366" y1="110" x2="380" y2="110" stroke="#8fb5bf" stroke-width="1.2" marker-end="url(#arr)"/>
+  <line x1="520" y1="110" x2="534" y2="110" stroke="#8fb5bf" stroke-width="1.2" marker-end="url(#arr)"/>
+  <!-- timing note -->
+  <text x="455" y="158" text-anchor="middle" fill="#5a7a82" font-size="8" font-style="italic">8 LLM round-trips · branches on prior tool output · reconciles contradictions</text>
+  <text x="455" y="173" text-anchor="middle" fill="#5a7a82" font-size="8" font-style="italic">justified rationale · suppresses conflicting campaigns · chooses channel + send time</text>
 
-  <!-- DBOS label banner at top of container -->
-  <rect x="300" y="32" width="356" height="28" rx="5" fill="#0B2026"/>
-  <text x="478" y="51" text-anchor="middle" fill="#00D4AA" font-size="11" font-weight="700" letter-spacing="0.05em">DBOS DURABLE WORKFLOW — 7 checkpointed steps on Lakebase</text>
+  <!-- ─── Steps 2+3: PERSIST  y=213 h=42 ─── -->
+  <rect x="214" y="213" width="482" height="42" rx="7" fill="rgba(0,212,170,0.08)" stroke="#00D4AA" stroke-width="1.2"/>
+  <rect x="214" y="213" width="46" height="19" rx="5" fill="#00D4AA"/>
+  <text x="237" y="226" text-anchor="middle" fill="#0B2026" font-size="8" font-weight="700">2 · 3</text>
+  <text x="455" y="229" text-anchor="middle" fill="#00D4AA" font-size="10" font-weight="600">save_journey_step()  ·  persist_decision_step()</text>
+  <text x="455" y="244" text-anchor="middle" fill="#8fb5bf" font-size="8">DecisionArtifact + journey_state → Lakebase — ACID transaction</text>
+  <!-- connector from Agent 1 -->
+  <line x1="455" y1="198" x2="455" y2="211" stroke="#00D4AA" stroke-width="1.8" marker-end="url(#arr-green)"/>
 
-  <!-- Step number spine (vertical dashed line inside container) -->
-  <line x1="270" y1="80" x2="270" y2="695" stroke="#00D4AA" stroke-width="1" stroke-dasharray="3,4" opacity="0.35"/>
+  <!-- ─── Step 4: DURABLE SLEEP  y=270 h=46 ─── -->
+  <rect x="214" y="270" width="482" height="46" rx="7" fill="url(#hatch-sleep)" stroke="#FF8C2A" stroke-width="2" stroke-dasharray="7,4"/>
+  <rect x="214" y="270" width="50" height="19" rx="5" fill="#FF8C2A"/>
+  <text x="239" y="283" text-anchor="middle" fill="#0B2026" font-size="8" font-weight="700">Step 4</text>
+  <text x="455" y="287" text-anchor="middle" fill="#FF8C2A" font-size="10" font-weight="700">await DBOS.sleep_async(delay)</text>
+  <text x="455" y="303" text-anchor="middle" fill="#8fb5bf" font-size="8">15–20s simulated · production: hours · survives crash / scale-to-zero</text>
+  <!-- connector from persist -->
+  <line x1="455" y1="255" x2="455" y2="268" stroke="#FF8C2A" stroke-width="1.5" marker-end="url(#arr-orange)"/>
 
-  <!-- ═══ STEP 1: REASONING AGENT (Agent 1) ═══ -->
-  <!-- Box: x=258 y=75 w=445 h=175 -->
-  <rect x="258" y="75" width="445" height="175" rx="10" fill="rgba(64,209,245,0.08)" stroke="#40d1f5" stroke-width="2"/>
-  <!-- Step badge -->
-  <rect x="258" y="75" width="40" height="20" rx="5" fill="#40d1f5"/>
-  <text x="278" y="89" text-anchor="middle" fill="#0B2026" font-size="9" font-weight="700">Step 1</text>
-  <!-- Header -->
-  <text x="480" y="98" text-anchor="middle" fill="#40d1f5" font-size="13" font-weight="700">REASONING AGENT (Agent 1)</text>
-  <text x="480" y="113" text-anchor="middle" fill="#8fb5bf" font-size="9" font-style="italic">9 tools · output=DecisionArtifact · SkillsCapability · Agent Reasoning: ~60s</text>
+  <!-- ─── Step 5: RE-EVALUATE  y=330 h=40 ─── -->
+  <rect x="214" y="330" width="482" height="40" rx="7" fill="rgba(143,181,191,0.06)" stroke="#8fb5bf" stroke-width="1.2"/>
+  <rect x="214" y="330" width="50" height="19" rx="5" fill="#8fb5bf"/>
+  <text x="239" y="343" text-anchor="middle" fill="#0B2026" font-size="8" font-weight="700">Step 5</text>
+  <text x="455" y="346" text-anchor="middle" fill="#8fb5bf" font-size="10" font-weight="600">re_evaluate_step()</text>
+  <text x="455" y="361" text-anchor="middle" fill="#5a7a82" font-size="8">plain @DBOS.step() — not an agent · checks: converted? new tickets? cap changes?</text>
+  <!-- connector from sleep -->
+  <line x1="455" y1="316" x2="455" y2="328" stroke="#8fb5bf" stroke-width="1.5" marker-end="url(#arr)"/>
 
-  <!-- System Prompt sub-box: x=272 y=123 w=108 h=48 -->
-  <rect x="272" y="123" width="108" height="48" rx="6" fill="rgba(64,209,245,0.12)" stroke="#40d1f5" stroke-width="1.5"/>
-  <text x="326" y="143" text-anchor="middle" fill="#8fb5bf" font-size="9" font-weight="500">SYSTEM</text>
-  <text x="326" y="159" text-anchor="middle" fill="#F9F7F4" font-size="10" font-weight="600">Prompt</text>
+  <!-- ─── Step 6: COPYWRITER AGENT (Agent 2)  y=384 h=150 ─── -->
+  <rect x="214" y="384" width="482" height="150" rx="10" fill="rgba(64,209,245,0.08)" stroke="#40d1f5" stroke-width="2"/>
+  <rect x="214" y="384" width="50" height="20" rx="6" fill="#40d1f5"/>
+  <text x="239" y="398" text-anchor="middle" fill="#0B2026" font-size="9" font-weight="700">Step 6</text>
+  <text x="455" y="406" text-anchor="middle" fill="#40d1f5" font-size="13" font-weight="700">COPYWRITER AGENT (Agent 2)</text>
+  <text x="455" y="422" text-anchor="middle" fill="#8fb5bf" font-size="9" font-style="italic">Pydantic AI · output = EmailContent · Personalized email · ~60s</text>
+  <!-- sub-labels -->
+  <rect x="228" y="434" width="200" height="40" rx="6" fill="rgba(64,209,245,0.1)" stroke="#40d1f5" stroke-width="1.2"/>
+  <text x="328" y="451" text-anchor="middle" fill="#8fb5bf" font-size="8.5" font-weight="600">CONTEXT INPUT</text>
+  <text x="328" y="466" text-anchor="middle" fill="#F9F7F4" font-size="9">DecisionArtifact · Profile · Cart</text>
+  <rect x="444" y="434" width="238" height="40" rx="6" fill="rgba(0,212,170,0.1)" stroke="#00D4AA" stroke-width="1.2"/>
+  <text x="563" y="451" text-anchor="middle" fill="#00D4AA" font-size="8.5" font-weight="600">OUTPUT</text>
+  <text x="563" y="466" text-anchor="middle" fill="#F9F7F4" font-size="9">EmailContent — segment-of-1</text>
+  <line x1="428" y1="454" x2="442" y2="454" stroke="#8fb5bf" stroke-width="1.2" marker-end="url(#arr)"/>
+  <!-- note -->
+  <text x="455" y="493" text-anchor="middle" fill="#5a7a82" font-size="8" font-style="italic">Cindy profile · Whiskers context · optimal send time · routes to AI Gateway</text>
+  <text x="455" y="507" text-anchor="middle" fill="#5a7a82" font-size="8" font-style="italic">Same Claude Sonnet model via AsyncDatabricksOpenAI</text>
+  <!-- connector from re-evaluate -->
+  <line x1="455" y1="370" x2="455" y2="382" stroke="#40d1f5" stroke-width="2" marker-end="url(#arr-cyan)"/>
 
-  <!-- SkillsCapability sub-box: x=393 y=123 w=130 h=48 -->
-  <rect x="393" y="123" width="130" height="48" rx="6" fill="rgba(68,98,201,0.15)" stroke="#4462c9" stroke-width="1.5"/>
-  <text x="458" y="143" text-anchor="middle" fill="#4462c9" font-size="9" font-weight="500">SKILLS</text>
-  <text x="458" y="159" text-anchor="middle" fill="#F9F7F4" font-size="10" font-weight="600">SkillsCapability</text>
+  <!-- ─── Step 7: SIMULATE SEND  y=548 h=42 ─── -->
+  <rect x="214" y="548" width="482" height="42" rx="7" fill="rgba(0,212,170,0.08)" stroke="#00D4AA" stroke-width="1.2"/>
+  <rect x="214" y="548" width="50" height="19" rx="5" fill="#00D4AA"/>
+  <text x="239" y="561" text-anchor="middle" fill="#0B2026" font-size="8" font-weight="700">Step 7</text>
+  <text x="455" y="564" text-anchor="middle" fill="#00D4AA" font-size="10" font-weight="600">simulate_send_step()  —  sent_emails table · journey → COMPLETE</text>
+  <text x="455" y="579" text-anchor="middle" fill="#8fb5bf" font-size="8">DBOS checkpoints final state · workflow transitions to COMPLETE</text>
+  <!-- connector from Agent 2 -->
+  <line x1="455" y1="534" x2="455" y2="546" stroke="#00D4AA" stroke-width="1.8" marker-end="url(#arr-green)"/>
 
-  <!-- Arrow Prompt → Skills -->
-  <line x1="380" y1="147" x2="391" y2="147" stroke="#8fb5bf" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- ═══════════════════════════════════════════════
+       EXTERNAL ARROWS
+       ═══════════════════════════════════════════════ -->
 
-  <!-- Tool Reasoning sub-box: x=272 y=183 w=108 h=48 -->
-  <rect x="272" y="183" width="108" height="48" rx="6" fill="rgba(68,98,201,0.12)" stroke="#4462c9" stroke-width="1.5"/>
-  <text x="326" y="203" text-anchor="middle" fill="#4462c9" font-size="9" font-weight="500">@agent.tool</text>
-  <text x="326" y="219" text-anchor="middle" fill="#F9F7F4" font-size="10" font-weight="600">Tool Reasoning</text>
+  <!-- Event Trigger → DBOS (top) -->
+  <line x1="185" y1="55" x2="212" y2="75" stroke="#FF8C2A" stroke-width="2" marker-end="url(#arr-orange)"/>
+  <text x="194" y="62" text-anchor="middle" fill="#8fb5bf" font-size="8.5" font-style="italic">webhook</text>
 
-  <!-- Arrow Skills → Tool Reasoning -->
-  <line x1="458" y1="171" x2="458" y2="178" stroke="#8fb5bf" stroke-width="1" stroke-dasharray="3,2"/>
-  <line x1="458" y1="178" x2="382" y2="178" stroke="#8fb5bf" stroke-width="1" stroke-dasharray="3,2"/>
-  <line x1="382" y1="178" x2="382" y2="183" stroke="#8fb5bf" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arrow)"/>
+  <!-- Agent 1 ↔ UC Functions (bidirectional, via left edge x=214) -->
+  <!-- out: Agent 1 left → UC right -->
+  <line x1="214" y1="118" x2="187" y2="260" stroke="#4462c9" stroke-width="1.8" stroke-dasharray="5,3" marker-end="url(#arr-purple)"/>
+  <!-- return: UC right → Agent 1 left -->
+  <line x1="185" y1="280" x2="214" y2="148" stroke="#4462c9" stroke-width="1.8" stroke-dasharray="5,3" marker-end="url(#arr-purple)"/>
+  <rect x="180" y="196" width="40" height="26" rx="4" fill="#0B2026"/>
+  <text x="200" y="207" text-anchor="middle" fill="#4462c9" font-size="8" font-weight="600">tool</text>
+  <text x="200" y="218" text-anchor="middle" fill="#4462c9" font-size="8" font-weight="600">calls</text>
 
-  <!-- DecisionArtifact sub-box: x=393 y=183 w=130 h=48 -->
-  <rect x="393" y="183" width="130" height="48" rx="6" fill="rgba(0,212,170,0.12)" stroke="#00D4AA" stroke-width="1.5"/>
-  <text x="458" y="203" text-anchor="middle" fill="#00D4AA" font-size="9" font-weight="500">OUTPUT</text>
-  <text x="458" y="219" text-anchor="middle" fill="#F9F7F4" font-size="10" font-weight="600">DecisionArtifact</text>
+  <!-- Agent 1 → AI Gateway -->
+  <line x1="696" y1="108" x2="716" y2="85" stroke="#FF3621" stroke-width="2" marker-end="url(#arr-red)"/>
+  <!-- AI Gateway → Agent 1 response -->
+  <line x1="716" y1="100" x2="696" y2="148" stroke="#FF3621" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr-red)"/>
+  <rect x="694" y="114" width="28" height="20" rx="3" fill="#0B2026"/>
+  <text x="708" y="124" text-anchor="middle" fill="#FF3621" font-size="7.5">LLM</text>
+  <text x="708" y="133" text-anchor="middle" fill="#8fb5bf" font-size="6.5">1→</text>
 
-  <!-- Arrow Tool → Decision -->
-  <line x1="380" y1="207" x2="391" y2="207" stroke="#8fb5bf" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- Agent 2 → AI Gateway -->
+  <line x1="696" y1="470" x2="716" y2="110" stroke="#FF3621" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-red)"/>
+  <rect x="705" y="280" width="18" height="70" rx="3" fill="#0B2026"/>
+  <text x="714" y="315" text-anchor="middle" fill="#FF3621" font-size="7" font-style="italic" transform="rotate(-90,714,315)">Agent 2 → LLM</text>
 
-  <!-- RunContext + structured output badges (right side inside agent box) -->
-  <rect x="536" y="183" width="152" height="22" rx="4" fill="rgba(64,209,245,0.08)" stroke="#1e4f5a" stroke-width="1"/>
-  <text x="612" y="198" text-anchor="middle" fill="#8fb5bf" font-size="8">RunContext[CDPDeps]</text>
-  <rect x="536" y="210" width="152" height="22" rx="4" fill="rgba(0,212,170,0.08)" stroke="#1e4f5a" stroke-width="1"/>
-  <text x="612" y="225" text-anchor="middle" fill="#8fb5bf" font-size="8">structured output_type</text>
+  <!-- Steps 2+3 → Lakebase -->
+  <line x1="696" y1="234" x2="716" y2="430" stroke="#00D4AA" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-green)"/>
+  <rect x="700" y="320" width="18" height="65" rx="3" fill="#0B2026"/>
+  <text x="709" y="352" text-anchor="middle" fill="#00D4AA" font-size="7" font-style="italic" transform="rotate(-90,709,352)">persist →</text>
 
-  <!-- Arrow: Agent 1 right edge → AI Gateway (right side, x=703 to x=724) -->
-  <line x1="703" y1="150" x2="724" y2="140" stroke="#FF3621" stroke-width="2" marker-end="url(#arrow-red)"/>
-  <line x1="724" y1="160" x2="703" y2="170" stroke="#FF3621" stroke-width="2" marker-end="url(#arrow-red)"/>
-  <text x="714" y="137" text-anchor="middle" fill="#8fb5bf" font-size="8">prompts</text>
-  <text x="714" y="183" text-anchor="middle" fill="#8fb5bf" font-size="8">responses</text>
+  <!-- Step 7 → Lakebase -->
+  <line x1="696" y1="569" x2="716" y2="500" stroke="#00D4AA" stroke-width="2" marker-end="url(#arr-green)"/>
+  <text x="712" y="544" text-anchor="middle" fill="#8fb5bf" font-size="7.5">send →</text>
 
-  <!-- Arrow: Agent 1 left edge → UC Functions (left side) -->
-  <!-- Exit at x=258, y=207; go left to x=227, then label -->
-  <line x1="258" y1="207" x2="228" y2="207" stroke="#4462c9" stroke-width="2" marker-end="url(#arrow-purple)"/>
-  <rect x="228" y="196" width="32" height="14" rx="3" fill="#0B2026"/>
-  <text x="244" y="207" text-anchor="middle" fill="#4462c9" font-size="7" font-weight="600">tools</text>
+  <!-- MLflow → DBOS (observation line) -->
+  <line x1="185" y1="460" x2="212" y2="490" stroke="#4462c9" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="185" y="478" text-anchor="middle" fill="#4462c9" font-size="7" font-style="italic">traces</text>
 
-  <!-- Connector from left arrow stub to UC Functions (via waypoint) -->
-  <line x1="226" y1="207" x2="226" y2="350" stroke="#4462c9" stroke-width="1.5" stroke-dasharray="4,3"/>
-  <line x1="226" y1="350" x2="227" y2="350" stroke="#4462c9" stroke-width="1.5" marker-end="url(#arrow-purple)"/>
-
-  <!-- ═══ STEP 2+3: PERSIST STEPS ═══ -->
-  <!-- Box: x=258 y=265 w=445 h=55 -->
-  <rect x="258" y="265" width="445" height="55" rx="8" fill="rgba(0,212,170,0.1)" stroke="#00D4AA" stroke-width="1.5"/>
-  <rect x="258" y="265" width="40" height="20" rx="5" fill="#00D4AA"/>
-  <text x="278" y="279" text-anchor="middle" fill="#0B2026" font-size="8" font-weight="700">2 / 3</text>
-  <text x="480" y="285" text-anchor="middle" fill="#00D4AA" font-size="10" font-weight="600">save_journey_step()  ·  persist_decision_step()</text>
-  <text x="480" y="302" text-anchor="middle" fill="#8fb5bf" font-size="8.5">Write DecisionArtifact + journey_state to Lakebase — ACID transaction</text>
-
-  <!-- Connector arrow: Agent 1 bottom → Persist top -->
-  <line x1="480" y1="250" x2="480" y2="263" stroke="#00D4AA" stroke-width="2" marker-end="url(#arrow-green)"/>
-
-  <!-- Arrow: Persist → Lakebase (right side) -->
-  <line x1="703" y1="292" x2="724" y2="720" stroke="#00D4AA" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-green)"/>
-  <rect x="707" y="490" width="18" height="80" rx="3" fill="#0B2026"/>
-  <text x="716" y="530" text-anchor="middle" fill="#8fb5bf" font-size="7" font-style="italic" transform="rotate(-90,716,530)">ACID txn</text>
-
-  <!-- ═══ STEP 4: DURABLE SLEEP ═══ -->
-  <!-- Sleep bar: x=258 y=335 w=445 h=50 — dashed orange, hatch fill -->
-  <rect x="258" y="335" width="445" height="50" rx="8" fill="url(#sleep-hatch)" stroke="#f0883e" stroke-width="2" stroke-dasharray="7,4"/>
-  <rect x="258" y="335" width="40" height="20" rx="5" fill="#f0883e"/>
-  <text x="278" y="349" text-anchor="middle" fill="#0B2026" font-size="9" font-weight="700">Step 4</text>
-  <text x="480" y="358" text-anchor="middle" fill="#f0883e" font-size="10" font-weight="700">DBOS.sleep_async(delay)  —  durable pause: 15–20s simulated  ·  production: hours</text>
-  <text x="480" y="374" text-anchor="middle" fill="#8fb5bf" font-size="8">Persists wake time to Lakebase · survives crash / scale-to-zero / restart</text>
-
-  <!-- Connector arrow: Persist → Sleep -->
-  <line x1="480" y1="320" x2="480" y2="333" stroke="#f0883e" stroke-width="1.5" marker-end="url(#arrow-orange)"/>
-
-  <!-- ═══ STEP 5: RE-EVALUATE (plain function, not agent-styled) ═══ -->
-  <!-- Box: x=258 y=400 w=445 h=48 — gray, simple -->
-  <rect x="258" y="400" width="445" height="48" rx="8" fill="rgba(143,181,191,0.08)" stroke="#8fb5bf" stroke-width="1.5"/>
-  <rect x="258" y="400" width="40" height="20" rx="5" fill="#8fb5bf"/>
-  <text x="278" y="414" text-anchor="middle" fill="#0B2026" font-size="9" font-weight="700">Step 5</text>
-  <text x="480" y="420" text-anchor="middle" fill="#8fb5bf" font-size="10" font-weight="600">re_evaluate_step()  —  plain @DBOS.step(), not agent</text>
-  <text x="480" y="436" text-anchor="middle" fill="#5a7a82" font-size="8">Check if customer converted · new tickets · frequency cap changes</text>
-
-  <!-- Connector arrow: Sleep → Re-evaluate -->
-  <line x1="480" y1="385" x2="480" y2="398" stroke="#8fb5bf" stroke-width="1.5" marker-end="url(#arrow)"/>
-
-  <!-- ═══ STEP 6: COPYWRITER AGENT (Agent 2) ═══ -->
-  <!-- Box: x=258 y=463 w=445 h=155 -->
-  <rect x="258" y="463" width="445" height="155" rx="10" fill="rgba(64,209,245,0.08)" stroke="#40d1f5" stroke-width="2"/>
-  <rect x="258" y="463" width="40" height="20" rx="5" fill="#40d1f5"/>
-  <text x="278" y="477" text-anchor="middle" fill="#0B2026" font-size="9" font-weight="700">Step 6</text>
-  <text x="480" y="486" text-anchor="middle" fill="#40d1f5" font-size="13" font-weight="700">COPYWRITER AGENT (Agent 2)</text>
-  <text x="480" y="501" text-anchor="middle" fill="#8fb5bf" font-size="9" font-style="italic">Pydantic AI · output_type=EmailContent · Email Composition: ~60s</text>
-
-  <!-- Agent 2 context sub-box: x=272 y=511 w=190 h=48 -->
-  <rect x="272" y="511" width="190" height="48" rx="6" fill="rgba(64,209,245,0.12)" stroke="#40d1f5" stroke-width="1.5"/>
-  <text x="367" y="531" text-anchor="middle" fill="#8fb5bf" font-size="9" font-weight="500">CONTEXT INPUT</text>
-  <text x="367" y="548" text-anchor="middle" fill="#F9F7F4" font-size="9">DecisionArtifact + Profile + Cart</text>
-
-  <!-- Agent 2 output sub-box: x=476 y=511 w=212 h=48 -->
-  <rect x="476" y="511" width="212" height="48" rx="6" fill="rgba(0,212,170,0.12)" stroke="#00D4AA" stroke-width="1.5"/>
-  <text x="582" y="531" text-anchor="middle" fill="#00D4AA" font-size="9" font-weight="500">OUTPUT</text>
-  <text x="582" y="548" text-anchor="middle" fill="#F9F7F4" font-size="9">EmailContent — segment-of-1</text>
-
-  <!-- Arrow context → output -->
-  <line x1="462" y1="535" x2="474" y2="535" stroke="#8fb5bf" stroke-width="1.5" marker-end="url(#arrow)"/>
-
-  <!-- Agent 2 note -->
-  <text x="480" y="576" text-anchor="middle" fill="#8fb5bf" font-size="8.5">Personalized with Cindy profile · Whiskers context · optimal send time</text>
-  <text x="480" y="590" text-anchor="middle" fill="#8fb5bf" font-size="8.5">Routes through same AI Gateway → Claude Sonnet</text>
-
-  <!-- Connector arrow: Re-evaluate → Agent 2 -->
-  <line x1="480" y1="448" x2="480" y2="461" stroke="#40d1f5" stroke-width="2" marker-end="url(#arrow-cyan)"/>
-
-  <!-- Agent 2 → AI Gateway arrow (right side) -->
-  <line x1="703" y1="535" x2="724" y2="190" stroke="#FF3621" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-red)"/>
-  <rect x="707" y="330" width="18" height="80" rx="3" fill="#0B2026"/>
-  <text x="716" y="370" text-anchor="middle" fill="#8fb5bf" font-size="7" font-style="italic" transform="rotate(-90,716,370)">Agent 2 → AI Gateway</text>
-
-  <!-- ═══ STEP 7: SIMULATE SEND ═══ -->
-  <!-- Box: x=258 y=633 w=445 h=50 -->
-  <rect x="258" y="633" width="445" height="50" rx="8" fill="rgba(0,212,170,0.1)" stroke="#00D4AA" stroke-width="1.5"/>
-  <rect x="258" y="633" width="40" height="20" rx="5" fill="#00D4AA"/>
-  <text x="278" y="647" text-anchor="middle" fill="#0B2026" font-size="9" font-weight="700">Step 7</text>
-  <text x="480" y="653" text-anchor="middle" fill="#00D4AA" font-size="10" font-weight="600">simulate_send_step()  —  write to sent_emails · journey → completed</text>
-  <text x="480" y="669" text-anchor="middle" fill="#8fb5bf" font-size="8.5">DBOS checkpoints final step · workflow transitions to COMPLETE state</text>
-
-  <!-- Connector arrow: Agent 2 → Send -->
-  <line x1="480" y1="618" x2="480" y2="631" stroke="#00D4AA" stroke-width="2" marker-end="url(#arrow-green)"/>
-
-  <!-- Arrow: Send → Lakebase (right) -->
-  <line x1="703" y1="658" x2="724" y2="720" stroke="#00D4AA" stroke-width="2" marker-end="url(#arrow-green)"/>
-
-  <!-- ═══════ WIRE-IN ARROWS: External → DBOS container ═══════ -->
-
-  <!-- Event Trigger → DBOS container top-left corner -->
-  <!-- Event right edge x=185, y=117; DBOS left edge x=238, y=117 -->
-  <line x1="185" y1="117" x2="236" y2="117" stroke="#FF8C2A" stroke-width="2" marker-end="url(#arrow-orange)"/>
-  <text x="211" y="109" text-anchor="middle" fill="#8fb5bf" font-size="9" font-style="italic">webhook</text>
-
-  <!-- UC Functions right edge → Agent 1 left edge (already drawn above via the split line) -->
-  <!-- Re-draw cleaner: UC right (x=225) at y=350 → DBOS left (x=238) at y=207 via waypoint -->
-  <!-- (the tool call arrow from Agent 1 left edge already handles this bidirectionally) -->
-  <line x1="225" y1="350" x2="258" y2="250" stroke="#4462c9" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrow-purple)"/>
-  <rect x="227" y="285" width="34" height="14" rx="3" fill="#0B2026"/>
-  <text x="244" y="296" text-anchor="middle" fill="#4462c9" font-size="7">tool data</text>
-
-  <!-- MLflow observation line: from MLflow top (x=125,y=758) up to DBOS left edge (x=238,y=700) -->
-  <line x1="225" y1="758" x2="238" y2="700" stroke="#4462c9" stroke-width="1" stroke-dasharray="4,3"/>
-  <rect x="215" y="720" width="60" height="14" rx="3" fill="#0B2026"/>
-  <text x="245" y="731" text-anchor="middle" fill="#4462c9" font-size="7" font-style="italic">traces all spans</text>
-
-  <!-- ═══════ UNITY CATALOG GOVERNANCE (bottom bar) ═══════ -->
-  <!-- Bar: x=25 y=990 w=850 h=40 -->
-  <rect x="25" y="990" width="850" height="40" rx="6" fill="rgba(255,54,33,0.08)" stroke="#FF3621" stroke-width="2"/>
-  <text x="450" y="1014" text-anchor="middle" fill="#FF3621" font-size="11" font-weight="700" letter-spacing="0.05em">UNITY CATALOG GOVERNANCE</text>
-  <text x="450" y="1028" text-anchor="middle" fill="#8fb5bf" font-size="9">All tool calls · All model calls · All state · Single audit plane</text>
+  <!-- ═══ UNITY CATALOG GOVERNANCE (bottom bar) ═══ -->
+  <rect x="20" y="750" width="860" height="32" rx="6" fill="rgba(255,54,33,0.07)" stroke="#FF3621" stroke-width="1.5"/>
+  <text x="450" y="769" text-anchor="middle" fill="#FF3621" font-size="11" font-weight="700" letter-spacing="0.08em">UNITY CATALOG GOVERNANCE</text>
+  <text x="450" y="779" text-anchor="middle" fill="#8fb5bf" font-size="8">All tool calls · All model calls · All state · Single audit plane</text>
 
 </svg>
 </div>
