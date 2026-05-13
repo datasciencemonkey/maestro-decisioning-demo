@@ -7,3 +7,13 @@ command:
   - 0.0.0.0
   - --port
   - 8000
+
+env:
+  - name: LAKEBASE_HOST
+    value: ep-wispy-bonus-d2qqe068.database.us-east-1.cloud.databricks.com
+  - name: LAKEBASE_DATABASE
+    value: maestro_cdp
+  - name: LAKEBASE_USER
+    value: maestro_app
+  - name: LAKEBASE_PASSWORD
+    value: maestro-cdp-2026!

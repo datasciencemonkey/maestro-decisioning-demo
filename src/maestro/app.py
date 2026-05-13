@@ -46,12 +46,15 @@ def _get_db_config():
     pg_host = "ep-wispy-bonus-d2qqe068.database.us-east-1.cloud.databricks.com"
     database = "maestro_cdp"
 
-    if os.environ.get("DATABRICKS_HOST"):
-        # Databricks Apps: use native Postgres service role (SP can't auth to Lakebase directly)
-        print("Databricks Apps detected — using native Postgres role")
+    if os.environ.get("LAKEBASE_PASSWORD"):
+        # Env vars set (app.yaml or secrets) — use native Postgres role
+        print("Using Lakebase native Postgres role from env vars")
         params = dict(
-            host=pg_host, port=5432, database=database,
-            user="maestro_app", password="maestro-cdp-2026!",
+            host=os.environ.get("LAKEBASE_HOST", pg_host),
+            port=5432,
+            database=os.environ.get("LAKEBASE_DATABASE", database),
+            user=os.environ.get("LAKEBASE_USER", "maestro_app"),
+            password=os.environ["LAKEBASE_PASSWORD"],
             sslmode="require",
         )
     else:
@@ -59,12 +62,9 @@ def _get_db_config():
         try:
             params = _get_lakebase_params_sdk()
         except Exception as e:
-            print(f"SDK Lakebase auth failed ({e}), falling back to native Postgres role")
-            params = dict(
-                host=pg_host, port=5432, database=database,
-                user="maestro_app", password="maestro-cdp-2026!",
-                sslmode="require",
-            )
+            print(f"SDK Lakebase auth failed: {e}")
+            app.state.db_params = None
+            return None
 
     try:
         db_url = (
