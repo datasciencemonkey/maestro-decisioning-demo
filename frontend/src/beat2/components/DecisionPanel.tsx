@@ -105,7 +105,7 @@ export default function DecisionPanel({ verdict, decisions, signals }: DecisionP
             >
               <span className="text-[11px] text-muted-foreground font-mono truncate">{s.signal}</span>
               <div className="flex items-center gap-1.5 shrink-0">
-                <span className="text-[11px] text-card-foreground">{s.value}</span>
+                <span className="text-[11px] text-card-foreground">{typeof s.value === 'object' ? JSON.stringify(s.value) : String(s.value)}</span>
                 <span
                   className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
                     s.weight >= 0.8

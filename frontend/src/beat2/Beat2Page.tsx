@@ -60,12 +60,14 @@ function mapToolCalls(artifact: Artifact) {
 
   const freqSig = artifact.contributing_signals?.find(s => s.signal.includes('freq'))
   if (freqSig) {
-    tools.push({ tool: 'check_frequency_cap', icon: '⚠️', output: `${freqSig.value} — weight ${freqSig.weight}`, highlight: 'warn' })
+    const freqVal = typeof freqSig.value === 'object' ? JSON.stringify(freqSig.value) : String(freqSig.value)
+    tools.push({ tool: 'check_frequency_cap', icon: '⚠️', output: `${freqVal} — weight ${freqSig.weight}`, highlight: 'warn' })
   }
 
   const propSig = artifact.contributing_signals?.find(s => s.signal.includes('prop'))
   if (propSig) {
-    tools.push({ tool: 'score_propensity', icon: '📊', output: `${propSig.signal}: ${propSig.value}`, highlight: 'ok' })
+    const propVal = typeof propSig.value === 'object' ? JSON.stringify(propSig.value) : String(propSig.value)
+    tools.push({ tool: 'score_propensity', icon: '📊', output: `${propSig.signal}: ${propVal}`, highlight: 'ok' })
   }
 
   tools.push(
