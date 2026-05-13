@@ -21,6 +21,25 @@ from maestro.models import CartAbandonedEvent
 CT = ZoneInfo("America/Chicago")
 
 
+def _get_db_params() -> dict:
+    """Get Lakebase connection params — env vars (Apps) or SDK (local)."""
+    import os
+    if os.environ.get("LAKEBASE_PASSWORD"):
+        return dict(
+            host=os.environ.get("LAKEBASE_HOST", "ep-wispy-bonus-d2qqe068.database.us-east-1.cloud.databricks.com"),
+            port=5432,
+            database=os.environ.get("LAKEBASE_DATABASE", "maestro_cdp"),
+            user=os.environ.get("LAKEBASE_USER", "maestro_app"),
+            password=os.environ["LAKEBASE_PASSWORD"],
+            sslmode="require",
+        )
+    from maestro.app import app
+    if hasattr(app.state, "db_params") and app.state.db_params:
+        return app.state.db_params
+
+    return get_lakebase_conn_params()
+
+
 # ── Async DBOS Steps (for LLM calls) ──────────────────────────────────────
 
 
@@ -59,7 +78,7 @@ def persist_decision_step(decision_json: str) -> str:
     """Persist DecisionArtifact to Lakebase decisions table."""
     import psycopg2
 
-    from maestro.bootstrap import get_lakebase_conn_params
+
 
     decision = json.loads(decision_json)
     decision_id = decision.get("decision_id", f"dec_{uuid.uuid4().hex[:8]}")
@@ -107,9 +126,7 @@ def save_journey_step(
     """Persist journey state to Lakebase journey_state table."""
     import psycopg2
 
-    from maestro.bootstrap import get_lakebase_conn_params
-
-    params = get_lakebase_conn_params()
+    params = _get_db_params()
     conn = psycopg2.connect(**params)
     conn.autocommit = True
     cur = conn.cursor()
@@ -141,7 +158,7 @@ def re_evaluate_step(journey_id: str, artifact_json: str) -> str:
 @DBOS.step()
 def simulate_send_step(journey_id: str, customer_id: str, email_json: str) -> str:
     """Write to sent_emails table, simulating delivery."""
-    from maestro.bootstrap import get_lakebase_conn_params
+
     from maestro.send import build_send_record, insert_sent_email
 
     record = build_send_record(journey_id, customer_id, email_json)
@@ -155,9 +172,7 @@ def update_journey_status_step(journey_id: str, status: str) -> str:
     """Update journey_state status."""
     import psycopg2
 
-    from maestro.bootstrap import get_lakebase_conn_params
-
-    params = get_lakebase_conn_params()
+    params = _get_db_params()
     conn = psycopg2.connect(**params)
     conn.autocommit = True
     cur = conn.cursor()
@@ -175,9 +190,7 @@ def rehydrate_journey_step(journey_id: str) -> str:
     """Read journey state from Lakebase (kept for backward compatibility)."""
     import psycopg2
 
-    from maestro.bootstrap import get_lakebase_conn_params
-
-    params = get_lakebase_conn_params()
+    params = _get_db_params()
     conn = psycopg2.connect(**params)
     cur = conn.cursor()
     cur.execute(

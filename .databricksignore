@@ -1,0 +1,34 @@
+# Agent skills (local dev only — app uses app_skills/)
+.agents/
+skills/
+
+# Dev tooling
+.claude/
+.vite/
+.databricks/
+.git/
+.pytest_cache/
+__pycache__/
+*.pyc
+
+# Flutter (old frontend, not used)
+frontend_flutter/
+
+# Frontend source (only dist/ is needed)
+frontend/src/
+frontend/node_modules/
+frontend/docs/
+frontend/*.json
+frontend/*.ts
+frontend/*.js
+frontend/*.md
+
+# Tests (not needed on app)
+tests/
+
+# Docs and planning
+docs/
+files/
+
+# Scripts (local dev only)
+scripts/
