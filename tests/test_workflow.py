@@ -6,6 +6,46 @@ import os
 import psycopg2
 import pytest
 
+
+# ── Unit tests (no Lakebase required) ──────────────────────────────────────
+
+
+def test_unified_workflow_imports():
+    """Verify all steps can be imported from the unified workflow."""
+    from maestro.workflow import (
+        compose_email_step,
+        persist_decision_step,
+        re_evaluate_step,
+        run_agent_step,
+        save_journey_step,
+        simulate_send_step,
+        unified_journey_workflow,
+        update_journey_status_step,
+    )
+    assert callable(unified_journey_workflow)
+    assert callable(run_agent_step)
+    assert callable(persist_decision_step)
+    assert callable(save_journey_step)
+    assert callable(re_evaluate_step)
+    assert callable(compose_email_step)
+    assert callable(simulate_send_step)
+    assert callable(update_journey_status_step)
+
+
+def test_backward_compatible_aliases():
+    """Verify old names still work."""
+    from maestro.workflow import (
+        journey_workflow,
+        rehydrate_journey_step,
+        save_decision_step,
+    )
+    assert callable(journey_workflow)
+    assert callable(save_decision_step)
+    assert callable(rehydrate_journey_step)
+
+
+# ── Integration tests (require Lakebase + LLM) ────────────────────────────
+
 pytestmark = [pytest.mark.integration]
 
 

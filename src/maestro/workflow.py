@@ -1,8 +1,10 @@
-"""DBOS durable workflow for Beat 2 + 2.5.
+"""Unified DBOS durable workflow for Beat 2 + 2.5 + 3.
 
-Orchestrates: agent reasoning → persist decision → durable sleep → resume.
-The workflow survives process restarts — DBOS checkpoints each step and
-persists the sleep wake-up time to Lakebase.
+Single workflow orchestrating: agent reasoning -> persist decision ->
+durable sleep -> re-evaluate context -> compose email -> simulate send.
+
+The workflow survives process restarts — DBOS checkpoints each step
+and persists the sleep wake-up time to Lakebase.
 """
 
 from __future__ import annotations
@@ -19,38 +21,34 @@ from maestro.models import CartAbandonedEvent, DecisionArtifact
 CT = ZoneInfo("America/Chicago")
 
 
-# ── DBOS Steps (checkpointed, non-deterministic) ───────────────────────────
+# ── DBOS Steps ─────────────────────────────────────────────────────────────
 
 
 @DBOS.step()
-def run_agent_step(event_json: str, model_name: str = "databricks-claude-sonnet-4-6") -> str:
-    """Run the Maestro agent. Checkpointed because LLM calls are non-deterministic.
-
-    Takes and returns JSON strings to avoid DBOS serialization issues
-    with complex Pydantic objects.
-    """
+def run_agent_step(event_json: str) -> str:
+    """Run the Maestro agent. Returns DecisionArtifact as JSON."""
     import asyncio
 
     from maestro.agent import run_maestro
     from maestro.bootstrap import bootstrap
 
     event = CartAbandonedEvent.model_validate_json(event_json)
-    model, db_url = bootstrap()
+    model, _db_url = bootstrap()
     result = asyncio.get_event_loop().run_until_complete(
-        run_maestro(event, model, db_url)
+        run_maestro(event, model, _db_url)
     )
     return result.model_dump_json()
 
 
 @DBOS.step()
-def save_decision_step(decision_json: str, db_url: str) -> str:
+def persist_decision_step(decision_json: str) -> str:
     """Persist DecisionArtifact to Lakebase decisions table."""
     import psycopg2
 
+    from maestro.bootstrap import get_lakebase_conn_params
+
     decision = json.loads(decision_json)
     decision_id = decision.get("decision_id", f"dec_{uuid.uuid4().hex[:8]}")
-
-    from maestro.bootstrap import get_lakebase_conn_params
     params = get_lakebase_conn_params()
 
     conn = psycopg2.connect(**params)
@@ -84,20 +82,20 @@ def save_decision_step(decision_json: str, db_url: str) -> str:
     return decision_id
 
 
+# Backward-compatible alias
+save_decision_step = persist_decision_step
+
+
 @DBOS.step()
 def save_journey_step(
-    journey_id: str,
-    customer_id: str,
-    step: str,
-    due_ts: str,
-    state_blob: str,
+    journey_id: str, customer_id: str, step: str, due_ts: str, state_blob: str,
 ) -> str:
     """Persist journey state to Lakebase journey_state table."""
     import psycopg2
 
     from maestro.bootstrap import get_lakebase_conn_params
-    params = get_lakebase_conn_params()
 
+    params = get_lakebase_conn_params()
     conn = psycopg2.connect(**params)
     conn.autocommit = True
     cur = conn.cursor()
@@ -118,13 +116,49 @@ def save_journey_step(
 
 
 @DBOS.step()
+def re_evaluate_step(journey_id: str, artifact_json: str) -> str:
+    """Re-check context after sleep. Returns ReEvaluationResult as JSON."""
+    from maestro.re_evaluate import re_evaluate_context
+
+    result = re_evaluate_context(journey_id, artifact_json)
+    return json.dumps(result)
+
+
+@DBOS.step()
+def compose_email_step(artifact_json: str) -> str:
+    """Compose personalized email via copywriter agent. Returns EmailContent JSON."""
+    import asyncio
+
+    from maestro.bootstrap import bootstrap
+    from maestro.email_agent import compose_email
+
+    model, _db_url = bootstrap()
+    email = asyncio.get_event_loop().run_until_complete(
+        compose_email(artifact_json, model)
+    )
+    return email.model_dump_json()
+
+
+@DBOS.step()
+def simulate_send_step(journey_id: str, customer_id: str, email_json: str) -> str:
+    """Write to sent_emails table, simulating delivery."""
+    from maestro.bootstrap import get_lakebase_conn_params
+    from maestro.send import build_send_record, insert_sent_email
+
+    record = build_send_record(journey_id, customer_id, email_json)
+    params = get_lakebase_conn_params()
+    email_id = insert_sent_email(record, params)
+    return email_id
+
+
+@DBOS.step()
 def update_journey_status_step(journey_id: str, status: str) -> str:
-    """Update journey_state status (e.g., pending → completed)."""
+    """Update journey_state status."""
     import psycopg2
 
     from maestro.bootstrap import get_lakebase_conn_params
-    params = get_lakebase_conn_params()
 
+    params = get_lakebase_conn_params()
     conn = psycopg2.connect(**params)
     conn.autocommit = True
     cur = conn.cursor()
@@ -139,12 +173,12 @@ def update_journey_status_step(journey_id: str, status: str) -> str:
 
 @DBOS.step()
 def rehydrate_journey_step(journey_id: str) -> str:
-    """Read journey state from Lakebase and return the state_blob as JSON."""
+    """Read journey state from Lakebase (kept for backward compatibility)."""
     import psycopg2
 
     from maestro.bootstrap import get_lakebase_conn_params
-    params = get_lakebase_conn_params()
 
+    params = get_lakebase_conn_params()
     conn = psycopg2.connect(**params)
     cur = conn.cursor()
     cur.execute(
@@ -160,92 +194,85 @@ def rehydrate_journey_step(journey_id: str) -> str:
     return json.dumps(row[0]) if isinstance(row[0], dict) else str(row[0])
 
 
-# ── Main Workflow ───────────────────────────────────────────────────────────
+# ── Unified Workflow ───────────────────────────────────────────────────────
 
 
 @DBOS.workflow()
-def journey_workflow(event_json: str, delay_seconds: int = 10) -> str:
-    """Beat 2 + 2.5 orchestration workflow.
+def unified_journey_workflow(event_json: str, delay_seconds: int = 15) -> str:
+    """Complete Beat 2 + 2.5 + 3 workflow.
 
-    1. Run the agent to produce a DecisionArtifact (Beat 2)
-    2. Persist decision to Lakebase
-    3. Persist journey_state to Lakebase
-    4. Durable sleep until send_time (Beat 2.5)
-    5. Resume: rehydrate context, mark completed
+    Steps:
+      1. Agent reasoning -> DecisionArtifact
+      2. Persist decision to Lakebase
+      3. Save journey state
+      4. Durable sleep (simulates optimal send window)
+      5. Re-evaluate context (check for changes)
+      6. Compose email (copywriter agent)
+      7. Simulate send (write to sent_emails)
 
-    Args:
-        event_json: CartAbandonedEvent serialized as JSON
-        delay_seconds: Seconds to sleep (demo: 10s; real: ~42120s for 11h42m)
-
-    Returns:
-        journey_id of the completed journey
+    Returns: JSON dict with journey_id, decision_id, email_id, evaluation
     """
-    # ── Beat 2: Agent reasoning ─────────────────────────────────────────
-    DBOS.write_stream("journey", {
-        "type": "agent_started",
-        "status": "reasoning",
-    })
-
+    # ── Step 1: Agent reasoning ────────────────────────────────────────
     decision_json = run_agent_step(event_json)
     decision = json.loads(decision_json)
+    customer_id = decision.get("customer_id", "unknown")
 
-    DBOS.write_stream("journey", {
-        "type": "decision_rendered",
-        "verdict": decision.get("verdict"),
-        "customer_id": decision.get("customer_id"),
-    })
+    # ── Step 2: Persist decision ───────────────────────────────────────
+    decision_id = persist_decision_step(decision_json)
 
-    # ── Persist decision ────────────────────────────────────────────────
-    decision_id = save_decision_step(decision_json, "")
-
-    # ── Persist journey state ───────────────────────────────────────────
-    journey_id = decision.get("journey_id", f"jrn_{decision.get('customer_id', 'unknown')}_{uuid.uuid4().hex[:6]}")
-
-    # Find send_time from decisions list
+    # ── Step 3: Save journey state ─────────────────────────────────────
+    journey_id = decision.get(
+        "journey_id",
+        f"jrn_{customer_id}_{uuid.uuid4().hex[:6]}",
+    )
     send_time_decisions = [
         d for d in decision.get("decisions", []) if d.get("type") == "send_time"
     ]
-    due_ts = send_time_decisions[0]["value"] if send_time_decisions else datetime.now(CT).isoformat()
-
+    due_ts = (
+        send_time_decisions[0].get("value", datetime.now(CT).isoformat())
+        if send_time_decisions
+        else datetime.now(CT).isoformat()
+    )
     save_journey_step(
         journey_id=journey_id,
-        customer_id=decision["customer_id"],
+        customer_id=customer_id,
         step="awaiting_send",
         due_ts=due_ts,
         state_blob=decision_json,
     )
 
-    DBOS.write_stream("journey", {
-        "type": "journey_persisted",
-        "journey_id": journey_id,
-        "due_ts": due_ts,
-        "storage": "DBOS on Lakebase",
-    })
-
-    # ── Beat 2.5: Durable sleep ─────────────────────────────────────────
-    DBOS.write_stream("journey", {
-        "type": "sleep_started",
-        "delay_seconds": delay_seconds,
-    })
-
+    # ── Step 4: Durable sleep ──────────────────────────────────────────
     DBOS.sleep(delay_seconds)
 
-    # ── Resume: rehydrate and execute ───────────────────────────────────
-    DBOS.write_stream("journey", {
-        "type": "journey_resumed",
+    # ── Step 5: Re-evaluate context ────────────────────────────────────
+    eval_json = re_evaluate_step(journey_id, decision_json)
+    evaluation = json.loads(eval_json)
+
+    # ── Step 6: Compose email (if proceed/adjust) ──────────────────────
+    email_json = None
+    email_id = None
+    if evaluation["action"] in ("proceed", "adjust"):
+        context = (
+            decision_json
+            if evaluation["action"] == "proceed"
+            else evaluation.get("updated_artifact", decision_json)
+        )
+        email_json = compose_email_step(context)
+
+        # ── Step 7: Simulate send ──────────────────────────────────────
+        email_id = simulate_send_step(journey_id, customer_id, email_json)
+        update_journey_status_step(journey_id, "sent")
+    else:
+        update_journey_status_step(journey_id, "cancelled")
+
+    return json.dumps({
         "journey_id": journey_id,
+        "decision_id": decision_id,
+        "email_id": email_id,
+        "evaluation": evaluation["action"],
     })
 
-    state_json = rehydrate_journey_step(journey_id)
 
-    # Mark completed (Beat 3 would trigger email send here)
-    update_journey_status_step(journey_id, "completed")
+# ── Backward-compatible alias ──────────────────────────────────────────────
 
-    DBOS.write_stream("journey", {
-        "type": "decision_executed",
-        "journey_id": journey_id,
-        "status": "completed",
-    })
-    DBOS.close_stream("journey")
-
-    return journey_id
+journey_workflow = unified_journey_workflow
