@@ -14,6 +14,13 @@
   --color-databricks-navy: #0B2026;
   --color-databricks-cyan: #40D1F5;
 
+  /* Status colors (semantic) */
+  --color-status-suppressed: #EB1600;
+  --color-status-priority: #C4A87A;
+  --color-status-active: #40D1F5;
+  --color-status-dormant: #5A6F77;
+  --color-status-triggered: #22C55E;
+
   /* Light mode: Databricks branding */
   --color-background: #F9F7F4;
   --color-foreground: #0B2026;
