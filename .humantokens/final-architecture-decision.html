@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maestro CDP — Final Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0B2026;
+    --surface: #0f2d34;
+    --surface2: #143a43;
+    --border: #1e4f5a;
+    --text: #F9F7F4;
+    --text-muted: #8fb5bf;
+    --accent: #40d1f5;
+    --green: #00D4AA;
+    --red: #FF3621;
+    --orange: #FF8C2A;
+    --purple: #4462c9;
+    --db-red: #FF3621;
+    --db-cyan: #40d1f5;
+    --db-navy: #0B2026;
+    --db-cream: #F9F7F4;
+    --wake: #f0883e;
+  }
+
+  /* Databricks Light Mode */
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #F9F7F4;
+      --surface: #FFFFFF;
+      --surface2: #F1F5FA;
+      --border: #D8DEE4;
+      --text: #0B2026;
+      --text-muted: #4A4A4A;
+      --accent: #1B6AC9;
+      --green: #00875A;
+      --red: #D0021B;
+      --orange: #C75300;
+      --purple: #4462c9;
+      --db-red: #FF3621;
+      --db-cyan: #1B6AC9;
+      --db-navy: #0B2026;
+      --db-cream: #F9F7F4;
+      --wake: #C75300;
+    }
+
+    .db-header {
+      background: linear-gradient(135deg, #0B2026 0%, #143a43 100%);
+    }
+    .db-header .db-logo-text,
+    .db-header .db-header-title { color: #F9F7F4; }
+
+    .callout {
+      background: rgba(27,106,201,0.06);
+      border-color: rgba(27,106,201,0.25);
+    }
+
+    .badge-green { background: rgba(0,135,90,0.12); }
+    .badge-red { background: rgba(208,2,27,0.1); }
+    .badge-orange { background: rgba(199,83,0,0.1); }
+
+    .flow-node.event { background: rgba(199,83,0,0.08); }
+    .flow-node.agent { background: rgba(27,106,201,0.08); }
+    .flow-node.tool { background: rgba(68,98,201,0.08); }
+    .flow-node.persist { background: rgba(0,135,90,0.08); }
+    .flow-node.wake { background: rgba(199,83,0,0.08); }
+    .flow-node.action { background: rgba(0,135,90,0.1); }
+
+    .arch-layer.l1 { background: rgba(199,83,0,0.08); }
+    .arch-layer.l2 { background: rgba(27,106,201,0.08); }
+    .arch-layer.l3 { background: rgba(68,98,201,0.08); }
+    .arch-layer.l4 { background: rgba(0,135,90,0.08); }
+    .arch-layer.l5 { background: rgba(208,2,27,0.06); }
+
+    .tl-content { background: var(--surface); }
+    .tl-content.sleep { background: var(--bg); }
+    .tl-dot { background: var(--bg); }
+
+    .sleep-bar {
+      background: linear-gradient(90deg, rgba(199,83,0,0.1), rgba(0,135,90,0.1));
+    }
+
+    code { background: rgba(27,106,201,0.08); }
+    pre { background: #F1F5FA; border-color: var(--border); }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 0;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .db-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 2rem;
+    border-bottom: 2px solid var(--db-red);
+    background: linear-gradient(135deg, #0B2026 0%, #0f2d34 100%);
+    margin-bottom: 0.5rem;
+  }
+  .db-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .db-logo svg { width: 32px; height: 32px; }
+  .db-logo-text { font-size: 1rem; font-weight: 700; color: var(--db-cream); letter-spacing: 0.02em; }
+  .db-header-divider { width: 1px; height: 24px; background: var(--border); }
+  .db-header-title { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+  .content-wrap { padding: 1.5rem 2rem 2rem; }
+  h1 { font-size: 2rem; margin-bottom: 0.25rem; font-weight: 700; }
+  h2 { font-size: 1.4rem; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--db-cyan); border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; font-weight: 700; }
+  h3 { font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.75rem; color: var(--purple); font-weight: 700; }
+  .subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+  th { background: var(--surface2); color: var(--accent); text-align: left; padding: 0.6rem 0.8rem; border: 1px solid var(--border); }
+  td { padding: 0.6rem 0.8rem; border: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: var(--surface); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin: 1rem 0; }
+  .card-green { border-left: 4px solid var(--green); }
+  .card-red { border-left: 4px solid var(--red); }
+  .card-orange { border-left: 4px solid var(--orange); }
+  .card-blue { border-left: 4px solid var(--accent); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+  .badge-green { background: rgba(0,212,170,0.2); color: var(--green); }
+  .badge-red { background: rgba(255,54,33,0.2); color: var(--red); }
+  .badge-orange { background: rgba(255,140,42,0.2); color: var(--orange); }
+  code { background: var(--surface2); padding: 2px 6px; border-radius: 4px; font-size: 0.85rem; font-family: 'DM Mono', monospace; }
+  pre { background: var(--surface2); padding: 1rem; border-radius: 8px; overflow-x: auto; font-size: 0.85rem; margin: 1rem 0; border: 1px solid var(--border); font-family: 'DM Mono', monospace; }
+  .verdict { font-size: 1.1rem; font-weight: 600; margin-top: 0.5rem; }
+  .callout { background: rgba(64,209,245,0.08); border: 1px solid rgba(64,209,245,0.3); border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; }
+  .fatal { color: var(--red); font-weight: 600; }
+  ul, ol { margin: 0.5rem 0 0.5rem 1.5rem; }
+  li { margin-bottom: 0.3rem; }
+
+  .arch-layer {
+    width: 100%;
+    padding: 0.75rem 1.25rem;
+    text-align: center;
+    border: 1px solid var(--border);
+    font-size: 0.85rem;
+  }
+  .arch-layer:first-child { border-radius: 10px 10px 0 0; }
+  .arch-layer:last-child { border-radius: 0 0 10px 10px; }
+  .arch-layer.l1 { background: rgba(255,140,42,0.12); border-color: var(--orange); }
+  .arch-layer.l2 { background: rgba(64,209,245,0.1); border-color: var(--db-cyan); }
+  .arch-layer.l3 { background: rgba(68,98,201,0.12); border-color: var(--purple); }
+  .arch-layer.l4 { background: rgba(0,212,170,0.1); border-color: var(--green); }
+  .arch-layer.l5 { background: rgba(255,54,33,0.08); border-color: var(--db-red); }
+  .arch-label { font-weight: 600; }
+  .arch-detail { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem; }
+
+  .diagram-box { text-align: center; margin: 2rem 0; }
+  .diagram-box img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--border); }
+  .diagram-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; }
+
+  @media (max-width: 768px) {
+    body { padding: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="db-header">
+  <div class="db-logo">
+    <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M18 2L4 10v4.5l14 8 14-8V10L18 2z" fill="#FF3621"/>
+      <path d="M4 14.5v4.5l14 8 14-8v-4.5l-14 8-14-8z" fill="#FF3621" opacity="0.7"/>
+      <path d="M4 19v4.5l14 8 14-8V19l-14 8-14-8z" fill="#FF3621" opacity="0.4"/>
+    </svg>
+    <span class="db-logo-text">Databricks</span>
+  </div>
+  <div class="db-header-divider"></div>
+  <div class="db-header-title">Maestro CDP &middot; Final Architecture</div>
+</div>
+
+<div class="content-wrap">
+
+<h1>Maestro CDP — Final Architecture</h1>
+<p class="subtitle">Verified implementation aligned with codebase &middot; 2026-05-14</p>
+
+<!-- ───────────────────────────── EXECUTIVE SUMMARY ───────────────────────────── -->
+<h2>Executive Summary</h2>
+
+<p>
+Maestro is an agentic Customer Data Platform (CDP) demo running on Databricks that orchestrates cross-campaign optimization and personalized customer engagement. The demo proves that Pydantic AI + DBOS on Lakebase solves the core architectural challenge: <strong>durable agent execution</strong> — agents that start, stop, and whose state can be acted upon independently via transactional workflow persistence inside Databricks.
+</p>
+
+<p>
+The system recognizes a customer in real-time (Browser phase), runs a Pydantic AI supervisor agent across 9 domains to reason about campaign disposition (Reasoning phase), persists the decision transactionally via DBOS to Lakebase (Persistence phase), sleeps durably while awaiting the optimal send window, wakes up and re-evaluates context (Durable Execution phase), runs a copywriter agent to compose personalized email, and simulates delivery (Email Activation phase). All state lives in the governance plane (Unity Catalog).
+</p>
+
+<p>
+The key architectural choice: <strong>Pydantic AI agents + DBOS on Lakebase</strong> (not deepagents, not vstorm). This delivers ACID workflow durability + native Skills integration + MLflow observability + zero external dependencies.
+</p>
+
+<!-- ───────────────────────────── ARCHITECTURE DIAGRAM ───────────────────────────── -->
+<h2>Architecture Diagram</h2>
+
+<div class="diagram-box">
+  <img src="architecture.png" style="width:100%;max-width:1100px;" alt="Maestro system architecture">
+  <p class="diagram-label">System architecture showing event flow, agent reasoning, durable persistence, and email activation</p>
+</div>
+
+<!-- ───────────────────────────── UNIFIED DBOS WORKFLOW ───────────────────────────── -->
+<h2>Unified DBOS Workflow — 7 Steps</h2>
+
+<p>
+The workflow is declared once as <code>@DBOS.workflow()</code> in <code>src/maestro/workflow.py</code>. DBOS checkpoints each step and survives process restarts. Steps 1 and 6 are async (LLM calls); steps 2-5 and 7 are sync (DB operations).
+</p>
+
+<table>
+  <tr>
+    <th>Step</th>
+    <th>Function</th>
+    <th>Type</th>
+    <th>Purpose</th>
+    <th>Input → Output</th>
+  </tr>
+  <tr>
+    <td><strong>1</strong></td>
+    <td><code>run_agent_step()</code></td>
+    <td>async</td>
+    <td>Run Maestro reasoning agent on <code>cart_abandoned</code> event. Supervisor reasons across 9 tools and outputs DecisionArtifact.</td>
+    <td><code>event_json: str</code> → <code>DecisionArtifact (JSON)</code></td>
+  </tr>
+  <tr>
+    <td><strong>2</strong></td>
+    <td><code>save_journey_step()</code></td>
+    <td>sync</td>
+    <td>Persist journey state to Lakebase <code>journey_state</code> table with FK to <code>decisions</code>. Must run before persist_decision_step (FK constraint).</td>
+    <td><code>journey_id, customer_id, step, due_ts, state_blob</code> → <code>journey_id</code></td>
+  </tr>
+  <tr>
+    <td><strong>3</strong></td>
+    <td><code>persist_decision_step()</code></td>
+    <td>sync</td>
+    <td>Write DecisionArtifact to Lakebase <code>decisions</code> table via psycopg2. UPSERT on <code>decision_id</code> to support retries.</td>
+    <td><code>decision_json: str</code> → <code>decision_id</code></td>
+  </tr>
+  <tr>
+    <td><strong>4</strong></td>
+    <td><code>await DBOS.sleep_async()</code></td>
+    <td>async</td>
+    <td>Durable pause. Wake-up time persisted to Lakebase Postgres. Workflow survives process crash or scale-to-zero.</td>
+    <td><code>delay_seconds: int</code> → wake at due_ts</td>
+  </tr>
+  <tr>
+    <td><strong>5</strong></td>
+    <td><code>re_evaluate_step()</code></td>
+    <td>sync</td>
+    <td>After wake-up, re-check context — did customer convert? Did frequency caps change? Reads journey_state from Lakebase, returns ReEvaluationResult with action: proceed | abort | adjust.</td>
+    <td><code>journey_id, artifact_json</code> → <code>ReEvaluationResult (JSON)</code></td>
+  </tr>
+  <tr>
+    <td><strong>6</strong></td>
+    <td><code>compose_email_step()</code></td>
+    <td>async</td>
+    <td>Run copywriter agent to generate personalized email. Takes DecisionArtifact context + customer profile/cart. Outputs EmailContent with HTML + CTA.</td>
+    <td><code>artifact_json: str</code> → <code>EmailContent (JSON)</code></td>
+  </tr>
+  <tr>
+    <td><strong>7</strong></td>
+    <td><code>simulate_send_step()</code></td>
+    <td>sync</td>
+    <td>Write to <code>sent_emails</code> table. Update journey_state status → completed. Workflow concludes.</td>
+    <td><code>journey_id, customer_id, email_json</code> → <code>email_id</code></td>
+  </tr>
+</table>
+
+<p style="color:var(--text-muted); font-size:0.85rem; margin-top:1rem;">
+<strong>Implementation detail:</strong> The workflow is declared in <code>src/maestro/workflow.py:unified_journey_workflow()</code>. DBOS injects itself via <code>@DBOS.workflow()</code> and <code>@DBOS.step()</code> decorators. Each step becomes a Postgres function; the workflow state machine lives in <code>dbos_execution_history</code> table.
+</p>
+
+<!-- ───────────────────────────── AGENT 1: REASONING AGENT ───────────────────────────── -->
+<h2>Agent 1: Reasoning Agent</h2>
+
+<p>
+Pydantic AI supervisor agent that reasons across 9 domains given a <code>cart_abandoned</code> event. Declared in <code>src/maestro/agent.py</code>. Runs via Step 1 of the workflow.
+</p>
+
+<h3>System Prompt Summary</h3>
+<p>
+The agent is instructed to: (1) understand the customer (profile) and abandoned cart; (2) check operational constraints (production feasibility, campaign conflicts, frequency caps); (3) assess conversion likelihood and timing; (4) decide tool order based on learnings — when a tool's output makes another unnecessary, skip it and explain why; (5) reconcile contradictions (e.g., customer in active campaign + frequency cap breach = suppress lower-priority campaign); (6) output a structured DecisionArtifact with verdict, decisions array, contributing signals, and human-legible rationale.
+</p>
+
+<h3>9 Tools (all Pydantic AI @agent.tool)</h3>
+
+<table>
+  <tr>
+    <th>Tool</th>
+    <th>Signature</th>
+    <th>Returns</th>
+    <th>Source</th>
+  </tr>
+  <tr>
+    <td><code>read_profile()</code></td>
+    <td><code>customer_id: str</code></td>
+    <td><code>Profile</code> (name, email, pet_name, pet_type, timezone, preferred_channel, consent_email, consent_sms, is_repeat_buyer, loyalty_tier, quiet_hours)</td>
+    <td>Synthetic data dict; would read from UC <code>customers</code></td>
+  </tr>
+  <tr>
+    <td><code>read_cart()</code></td>
+    <td><code>customer_id: str</code></td>
+    <td><code>Cart</code> (items, total, created_at, abandoned_at)</td>
+    <td>Synthetic; would read from UC <code>orders</code> + <code>order_items</code></td>
+  </tr>
+  <tr>
+    <td><code>check_production_feasibility()</code></td>
+    <td><code>product_id: str, ship_by: str</code></td>
+    <td><code>Feasibility</code> (feasible, production_days, ship_by_achievable, reason)</td>
+    <td>Synthetic; would read UC <code>production_calendar</code></td>
+  </tr>
+  <tr>
+    <td><code>list_active_campaigns()</code></td>
+    <td><code>customer_id: str</code></td>
+    <td><code>list[Campaign]</code> (campaign_id, name, type, status, scheduled_send, channel)</td>
+    <td>Synthetic; would read UC <code>campaigns</code> + <code>campaign_membership</code></td>
+  </tr>
+  <tr>
+    <td><code>check_frequency_cap()</code></td>
+    <td><code>customer_id: str, channel: str, window_days: int</code></td>
+    <td><code>CapStatus</code> (cap, current, queued, status=ok|warning|breach, window_days)</td>
+    <td>Synthetic; would aggregate UC <code>campaigns</code> table</td>
+  </tr>
+  <tr>
+    <td><code>read_support_tickets()</code></td>
+    <td><code>customer_id: str, lookback_days: int</code></td>
+    <td><code>list[Ticket]</code> (ticket_id, subject, status, priority, created_at, resolved_at)</td>
+    <td>Synthetic; would read UC <code>support_tickets</code></td>
+  </tr>
+  <tr>
+    <td><code>score_propensity()</code></td>
+    <td><code>customer_id: str, intent: str</code></td>
+    <td><code>Score</code> (score: 0-1, model_version, confidence)</td>
+    <td>Synthetic; would call Model Serving endpoint</td>
+  </tr>
+  <tr>
+    <td><code>optimal_send_time()</code></td>
+    <td><code>customer_id: str, cohort: str, propensity: float</code></td>
+    <td><code>SendTimestamp</code> (optimal_ts, cohort, adjusted_for_quiet_hours, original_ts, reason)</td>
+    <td>Synthetic; would call model or service</td>
+  </tr>
+  <tr>
+    <td><code>persist_journey_state()</code></td>
+    <td><code>customer_id: str, step: str, due_ts: str, blob: dict</code></td>
+    <td><code>JourneyHandle</code> (journey_id, customer_id, step, due_ts, status)</td>
+    <td>In-agent stub; actual persistence happens in Step 2 of workflow</td>
+  </tr>
+</table>
+
+<h3>Agent Configuration</h3>
+
+<pre>maestro_agent = Agent(
+    model,
+    output_type=DecisionArtifact,
+    deps_type=MaestroDeps,
+    instructions=SYSTEM_PROMPT,
+    name="maestro-cdp",
+    retries=1,
+    capabilities=[SkillsCapability(directories=["./app_skills"])],
+)</pre>
+
+<p>
+<strong>SkillsCapability</strong> loads domain best practices from <code>./app_skills/</code>. Pydantic AI v0.18+ integrates Skills seamlessly via <code>capabilities=</code>.
+</p>
+
+<h3>Dependencies Injection</h3>
+
+<p>
+Each tool receives <code>ctx: RunContext[MaestroDeps]</code> with <code>customer_id</code>, <code>event</code>, and optional <code>db_url</code>. DBOS workflow injects via <code>await run_agent_step(event_json)</code> → agent runs with deps auto-populated from context.
+</p>
+
+<h3>Timing</h3>
+
+<p>
+Agent reasoning: ~60s (8 LLM round-trips through AI Gateway at <code>/ai-gateway/mlflow/v1</code> with databricks-claude-sonnet-4-6). Tools are called sequentially, with early termination (tool X's output makes tool Y unnecessary → skip Y and explain why in rationale).
+</p>
+
+<!-- ───────────────────────────── AGENT 2: COPYWRITER AGENT ───────────────────────────── -->
+<h2>Agent 2: Copywriter Agent</h2>
+
+<p>
+Separate Pydantic AI agent that composes personalized cart recovery emails. Declared in <code>src/maestro/email_agent.py</code>. Runs via Step 6 of the workflow.
+</p>
+
+<h3>System Prompt Summary</h3>
+<p>
+Write a warm, personal cart recovery email. Rules: subject &lt;50 chars (mention pet name if available), body &lt;100 words (conversational, mention specific product), tone matches customer relationship, use pet name naturally, include one clear CTA (no urgency tactics), include hero image URL, CTA points to resume-cart endpoint.
+</p>
+
+<h3>CopywriterDeps</h3>
+
+<pre>@dataclass
+class CopywriterDeps:
+    customer_id: str
+    profile: Profile
+    cart: Cart
+    tone: str
+    hero_image_url: str</pre>
+
+<h3>Output Type</h3>
+
+<p>
+<code>EmailContent(subject, body_html, body_text, hero_image_url, cta_text, cta_url)</code>. The agent generates HTML body as a fragment (no outer <code>&lt;html&gt;</code> tags); the email template wrapper supplies the outer chrome.
+</p>
+
+<h3>Context Flow</h3>
+
+<p>
+Agent 1 produces DecisionArtifact with a <code>"tone"</code> decision (e.g., "warm + personal" for repeat buyers with pets). Step 6 deserializes the artifact, looks up the customer's profile and cart from synthetic data, extracts the tone, instantiates CopywriterDeps, and runs <code>compose_email(artifact_json, model)</code>. The copywriter agent reads <code>deps.tone</code> and crafts the email.
+</p>
+
+<h3>Timing</h3>
+
+<p>
+Email composition: ~60s (4-5 LLM calls through AI Gateway).
+</p>
+
+<!-- ───────────────────────────── DATA MODELS ───────────────────────────── -->
+<h2>Data Models (Pydantic)</h2>
+
+<p>
+All models defined in <code>src/maestro/models.py</code>. Total: 16 classes covering input events, tool returns, and decision outputs.
+</p>
+
+<table>
+  <tr>
+    <th>Model</th>
+    <th>Fields</th>
+    <th>Purpose</th>
+  </tr>
+  <tr>
+    <td><code>CartAbandonedEvent</code></td>
+    <td>event_type, customer_id, cart_id, abandoned_at, cart_total, items, source_session_id, tier1_clearance</td>
+    <td>Input event triggering the workflow</td>
+  </tr>
+  <tr>
+    <td><code>CartItem</code></td>
+    <td>product_id, qty, price</td>
+    <td>Line item in abandoned cart</td>
+  </tr>
+  <tr>
+    <td><code>Profile</code></td>
+    <td>customer_id, name, email, pet_name, pet_type, timezone, preferred_channel, consent_email, consent_sms, is_repeat_buyer, loyalty_tier, quiet_hours_start, quiet_hours_end</td>
+    <td>Customer demographics and preferences</td>
+  </tr>
+  <tr>
+    <td><code>Cart</code></td>
+    <td>cart_id, customer_id, items, total, created_at, abandoned_at</td>
+    <td>Abandoned shopping cart context</td>
+  </tr>
+  <tr>
+    <td><code>Feasibility</code></td>
+    <td>product_id, feasible, production_days, ship_by_achievable, reason</td>
+    <td>Production capability check</td>
+  </tr>
+  <tr>
+    <td><code>Campaign</code></td>
+    <td>campaign_id, name, campaign_type, status (active|triggered|paused|dormant), scheduled_send, channel</td>
+    <td>Active/inactive campaign enrollment</td>
+  </tr>
+  <tr>
+    <td><code>CapStatus</code></td>
+    <td>customer_id, channel, cap, current, queued, status (ok|warning|breach), window_days</td>
+    <td>Frequency cap state (breach detection)</td>
+  </tr>
+  <tr>
+    <td><code>Ticket</code></td>
+    <td>ticket_id, customer_id, subject, status, priority, created_at, resolved_at</td>
+    <td>Recent support friction signals</td>
+  </tr>
+  <tr>
+    <td><code>Score</code></td>
+    <td>customer_id, intent, score (0-1), model_version, confidence</td>
+    <td>Propensity to convert</td>
+  </tr>
+  <tr>
+    <td><code>SendTimestamp</code></td>
+    <td>customer_id, optimal_ts, cohort, adjusted_for_quiet_hours, original_ts, reason</td>
+    <td>Optimal send time (with quiet-hours adjustment)</td>
+  </tr>
+  <tr>
+    <td><code>JourneyHandle</code></td>
+    <td>journey_id, customer_id, step, due_ts, status (pending|in_progress|completed|failed)</td>
+    <td>Handoff point to durable workflow</td>
+  </tr>
+  <tr>
+    <td><code>Decision</code></td>
+    <td>type (suppress_from|prioritize_in|tone|send_time|channel), target, value, weight, reason</td>
+    <td>One decision action within an artifact</td>
+  </tr>
+  <tr>
+    <td><code>ContributingSignal</code></td>
+    <td>signal, value, weight</td>
+    <td>One factor that influenced the decision</td>
+  </tr>
+  <tr>
+    <td><code>DecisionArtifact</code></td>
+    <td>decision_id, customer_id, journey_id, trigger_event_id, verdict, decisions[], contributing_signals[], rationale, trace_id, created_at</td>
+    <td><strong>Agent 1 output.</strong> Structured disposition decision with reasoning chain.</td>
+  </tr>
+  <tr>
+    <td><code>EmailContent</code></td>
+    <td>subject, body_html, body_text, hero_image_url, cta_text, cta_url</td>
+    <td><strong>Agent 2 output.</strong> Personalized email ready to send.</td>
+  </tr>
+  <tr>
+    <td><code>ReEvaluationResult</code></td>
+    <td>action (proceed|abort|adjust), reason, changes_detected[], updated_artifact</td>
+    <td><strong>Step 5 output.</strong> Re-eval context after durable sleep.</td>
+  </tr>
+</table>
+
+<!-- ───────────────────────────── INFRASTRUCTURE ───────────────────────────── -->
+<h2>Infrastructure</h2>
+
+<h3>Workspace</h3>
+<ul>
+  <li><strong>Host:</strong> <code>fevm-serverless-9cefok.cloud.databricks.com</code></li>
+  <li><strong>Profile:</strong> <code>9cefok</code> (local dev)</li>
+</ul>
+
+<h3>Lakebase Project</h3>
+<ul>
+  <li><strong>Project:</strong> <code>maestro-cdp</code></li>
+  <li><strong>Branch:</strong> <code>production</code></li>
+  <li><strong>Database:</strong> <code>maestro_cdp</code></li>
+  <li><strong>Endpoint:</strong> <code>ep-wispy-bonus-d2qqe068.database.us-east-1.cloud.databricks.com:5432</code></li>
+</ul>
+
+<h3>LLM Routing</h3>
+<ul>
+  <li><strong>Framework:</strong> Pydantic AI (v0.18+)</li>
+  <li><strong>Model:</strong> <code>databricks-claude-sonnet-4-6</code></li>
+  <li><strong>Provider:</strong> <code>AsyncDatabricksOpenAI</code> via <code>OpenAIProvider</code></li>
+  <li><strong>Gateway:</strong> <code>/ai-gateway/mlflow/v1/</code> endpoint (on workspace host)</li>
+  <li><strong>Auth:</strong> WorkspaceClient (local: profile creds; Apps: service principal via env vars)</li>
+</ul>
+
+<h3>DBOS Configuration</h3>
+<ul>
+  <li><strong>System DB URL:</strong> <code>postgresql://{user}:{token}@ep-wispy-bonus-d2qqe068.database.us-east-1.cloud.databricks.com:5432/maestro_cdp?sslmode=require</code></li>
+  <li><strong>Application DB URL:</strong> Same (single database)</li>
+  <li><strong>Native Postgres Role (Apps):</strong> <code>maestro_app</code> with token-based auth from env vars (<code>LAKEBASE_HOST</code>, <code>LAKEBASE_USER</code>, <code>LAKEBASE_PASSWORD</code>, <code>LAKEBASE_DATABASE</code>)</li>
+  <li><strong>SDK Auth (Local):</strong> WorkspaceClient reads Lakebase endpoint from <code>/api/2.0/postgres/</code>, generates credentials via <code>/api/2.0/postgres/credentials</code>, current user from <code>/api/2.0/preview/scim/v2/Me</code></li>
+</ul>
+
+<h3>Observability</h3>
+<ul>
+  <li><strong>MLflow Tracing:</strong> <code>mlflow.pydantic_ai.autolog()</code> auto-captures tool calls, LLM requests, tokens, latency per step</li>
+  <li><strong>MLflow Experiment:</strong> <code>/Users/sathish.gangichetty@databricks.com/maestro-cdp</code></li>
+  <li><strong>DBOS Execution History:</strong> <code>dbos_execution_history</code> table tracks workflow steps, retries, state</li>
+</ul>
+
+<!-- ───────────────────────────── DATABASE SCHEMA ───────────────────────────── -->
+<h2>Database Schema (Lakebase)</h2>
+
+<table>
+  <tr>
+    <th>Table</th>
+    <th>Purpose</th>
+    <th>Key Columns</th>
+  </tr>
+  <tr>
+    <td><code>journey_state</code></td>
+    <td>Durable state for workflows in progress. Updated after Agent 1; read by Step 5 for re-eval.</td>
+    <td>journey_id (PK), customer_id (FK), current_step, next_action_due_ts, state_blob (JSON), status, updated_at</td>
+  </tr>
+  <tr>
+    <td><code>decisions</code></td>
+    <td>All DecisionArtifacts produced by Agent 1. Audit trail for cross-campaign reasoning.</td>
+    <td>decision_id (PK), customer_id (FK), journey_id (FK), trigger_event_id, verdict, decisions (JSON), contributing_signals (JSON), rationale, trace_id, created_at</td>
+  </tr>
+  <tr>
+    <td><code>sent_emails</code></td>
+    <td>Records of simulated email sends. Marks journey completion.</td>
+    <td>email_id (PK), journey_id (FK), customer_id (FK), subject, body_html, body_text, hero_image_url, cta_text, cta_url, sent_at</td>
+  </tr>
+  <tr>
+    <td><code>customers</code></td>
+    <td>Customer master (synthetic in demo, would be Delta on Databricks)</td>
+    <td>customer_id (PK), name, email, pet_name, pet_type, timezone, preferred_channel, consent_email, consent_sms, is_repeat_buyer, loyalty_tier</td>
+  </tr>
+  <tr>
+    <td><code>orders</code></td>
+    <td>Historical orders (would be Delta)</td>
+    <td>order_id (PK), customer_id (FK), order_date, total</td>
+  </tr>
+  <tr>
+    <td><code>order_items</code></td>
+    <td>Line items in orders (would be Delta)</td>
+    <td>item_id (PK), order_id (FK), product_id, qty, price</td>
+  </tr>
+  <tr>
+    <td><code>production_calendar</code></td>
+    <td>Production capacity for fulfillment (would be Delta)</td>
+    <td>product_id, ship_by_date, feasible, production_days</td>
+  </tr>
+  <tr>
+    <td><code>campaigns</code></td>
+    <td>Campaign master (would be Delta)</td>
+    <td>campaign_id (PK), name, campaign_type, status, channel</td>
+  </tr>
+  <tr>
+    <td><code>campaign_membership</code></td>
+    <td>Enrollment of customers in campaigns (would be Delta)</td>
+    <td>customer_id, campaign_id, status, enrolled_at, scheduled_send</td>
+  </tr>
+  <tr>
+    <td><code>support_tickets</code></td>
+    <td>Customer support issues (would be Delta)</td>
+    <td>ticket_id (PK), customer_id (FK), subject, status, priority, created_at, resolved_at</td>
+  </tr>
+  <tr>
+    <td><code>consent</code></td>
+    <td>Customer communication consent (would be Delta)</td>
+    <td>customer_id (FK), channel, consented, updated_at</td>
+  </tr>
+  <tr>
+    <td><code>propensity_scores</code></td>
+    <td>Model Serving outputs (would be Delta, synced from endpoint)</td>
+    <td>customer_id, intent, score, model_version, score_timestamp</td>
+  </tr>
+  <tr>
+    <td><strong>DBOS System Tables</strong></td>
+    <td>Created automatically by DBOS on init</td>
+    <td><code>dbos_execution_history</code>, <code>dbos_kv</code>, etc.</td>
+  </tr>
+</table>
+
+<!-- ───────────────────────────── FRONTEND ───────────────────────────── -->
+<h2>Frontend</h2>
+
+<p>
+React 19 + TypeScript + Vite + Framer Motion + Tailwind CSS. Hosted on Databricks Apps. Shows the 15-minute demo with real-time phase transitions and reasoning trace streaming.
+</p>
+
+<h3>Phase State Machine</h3>
+<p>
+<code>idle → narrative → panels → workflow → email_preview → delivered</code>
+</p>
+
+<h3>Core Components</h3>
+<ul>
+  <li><strong>CampaignPanel</strong> — Lists active campaigns for Cindy; animates state (flagged → suppressed → prioritized)</li>
+  <li><strong>DecisionPanel</strong> — Displays verdict, 5 decision rows, persistence card</li>
+  <li><strong>ReasoningTrace</strong> — Streams tool calls + reasoning steps from MLflow trace</li>
+  <li><strong>WorkflowTimeline</strong> — 7-step timeline with durable sleep visualization</li>
+  <li><strong>CustomerCard</strong> — Cindy's profile, cart, loyalty tier, pet info (Whiskers)</li>
+  <li><strong>EmailPreview</strong> — Renders composed email with hero image and CTA</li>
+</ul>
+
+<h3>Theming</h3>
+<p>
+Databricks dark/light mode CSS variables. Typography: DM Sans (body), DM Mono (code). Colors: db-navy, db-cyan, db-red, db-cream.
+</p>
+
+<!-- ───────────────────────────── API ENDPOINTS ───────────────────────────── -->
+<h2>API Endpoints</h2>
+
+<p>
+FastAPI app in <code>src/maestro/app.py</code>. All endpoints optionally protected by Databricks workspace auth.
+</p>
+
+<table>
+  <tr>
+    <th>Method</th>
+    <th>Path</th>
+    <th>Purpose</th>
+    <th>Response</th>
+  </tr>
+  <tr>
+    <td>POST</td>
+    <td><code>/api/workflow</code></td>
+    <td>Start a unified journey workflow. Body: <code>CartAbandonedEvent</code> JSON.</td>
+    <td><code>{ journey_id, decision_id, email_id, evaluation }</code></td>
+  </tr>
+  <tr>
+    <td>GET</td>
+    <td><code>/api/workflow/{id}/status</code></td>
+    <td>Poll workflow status. Returns current step, decision, email content.</td>
+    <td><code>{ status, current_step, decision, email, journey_state }</code></td>
+  </tr>
+  <tr>
+    <td>GET</td>
+    <td><code>/api/workflow/{id}/phases</code></td>
+    <td>Get 7-phase timeline with timing and status.</td>
+    <td><code>[ { phase_id, name, status, start_ts, end_ts, output } ]</code></td>
+  </tr>
+  <tr>
+    <td>GET</td>
+    <td><code>/api/customer/{cid}/profile</code></td>
+    <td>Fetch customer profile for demo narrative.</td>
+    <td><code>Profile</code> JSON</td>
+  </tr>
+  <tr>
+    <td>GET</td>
+    <td><code>/api/customer/{cid}/cart</code></td>
+    <td>Fetch abandoned cart.</td>
+    <td><code>Cart</code> JSON</td>
+  </tr>
+  <tr>
+    <td>GET</td>
+    <td><code>/api/customer/{cid}/campaigns</code></td>
+    <td>List active campaigns for this customer.</td>
+    <td><code>[ Campaign ]</code></td>
+  </tr>
+  <tr>
+    <td>GET</td>
+    <td><code>/health</code></td>
+    <td>Health check. Returns DBOS status.</td>
+    <td><code>{ status, dbos_ready }</code></td>
+  </tr>
+</table>
+
+<!-- ───────────────────────────── DEMO SCENARIO ───────────────────────────── -->
+<h2>Demo Scenario — Cindy Chen</h2>
+
+<h3>Customer Profile</h3>
+<ul>
+  <li><strong>ID:</strong> <code>cust_88241</code></li>
+  <li><strong>Name:</strong> Cindy Chen</li>
+  <li><strong>Email:</strong> cindy@example.com</li>
+  <li><strong>Pet:</strong> Whiskers (tabby kitten)</li>
+  <li><strong>Timezone:</strong> America/Chicago</li>
+  <li><strong>Loyalty Tier:</strong> Gold (repeat buyer, $800+ annual spend)</li>
+  <li><strong>Quiet Hours:</strong> 9 PM – 7 AM CT</li>
+</ul>
+
+<h3>Abandoned Cart</h3>
+<ul>
+  <li><strong>Product:</strong> "Welcome Home, Whiskers!" premium photo book</li>
+  <li><strong>Price:</strong> $42.00</li>
+  <li><strong>Abandoned At:</strong> 8:18 PM CT (within quiet hours)</li>
+</ul>
+
+<h3>Operational Conflict</h3>
+<ul>
+  <li><strong>Spring Seasonal Campaign:</strong> Queued send for this customer (low priority, email channel)</li>
+  <li><strong>Frequency Cap:</strong> Email limit 2/week. If both campaigns send → breach.</li>
+  <li><strong>Conflict:</strong> Triggered Cart Recovery vs. Active Spring Seasonal = frequency cap breach</li>
+</ul>
+
+<h3>Expected Decision</h3>
+<ul>
+  <li><strong>Verdict:</strong> Re-prioritize</li>
+  <li><strong>Actions:</strong>
+    <ul>
+      <li>Suppress Spring Seasonal for Cindy (lower priority)</li>
+      <li>Prioritize Cart Recovery (triggered, higher priority)</li>
+      <li>Tone: Warm + personal (mention Whiskers)</li>
+      <li>Send Time: 8:00 AM CT next day (adjusted from 11:48 PM to avoid quiet hours)</li>
+      <li>Channel: Email (consented preference)</li>
+    </ul>
+  </li>
+  <li><strong>Rationale:</strong> "Cindy is a gold-tier repeat buyer with high propensity for cart recovery. The abandoned photo book is time-sensitive (fulfillable, no production delays). Spring Seasonal conflicts with frequency cap; suppressing lower-priority campaign respects consent and cap logic. Warm tone with Whiskers personalization matches her repeat buyer + pet owner relationship. Send time adjusted to 8 AM CT to avoid quiet hours (shifts from 11:48 PM)."</li>
+</ul>
+
+<!-- ───────────────────────────── KEY DECISIONS ───────────────────────────── -->
+<h2>Key Architectural Decisions</h2>
+
+<h3>Why Pydantic AI + DBOS (not deepagents, not vstorm)</h3>
+
+<p>
+<strong>The requirement:</strong> Durable agent execution — agents start, stop, and produce state that can be acted upon independently (not conversation checkpointing).
+</p>
+
+<p>
+<strong>Pydantic AI + DBOS on Lakebase:</strong> ACID workflow durability (Postgres inside Databricks) + structured output_type enforcement + native Skills integration + MLflow autolog. All state in governance plane (UC). Zero external dependencies.
+</p>
+
+<p>
+<strong>Deepagents (v0.3.1):</strong> No ACID durability, state on local filesystem, breaks governance thesis, no MLflow integration.
+</p>
+
+<p>
+<strong>Full vstorm ecosystem:</strong> Still no ACID durability, 5 packages at v0.x, Docker dependency (no serverless), wrong web stack for Databricks Apps.
+</p>
+
+<h3>Why Lakebase (not external Postgres)</h3>
+
+<p>
+Lakebase = Postgres inside Databricks. Eliminates network round-trips for state lookups, keeps customer data in governance plane, simplifies auth (WorkspaceClient), simplifies DBOS config (single DB URL). All tables can be UC-protected and audited.
+</p>
+
+<h3>Why Two Agents (not one)</h3>
+
+<p>
+Separation of concerns. Agent 1 (Reasoning) is stateful, long-running, complex. Agent 2 (Copywriter) is stateless, fast, domain-specific. Copywriter only runs if Agent 1 says "proceed" or "adjust". Makes the reasoning artifact the contract between phases. Easier to test, debug, and replace either agent independently.
+</p>
+
+<h3>Why Async Workflow (not batch)</h3>
+
+<p>
+Durable sleep via <code>await DBOS.sleep_async()</code> means the workflow genuinely pauses and wakes — no polling, no Lambda timeout. Process can crash, scale to zero, redeploy — DBOS persists the wake-up time to Postgres and resumes automatically. This is workflow durability, not conversation resumption.
+</p>
+
+<h3>Why Skills (not custom tool registration)</h3>
+
+<p>
+Pydantic AI v0.18+ <code>SkillsCapability(directories=["./app_skills"])</code> loads domain best practices as tool documentation + examples. Tools are still @agent.tool (full control), but Skills provides richer context for the LLM. Example: a skill for "CDP best practices" teaches the agent about frequency caps, quiet hours, consent rules without hardcoding them in the system prompt.
+</p>
+
+<!-- ───────────────────────────── FOOTER ───────────────────────────── -->
+<p style="margin-top:3rem; padding-top:2rem; border-top:1px solid var(--border); color:var(--text-muted); font-size:0.85rem;">
+<strong>Document prepared:</strong> 2026-05-14<br>
+<strong>Implementation status:</strong> 28 tests passing, deployed to Databricks Apps<br>
+<strong>Contact:</strong> sathish.gangichetty@databricks.com
+</p>
+
+</div>
+
+</body>
+</html>
