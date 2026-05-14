@@ -46,16 +46,8 @@ def _get_db_config():
     pg_host = "ep-wispy-bonus-d2qqe068.database.us-east-1.cloud.databricks.com"
     database = "maestro_cdp"
 
-    # Resolve Lakebase password: direct env var OR Databricks secret scope
-    lakebase_pw = os.environ.get("LAKEBASE_PASSWORD")
-    if not lakebase_pw:
-        try:
-            import base64
-            raw = _w.secrets.get_secret(scope="sgscope", key="LAKEBASE_PASSWORD").value
-            lakebase_pw = base64.b64decode(raw).decode("utf-8") if raw else None
-            print("Lakebase password loaded from secret scope: sgscope/LAKEBASE_PASSWORD")
-        except Exception as e:
-            print(f"Failed to read secret sgscope/LAKEBASE_PASSWORD: {e}")
+    # Resolve Lakebase password from env (platform injects via valueFrom or direct)
+    lakebase_pw = os.environ.get("LAKEBASE_PASSWORD") or os.environ.get("LAKEBASE_SECRET_KEY")
 
     if lakebase_pw:
         print("Using Lakebase native Postgres role")
