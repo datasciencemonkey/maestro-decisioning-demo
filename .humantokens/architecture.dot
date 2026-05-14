@@ -1,0 +1,232 @@
+digraph MaestroArchitecture {
+    rankdir=TB;
+    bgcolor="#FFFFFF";
+    fontname="DM Sans,sans-serif";
+    node [fontname="DM Sans,sans-serif", fontsize=11, style=filled, color="#CCCCCC"];
+    edge [fontname="DM Sans,sans-serif", fontsize=9, color="#666666"];
+    label=<<B><FONT POINT-SIZE="18">Maestro CDP Architecture</FONT></B><BR/><FONT POINT-SIZE="11" COLOR="#666666">Unified DBOS Durable Workflow  |  Pydantic AI Agents  |  Databricks Platform</FONT>>;
+    labelloc=t;
+    labeljust=c;
+    pad=0.5;
+    nodesep=0.6;
+    ranksep=0.7;
+
+    // ── External trigger ──────────────────────────────────────────────
+    trigger [
+        label=<<B>cart_abandoned</B><BR/><FONT POINT-SIZE="9">FastAPI /api/workflow</FONT>>,
+        shape=cds, fillcolor="#F5F5F5", color="#999999", fontcolor="#333333"
+    ];
+
+    // ── DBOS Durable Workflow container ───────────────────────────────
+    subgraph cluster_dbos {
+        label=<<B>DBOS Durable Workflow</B><BR/><FONT POINT-SIZE="9" COLOR="#007A66">@DBOS.workflow  |  Checkpointed  |  Survives restarts</FONT>>;
+        style="rounded,bold";
+        color="#00D4AA";
+        bgcolor="#F0FBF8";
+        fontname="DM Sans,sans-serif";
+        fontsize=12;
+        penwidth=2.5;
+        margin=20;
+
+        // ── Step 1: Reasoning Agent ──────────────────────────────────
+        subgraph cluster_agent1 {
+            label=<<B>Step 1: Reasoning Agent</B><BR/><FONT POINT-SIZE="9" COLOR="#2E8B8B">Pydantic AI  |  output=DecisionArtifact  |  ~60s</FONT>>;
+            style="rounded,filled";
+            color="#40D1F5";
+            bgcolor="#E8F8FD";
+            fontname="DM Sans,sans-serif";
+            fontsize=11;
+            penwidth=2;
+            margin=16;
+
+            agent1 [
+                label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="4">
+                    <TR><TD><B>maestro-cdp Agent</B></TD></TR>
+                    <TR><TD><FONT POINT-SIZE="9" COLOR="#555555">SkillsCapability + 9 @agent.tool</FONT></TD></TR>
+                </TABLE>>,
+                shape=box, style="rounded,filled", fillcolor="#40D1F5",
+                fontcolor="#FFFFFF", color="#2BA8CC", penwidth=1.5
+            ];
+
+            tools [
+                label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="2">
+                    <TR><TD COLSPAN="3"><B>9 Tools</B></TD></TR>
+                    <TR><TD ALIGN="LEFT"><FONT POINT-SIZE="8">read_profile</FONT></TD>
+                        <TD ALIGN="LEFT"><FONT POINT-SIZE="8">read_cart</FONT></TD>
+                        <TD ALIGN="LEFT"><FONT POINT-SIZE="8">check_production_feasibility</FONT></TD></TR>
+                    <TR><TD ALIGN="LEFT"><FONT POINT-SIZE="8">list_active_campaigns</FONT></TD>
+                        <TD ALIGN="LEFT"><FONT POINT-SIZE="8">check_frequency_cap</FONT></TD>
+                        <TD ALIGN="LEFT"><FONT POINT-SIZE="8">read_support_tickets</FONT></TD></TR>
+                    <TR><TD ALIGN="LEFT"><FONT POINT-SIZE="8">score_propensity</FONT></TD>
+                        <TD ALIGN="LEFT"><FONT POINT-SIZE="8">optimal_send_time</FONT></TD>
+                        <TD ALIGN="LEFT"><FONT POINT-SIZE="8">persist_journey_state</FONT></TD></TR>
+                </TABLE>>,
+                shape=box, style="rounded,filled", fillcolor="#DDEEFF",
+                color="#4462C9", fontcolor="#333333", penwidth=1
+            ];
+
+            agent1 -> tools [label="@agent.tool", style=dashed, color="#4462C9", fontcolor="#4462C9"];
+        }
+
+        // ── Steps 2-3: Persist ───────────────────────────────────────
+        persist [
+            label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="2">
+                <TR><TD><B>Steps 2-3: Persist</B></TD></TR>
+                <TR><TD><FONT POINT-SIZE="9">save_journey_step</FONT></TD></TR>
+                <TR><TD><FONT POINT-SIZE="9">persist_decision_step</FONT></TD></TR>
+            </TABLE>>,
+            shape=box, style="rounded,filled", fillcolor="#00D4AA",
+            fontcolor="#FFFFFF", color="#009E7E", penwidth=1.5
+        ];
+
+        // ── Step 4: Durable Sleep ────────────────────────────────────
+        sleep [
+            label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="2">
+                <TR><TD><B>Step 4: Durable Sleep</B></TD></TR>
+                <TR><TD><FONT POINT-SIZE="9">DBOS.sleep_async(15-20s)</FONT></TD></TR>
+                <TR><TD><FONT POINT-SIZE="9" COLOR="#CC6600">Survives process restarts</FONT></TD></TR>
+            </TABLE>>,
+            shape=box, style="rounded,filled", fillcolor="#FF8C2A",
+            fontcolor="#FFFFFF", color="#CC6600", penwidth=1.5
+        ];
+
+        // ── Step 5: Re-evaluate ──────────────────────────────────────
+        reeval [
+            label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="2">
+                <TR><TD><B>Step 5: Re-evaluate</B></TD></TR>
+                <TR><TD><FONT POINT-SIZE="9">re_evaluate_context()</FONT></TD></TR>
+                <TR><TD><FONT POINT-SIZE="9" COLOR="#555555">Plain function (NOT an agent)</FONT></TD></TR>
+            </TABLE>>,
+            shape=box, style="rounded,filled", fillcolor="#E8E8E8",
+            fontcolor="#333333", color="#999999", penwidth=1.5
+        ];
+
+        // ── Step 6: Copywriter Agent ─────────────────────────────────
+        subgraph cluster_agent2 {
+            label=<<B>Step 6: Copywriter Agent</B><BR/><FONT POINT-SIZE="9" COLOR="#2E8B8B">Pydantic AI  |  output=EmailContent  |  ~60s</FONT>>;
+            style="rounded,filled";
+            color="#40D1F5";
+            bgcolor="#E8F8FD";
+            fontname="DM Sans,sans-serif";
+            fontsize=11;
+            penwidth=2;
+            margin=16;
+
+            agent2 [
+                label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="4">
+                    <TR><TD><B>fluttershy-copywriter Agent</B></TD></TR>
+                    <TR><TD><FONT POINT-SIZE="9" COLOR="#555555">Personalized cart recovery email</FONT></TD></TR>
+                </TABLE>>,
+                shape=box, style="rounded,filled", fillcolor="#40D1F5",
+                fontcolor="#FFFFFF", color="#2BA8CC", penwidth=1.5
+            ];
+        }
+
+        // ── Step 7: Simulate Send ────────────────────────────────────
+        send [
+            label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="2">
+                <TR><TD><B>Step 7: Simulate Send</B></TD></TR>
+                <TR><TD><FONT POINT-SIZE="9">simulate_send_step()</FONT></TD></TR>
+                <TR><TD><FONT POINT-SIZE="9" COLOR="#555555">sent_emails table</FONT></TD></TR>
+            </TABLE>>,
+            shape=box, style="rounded,filled", fillcolor="#00D4AA",
+            fontcolor="#FFFFFF", color="#009E7E", penwidth=1.5
+        ];
+
+        // ── Workflow edges (inside DBOS) ─────────────────────────────
+        agent1 -> persist [label="DecisionArtifact\n(JSON)", color="#333333", fontcolor="#333333", penwidth=1.5];
+        persist -> sleep [label="checkpoint", color="#333333", fontcolor="#333333", penwidth=1.5];
+        sleep -> reeval [label="wake", color="#FF8C2A", fontcolor="#CC6600", penwidth=1.5];
+        reeval -> agent2 [label="proceed / adjust", color="#333333", fontcolor="#333333", penwidth=1.5];
+        agent2 -> send [label="EmailContent\n(JSON)", color="#333333", fontcolor="#333333", penwidth=1.5];
+    }
+
+    // ── External Services ─────────────────────────────────────────────
+
+    // AI Gateway
+    aigateway [
+        label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="2">
+            <TR><TD><B>AI Gateway</B></TD></TR>
+            <TR><TD><FONT POINT-SIZE="9">Claude Sonnet 4</FONT></TD></TR>
+            <TR><TD><FONT POINT-SIZE="9">AsyncDatabricksOpenAI</FONT></TD></TR>
+        </TABLE>>,
+        shape=box, style="rounded,filled", fillcolor="#FF3621",
+        fontcolor="#FFFFFF", color="#CC2A1A", penwidth=1.5
+    ];
+
+    // UC Functions / Hosted MCPs
+    ucfunctions [
+        label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="2">
+            <TR><TD><B>UC Functions / Hosted MCPs</B></TD></TR>
+            <TR><TD><FONT POINT-SIZE="9">9 data tools (synthetic in demo)</FONT></TD></TR>
+            <TR><TD><FONT POINT-SIZE="9">customers, orders, campaigns, ...</FONT></TD></TR>
+        </TABLE>>,
+        shape=box, style="rounded,filled", fillcolor="#4462C9",
+        fontcolor="#FFFFFF", color="#3350A8", penwidth=1.5
+    ];
+
+    // Lakebase
+    lakebase [
+        label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="2">
+            <TR><TD><B>Lakebase (Managed Postgres)</B></TD></TR>
+            <TR><TD><FONT POINT-SIZE="9">journey_state  |  decisions  |  sent_emails</FONT></TD></TR>
+            <TR><TD><FONT POINT-SIZE="9">DBOS system tables (checkpoints)</FONT></TD></TR>
+        </TABLE>>,
+        shape=cylinder, style=filled, fillcolor="#00D4AA",
+        fontcolor="#FFFFFF", color="#009E7E", penwidth=1.5
+    ];
+
+    // MLflow Tracing
+    mlflow [
+        label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="2">
+            <TR><TD><B>MLflow Tracing</B></TD></TR>
+            <TR><TD><FONT POINT-SIZE="9">pydantic_ai.autolog()</FONT></TD></TR>
+            <TR><TD><FONT POINT-SIZE="9">tool calls, LLM requests, tokens</FONT></TD></TR>
+        </TABLE>>,
+        shape=box, style="rounded,filled", fillcolor="#9B59B6",
+        fontcolor="#FFFFFF", color="#7D3C98", penwidth=1.5
+    ];
+
+    // Unity Catalog Governance
+    ucgov [
+        label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="2">
+            <TR><TD><B>Unity Catalog Governance</B></TD></TR>
+            <TR><TD><FONT POINT-SIZE="9">Tool governance, access control, lineage</FONT></TD></TR>
+        </TABLE>>,
+        shape=box, style="rounded,filled", fillcolor="#FF3621",
+        fontcolor="#FFFFFF", color="#CC2A1A", penwidth=1.5
+    ];
+
+    // ── External edges ────────────────────────────────────────────────
+
+    // Trigger -> Agent 1
+    trigger -> agent1 [label="CartAbandonedEvent", color="#333333", fontcolor="#333333", penwidth=1.5];
+
+    // Agent 1 -> AI Gateway (LLM)
+    agent1 -> aigateway [label="LLM reasoning", color="#FF3621", fontcolor="#CC2A1A", penwidth=1.5, style=bold];
+
+    // Agent 2 -> AI Gateway (LLM)
+    agent2 -> aigateway [label="LLM compose", color="#FF3621", fontcolor="#CC2A1A", penwidth=1.5, style=bold];
+
+    // Agent 1 tools -> UC Functions
+    tools -> ucfunctions [label="@agent.tool\ndata reads", color="#4462C9", fontcolor="#3350A8", penwidth=1.5];
+
+    // Persist -> Lakebase
+    persist -> lakebase [label="ACID txn\npersist", color="#00D4AA", fontcolor="#007A66", penwidth=1.5];
+
+    // Send -> Lakebase
+    send -> lakebase [label="INSERT\nsent_emails", color="#00D4AA", fontcolor="#007A66", penwidth=1.5];
+
+    // Both agents -> MLflow (tracing)
+    agent1 -> mlflow [label="auto-trace", color="#9B59B6", fontcolor="#7D3C98", style=dashed, penwidth=1];
+    agent2 -> mlflow [label="auto-trace", color="#9B59B6", fontcolor="#7D3C98", style=dashed, penwidth=1];
+
+    // UC Governance encompasses UC Functions and AI Gateway
+    ucgov -> ucfunctions [label="governs", color="#FF3621", fontcolor="#CC2A1A", style=dashed, penwidth=1];
+    ucgov -> aigateway [label="governs", color="#FF3621", fontcolor="#CC2A1A", style=dashed, penwidth=1];
+    ucgov -> lakebase [label="governs", color="#FF3621", fontcolor="#CC2A1A", style=dashed, penwidth=1];
+
+    // ── Layout hints ──────────────────────────────────────────────────
+    {rank=same; aigateway; ucfunctions;}
+    {rank=same; lakebase; mlflow; ucgov;}
+}
