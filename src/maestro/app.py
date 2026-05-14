@@ -50,7 +50,9 @@ def _get_db_config():
     lakebase_pw = os.environ.get("LAKEBASE_PASSWORD")
     if not lakebase_pw:
         try:
-            lakebase_pw = _w.secrets.get_secret(scope="sgscope", key="LAKEBASE_PASSWORD").value
+            import base64
+            raw = _w.secrets.get_secret(scope="sgscope", key="LAKEBASE_PASSWORD").value
+            lakebase_pw = base64.b64decode(raw).decode("utf-8") if raw else None
             print("Lakebase password loaded from secret scope: sgscope/LAKEBASE_PASSWORD")
         except Exception as e:
             print(f"Failed to read secret sgscope/LAKEBASE_PASSWORD: {e}")
