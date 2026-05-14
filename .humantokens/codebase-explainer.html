@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maestro CDP — Codebase Explainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0B2026;
+    --surface: #0f2d34;
+    --surface2: #143a43;
+    --border: #1e4f5a;
+    --text: #F9F7F4;
+    --text-muted: #8fb5bf;
+    --accent: #40d1f5;
+    --green: #00D4AA;
+    --red: #FF3621;
+    --orange: #FF8C2A;
+    --purple: #4462c9;
+    --db-red: #FF3621;
+    --db-cyan: #40d1f5;
+    --db-navy: #0B2026;
+    --db-cream: #F9F7F4;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #F9F7F4;
+      --surface: #FFFFFF;
+      --surface2: #F1F5FA;
+      --border: #D8DEE4;
+      --text: #0B2026;
+      --text-muted: #4A4A4A;
+      --accent: #1B6AC9;
+      --green: #00875A;
+      --red: #D0021B;
+      --orange: #C75300;
+      --purple: #4462c9;
+      --db-red: #FF3621;
+      --db-cyan: #1B6AC9;
+      --db-navy: #0B2026;
+      --db-cream: #F9F7F4;
+    }
+    .db-header { background: linear-gradient(135deg, #0B2026 0%, #143a43 100%); }
+    .db-header .db-logo-text, .db-header .db-header-title { color: #F9F7F4; }
+    .callout { background: rgba(27,106,201,0.06); border-color: rgba(27,106,201,0.25); }
+    .badge-green { background: rgba(0,135,90,0.12); }
+    .badge-red { background: rgba(208,2,27,0.1); }
+    .badge-orange { background: rgba(199,83,0,0.1); }
+    code { background: rgba(27,106,201,0.08); }
+    pre { background: #F1F5FA; border-color: var(--border); }
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 0;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .db-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 2rem;
+    border-bottom: 2px solid var(--db-red);
+    background: linear-gradient(135deg, #0B2026 0%, #0f2d34 100%);
+    margin-bottom: 0.5rem;
+  }
+
+  .db-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .db-logo svg { width: 32px; height: 32px; }
+  .db-logo-text { font-size: 1rem; font-weight: 700; color: var(--db-cream); letter-spacing: 0.02em; }
+  .db-header-divider { width: 1px; height: 24px; background: var(--border); }
+  .db-header-title { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+
+  .content-wrap { padding: 1.5rem 2rem 2rem; }
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 0.25rem;
+    font-weight: 700;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--db-cyan);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+    font-weight: 700;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--purple);
+    font-weight: 700;
+  }
+
+  .subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin: 1rem 0;
+  }
+
+  .card-blue { border-left: 4px solid var(--accent); }
+
+  .callout {
+    background: rgba(64,209,245,0.08);
+    border: 1px solid rgba(64,209,245,0.3);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+  }
+
+  code {
+    background: var(--surface2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-family: 'DM Mono', monospace;
+  }
+
+  pre {
+    background: var(--surface2);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    margin: 1rem 0;
+    border: 1px solid var(--border);
+    font-family: 'DM Mono', monospace;
+    line-height: 1.5;
+  }
+
+  ul, ol { margin: 0.5rem 0 0.5rem 1.5rem; }
+  li { margin-bottom: 0.3rem; }
+
+  .section-intro {
+    font-size: 1rem;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+    line-height: 1.7;
+  }
+
+  .code-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .explanation {
+    background: var(--surface);
+    border-left: 4px solid var(--accent);
+    padding: 0.75rem 1rem;
+    margin: 0.75rem 0;
+    border-radius: 4px;
+    font-size: 0.95rem;
+  }
+
+  .highlight {
+    color: var(--orange);
+    font-weight: 600;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+  }
+
+  th {
+    background: var(--surface2);
+    color: var(--accent);
+    text-align: left;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border);
+  }
+
+  td {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  tr:nth-child(even) td { background: var(--surface); }
+
+  .flow-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 1rem 0;
+    padding: 1rem;
+    background: var(--surface);
+    border-left: 4px solid var(--green);
+    border-radius: 4px;
+  }
+
+  .flow-step {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .flow-step-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    background: var(--orange);
+    color: var(--bg);
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 0.75rem;
+  }
+
+  .flow-step-text {
+    flex: 1;
+    font-size: 0.95rem;
+  }
+
+  .flow-step-code {
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+  }
+</style>
+</head>
+<body>
+
+<div class="db-header">
+  <div class="db-logo">
+    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="20" cy="20" r="18" fill="var(--db-red)" opacity="0.1" stroke="var(--db-red)" stroke-width="1.5"/>
+      <path d="M20 10v20M10 20h20" stroke="var(--db-red)" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <span class="db-logo-text">MAESTRO</span>
+  </div>
+  <div class="db-header-divider"></div>
+  <span class="db-header-title">Codebase Explainer — Agent Loop</span>
+</div>
+
+<div class="content-wrap">
+
+<h1>Maestro CDP — Codebase Explainer</h1>
+<p class="subtitle">How the agent loop works, step by step. A guided walkthrough of the reasoning agent, copywriter agent, and DBOS workflow that orchestrates them.</p>
+
+<div class="callout">
+  <strong>Audience:</strong> You're new to the codebase and want to understand how the agent loop works. This document walks you through the actual code — no pseudocode, real imports, real function signatures, real prompts.
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+
+<h2>1. The Big Picture</h2>
+
+<p class="section-intro">
+When a customer abandons their cart, a single DBOS workflow fires. Inside that workflow, two Pydantic AI agents do the thinking — one decides what to do, the other writes the email.
+
+Here's what happens:
+</p>
+
+<div class="flow-summary">
+  <div class="flow-step">
+    <div class="flow-step-num">1</div>
+    <div class="flow-step-text"><span class="flow-step-code">CartAbandonedEvent</span> fires (from the frontend or event stream)</div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-step-num">2</div>
+    <div class="flow-step-text"><span class="highlight">Agent 1</span> (Reasoning) wakes up, reads 8 tools about customer, cart, campaigns, feasibility, timing</div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-step-num">3</div>
+    <div class="flow-step-text">Agent 1 produces a <span class="flow-step-code">DecisionArtifact</span> — what to do, why, and when</div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-step-num">4</div>
+    <div class="flow-step-text">DBOS persists the decision to Lakebase, then sleeps (simulating the optimal send window)</div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-step-num">5</div>
+    <div class="flow-step-text">DBOS wakes up, re-evaluates context (check for changes), then hands off to Agent 2</div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-step-num">6</div>
+    <div class="flow-step-text"><span class="highlight">Agent 2</span> (Copywriter) receives the decision artifact and writes the email</div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-step-num">7</div>
+    <div class="flow-step-text">DBOS simulates sending the email and updates journey status to completed</div>
+  </div>
+</div>
+
+<div class="explanation">
+<strong>Why two agents?</strong> Agent 1 is a <em>reasoner</em> — it considers constraints, makes trade-offs, decides next steps. Agent 2 is a <em>writer</em> — it takes that decision and makes it human and personal. Separating concerns keeps both agents focused and testable.
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+
+<h2>2. How Agent 1 (Reasoning) Is Built</h2>
+
+<p class="section-intro">
+Agent 1 lives in <code>src/maestro/agent.py</code>. It's a single Pydantic AI agent that reasons across 9 domains (customer profile, cart, campaigns, feasibility, frequency caps, support tickets, propensity scores, send timing, and journey persistence). Let's walk through how it's constructed.
+</p>
+
+<h3>2a. The MaestroDeps Dataclass — Dependency Injection</h3>
+
+<p>Every tool in the agent receives a <span class="highlight">RunContext</span> that includes dependencies. Here's what gets injected:</p>
+
+<pre><code>@dataclass
+class MaestroDeps:
+    """Runtime dependencies injected into every tool via RunContext."""
+
+    customer_id: str
+    event: CartAbandonedEvent
+    db_url: str | None = None</code></pre>
+
+<div class="explanation">
+The <code>customer_id</code> and <code>event</code> are passed when the agent is created. Every <code>@agent.tool</code> decorated function receives a <code>ctx: RunContext[MaestroDeps]</code> parameter that lets it access these dependencies without global state.
+</div>
+
+<h3>2b. The System Prompt — What Agent 1 Is Told</h3>
+
+<p>The system prompt is the agent's constitution. It's long (100+ lines), but here's the key sections:</p>
+
+<pre><code>SYSTEM_PROMPT = """\
+You are the agentic CDP disposition engine for Fluttershy, a print-on-demand
+photo product brand. A cart_abandoned event has fired.
+
+YOUR GOAL: Decide how to engage this customer for cart recovery, balancing:
+  • Their context (profile, cart, support history)
+  • Operational constraints (production calendar, frequency caps, consent)
+  • Likelihood of conversion (propensity score)
+  • Optimal timing (send-time model + quiet-hours policy)
+
+REASONING APPROACH — this is critical:
+  1. Start by understanding WHO the customer is (profile) and WHAT they left
+     behind (cart). These inform every subsequent decision.
+  2. Check operational constraints — can we even fulfill this order? Are there
+     campaign conflicts? Would another send breach frequency caps?
+  3. Assess likelihood and timing — how likely is recovery? When should we act?
+  4. YOU DECIDE the order of tool calls based on what you learn. When a tool's
+     output makes a subsequent tool unnecessary, SKIP it and explain why.
+  5. When two signals contradict (e.g., customer is in an active campaign AND
+     frequency cap would breach), reconcile them explicitly — state the
+     conflict, your resolution, and why.
+
+DECISION OUTPUT:
+When you have enough information, produce a DecisionArtifact with:
+  • verdict: your overall recommendation (e.g., "re-prioritize", "suppress",
+    "proceed", "defer")
+  • decisions: specific actions — each with type, target/value, and reason:
+    - suppress_from: remove customer from a lower-priority campaign
+    - prioritize_in: elevate a campaign for this customer
+    - tone: communication style (warm/personal, professional, empathetic)
+    - send_time: when to send, with timezone
+    - channel: communication channel (email, sms, push)
+  • contributing_signals: each signal that influenced your decision, with weight
+  • rationale: one paragraph, human-legible, explaining your reasoning chain
+
+...
+CDP DOMAIN KNOWLEDGE:
+  Campaign Priority: triggered > active/scheduled > paused > dormant
+  Frequency Cap Resolution: suppress lower-priority campaign, never the triggered one
+  Quiet Hours: 9 PM – 7 AM in customer timezone; shift to next 8 AM
+  Tone: pet owner → warm/personal with pet name; repeat buyer → familiar; new → welcoming
+"""</code></pre>
+
+<div class="explanation">
+Notice the prompt emphasizes <strong>reasoning, not scripting</strong>. It tells Claude to skip tools when unnecessary ("when a tool's output makes a subsequent tool unnecessary, SKIP it"), to reconcile contradictions, and to explain trade-offs. This is the opposite of a rigid function-calling pipeline.
+</div>
+
+<h3>2c. Agent Construction</h3>
+
+<p>The agent is created with Pydantic AI's builder pattern:</p>
+
+<pre><code>def create_agent(model) -> Agent[MaestroDeps, DecisionArtifact]:
+    """Create the Maestro CDP agent with all tools registered."""
+
+    maestro_agent = Agent(
+        model,
+        output_type=DecisionArtifact,
+        deps_type=MaestroDeps,
+        instructions=SYSTEM_PROMPT,
+        name="maestro-cdp",
+        retries=1,
+        capabilities=[SkillsCapability(directories=["./app_skills"])],
+    )
+
+    # ... tools registered below ...
+
+    return maestro_agent</code></pre>
+
+<div class="explanation">
+Key parameters:
+<ul>
+<li><code>output_type=DecisionArtifact</code> — Claude must output structured JSON that matches this Pydantic model. If the LLM returns something that doesn't parse, Pydantic AI retries.</li>
+<li><code>deps_type=MaestroDeps</code> — every tool receives <code>ctx: RunContext[MaestroDeps]</code> to access customer ID and event.</li>
+<li><code>instructions=SYSTEM_PROMPT</code> — the reasoning constitution above.</li>
+<li><code>retries=1</code> — if Claude's first output doesn't match the schema, try once more.</li>
+</ul>
+</div>
+
+<h3>2d. Tool Registration — The @agent.tool Decorator</h3>
+
+<p>Tools are async functions decorated with <code>@maestro_agent.tool</code>. Here are two examples:</p>
+
+<pre><code>    @maestro_agent.tool
+    async def read_profile(
+        ctx: RunContext[MaestroDeps], customer_id: str
+    ) -> Profile:
+        """Read the customer profile — demographics, pet info, timezone,
+        channel preferences, consent status, and loyalty tier."""
+        if customer_id in PROFILES:
+            return PROFILES[customer_id]
+        raise ValueError(f"Unknown customer: {customer_id}")
+
+    @maestro_agent.tool
+    async def check_frequency_cap(
+        ctx: RunContext[MaestroDeps],
+        customer_id: str,
+        channel: str,
+        window_days: int,
+    ) -> CapStatus:
+        """Check if sending on this channel would breach the frequency cap.
+        Returns current count, queued count, cap limit, and breach status."""
+        key = (customer_id, channel)
+        if key in CAP_STATUSES:
+            return CAP_STATUSES[key]
+        return CapStatus(
+            customer_id=customer_id, channel=channel,
+            cap=3, current=0, queued=0, status="ok", window_days=window_days,
+        )</code></pre>
+
+<div class="explanation">
+Every tool is:
+<ul>
+<li><strong>Async</strong> — Pydantic AI runs them concurrently when possible.</li>
+<li><strong>Documented</strong> — the docstring tells Claude what the tool does. Claude reads these docs before deciding which tool to call.</li>
+<li><strong>Typed</strong> — input and return types are explicit. Pydantic AI validates inputs before calling the tool.</li>
+<li><strong>Injectable</strong> — the <code>ctx: RunContext[MaestroDeps]</code> parameter provides access to customer ID, event, and database URL without global state.</li>
+</ul>
+</div>
+
+<p>There are 8 more tools in the full agent: <code>read_cart</code>, <code>check_production_feasibility</code>, <code>list_active_campaigns</code>, <code>read_support_tickets</code>, <code>score_propensity</code>, <code>optimal_send_time</code>, and <code>persist_journey_state</code>. All follow the same pattern.</p>
+
+<h3>2e. The Runner — run_maestro()</h3>
+
+<p>The runner is the entry point. It's called from the API or workflow:</p>
+
+<pre><code>async def run_maestro(
+    event: CartAbandonedEvent,
+    model,
+    db_url: str | None = None,
+) -> DecisionArtifact:
+    """Run the Maestro agent on a cart_abandoned event.
+
+    Returns a structured DecisionArtifact with verdict, decisions,
+    contributing signals, and rationale.
+    """
+    agent = create_agent(model)
+    deps = MaestroDeps(
+        customer_id=event.customer_id,
+        event=event,
+        db_url=db_url,
+    )
+
+    prompt = (
+        f"Cart abandoned event for customer {event.customer_id}. "
+        f"Cart ID: {event.cart_id}. "
+        f"Items: {[item.model_dump() for item in event.items]}. "
+        f"Total: ${event.cart_total:.2f}. "
+        f"Abandoned at: {event.abandoned_at.isoformat()}. "
+        f"Evaluate this customer for cart recovery disposition."
+    )
+
+    result = await agent.run(prompt, deps=deps)
+    return result.output</code></pre>
+
+<div class="explanation">
+The runner:
+<ul>
+<li>Creates the agent (which registers all tools).</li>
+<li>Builds the <code>MaestroDeps</code> with customer ID and event data.</li>
+<li>Constructs a short prompt that references the event and asks the agent to decide.</li>
+<li>Calls <code>await agent.run(prompt, deps=deps)</code> — this is where Claude reasons.</li>
+<li>Returns the parsed <code>DecisionArtifact</code>.</li>
+</ul>
+
+<strong>What happens inside <code>agent.run()</code>?</strong> Claude reads the system prompt, considers the tools, decides which ones to call, calls them (asynchronously), sees the results, and repeats until it has enough information. Then it outputs a JSON structure that Pydantic AI parses into a <code>DecisionArtifact</code> object.
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+
+<h2>3. How Agent 2 (Copywriter) Is Built</h2>
+
+<p class="section-intro">
+Agent 2 lives in <code>src/maestro/email_agent.py</code>. It's simpler than Agent 1 — no tools, no branching logic. It receives context (customer profile, cart, tone decision) and writes a short, branded email. It's a pure text generation task.
+</p>
+
+<h3>3a. The System Prompt</h3>
+
+<pre><code>COPYWRITER_PROMPT = """\
+You are a DTC email copywriter for Fluttershy, a premium pet photo products brand.
+
+Write a warm, personal cart recovery email. Rules:
+  - Subject line: under 50 characters, mention the pet by name if available
+  - Body: under 100 words, conversational, mention the specific product left behind
+  - Tone: {tone} — match the customer's relationship with the brand
+  - Use the pet's name naturally (not forced). If no pet, focus on the product.
+  - Include one clear CTA. Never use urgency tactics, guilt, or countdown timers.
+  - The hero image URL is: {hero_image_url}
+  - CTA URL is: https://fluttershy.com/cart/resume?cid={customer_id}
+
+Write the body_html as a simple HTML fragment (no full document, no <html> tags).
+Use <h1> for greeting, <p> for body, styled simply. The email template wrapper
+handles the outer chrome.
+"""</code></pre>
+
+<div class="explanation">
+This prompt is <strong>prescriptive</strong> — it gives hard rules (50 char subject, 100 word body, specific URLs) and tone constraints. Unlike Agent 1's reasoning prompt, this one says "do this, not that."
+</div>
+
+<h3>3b. CopywriterDeps — What Context Agent 2 Receives</h3>
+
+<pre><code>@dataclass
+class CopywriterDeps:
+    customer_id: str
+    profile: Profile
+    cart: Cart
+    tone: str
+    hero_image_url: str</code></pre>
+
+<div class="explanation">
+Agent 2 doesn't need to fetch anything. It receives everything it needs as dependencies:
+<ul>
+<li><code>profile</code> — customer name, pet name, loyalty tier (for tone calibration).</li>
+<li><code>cart</code> — the abandoned items (to mention specifically in the email).</li>
+<li><code>tone</code> — extracted from Agent 1's decision (e.g., "warm + personal").</li>
+<li><code>hero_image_url</code> — static (e.g., "/whiskers.jpg"), but could be dynamic per customer.</li>
+</ul>
+</div>
+
+<h3>3c. Agent Construction</h3>
+
+<pre><code>def create_copywriter_agent(model) -> Agent[CopywriterDeps, EmailContent]:
+    """Create the copywriter agent."""
+    return Agent(
+        model,
+        output_type=EmailContent,
+        deps_type=CopywriterDeps,
+        instructions=COPYWRITER_PROMPT,
+        name="fluttershy-copywriter",
+        retries=1,
+    )</code></pre>
+
+<div class="explanation">
+Same pattern as Agent 1: structured output (<code>EmailContent</code>), dependency injection, system prompt, retries. But no tools — Claude just reads the context and writes.
+</div>
+
+<h3>3d. Building the Prompt and Running Agent 2</h3>
+
+<pre><code>async def compose_email(
+    artifact_json: str,
+    model,
+) -> EmailContent:
+    """Compose a personalized email from the decision artifact context.
+
+    Uses synthetic data to look up profile/cart, then runs the copywriter agent.
+    """
+    from maestro.synthetic import CARTS, PROFILES
+
+    artifact = json.loads(artifact_json)
+    customer_id = artifact.get("customer_id", "cust_88241")
+    profile = PROFILES.get(customer_id)
+    cart = CARTS.get(customer_id)
+
+    if not profile or not cart:
+        raise ValueError(f"No profile/cart for customer: {customer_id}")
+
+    decisions = artifact.get("decisions", [])
+    tone_decision = next((d for d in decisions if d.get("type") == "tone"), None)
+    tone = tone_decision.get("value", "warm + personal") if tone_decision else "warm + personal"
+
+    agent = create_copywriter_agent(model)
+    deps = CopywriterDeps(
+        customer_id=customer_id,
+        profile=profile,
+        cart=cart,
+        tone=tone,
+        hero_image_url="/whiskers.jpg",
+    )
+    prompt = build_email_prompt(artifact, profile, cart)
+    result = await agent.run(prompt, deps=deps)
+    return result.output</code></pre>
+
+<div class="explanation">
+The flow:
+<ul>
+<li>Extract customer ID and tone from Agent 1's decision artifact.</li>
+<li>Load profile and cart from synthetic data (in production, this would be Lakebase).</li>
+<li>Build <code>CopywriterDeps</code> with all context.</li>
+<li>Call <code>await agent.run(prompt, deps=deps)</code> — Claude writes the email.</li>
+<li>Return the parsed <code>EmailContent</code> (subject, body_html, body_text, CTA, etc.).</li>
+</ul>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+
+<h2>4. The Output Models</h2>
+
+<p class="section-intro">
+Pydantic models define what each agent outputs. These are the contracts between agents and the workflow.
+</p>
+
+<h3>4a. DecisionArtifact — What Agent 1 Produces</h3>
+
+<pre><code>class Decision(BaseModel):
+    type: str  # suppress_from, prioritize_in, tone, send_time, channel
+    target: str | None = None
+    value: str | None = None
+    weight: float | None = None
+    reason: str | None = None
+
+
+class ContributingSignal(BaseModel):
+    signal: str
+    value: Any
+    weight: float
+
+
+class DecisionArtifact(BaseModel):
+    decision_id: str
+    customer_id: str
+    journey_id: str
+    trigger_event_id: str
+    verdict: str
+    decisions: list[Decision]
+    contributing_signals: list[ContributingSignal]
+    rationale: str
+    trace_id: str | None = None
+    created_at: datetime</code></pre>
+
+<div class="explanation">
+<code>DecisionArtifact</code> is the structured output of Agent 1. It includes:
+<ul>
+<li><code>verdict</code> — the recommendation (e.g., "re-prioritize", "proceed", "defer").</li>
+<li><code>decisions</code> — a list of specific actions: suppress campaigns, prioritize campaigns, set tone, pick send time, pick channel.</li>
+<li><code>contributing_signals</code> — which inputs influenced the decision and how much (weight 0-1).</li>
+<li><code>rationale</code> — one paragraph explaining the reasoning chain (human-readable).</li>
+<li>IDs for tracing: <code>decision_id</code>, <code>journey_id</code>, <code>trace_id</code> (MLflow).</li>
+</ul>
+</div>
+
+<h3>4b. EmailContent — What Agent 2 Produces</h3>
+
+<pre><code>class EmailContent(BaseModel):
+    subject: str
+    body_html: str
+    body_text: str
+    hero_image_url: str
+    cta_text: str
+    cta_url: str</code></pre>
+
+<div class="explanation">
+Agent 2 outputs the complete email payload:
+<ul>
+<li><code>subject</code> — subject line (max 50 chars per the prompt).</li>
+<li><code>body_html</code> and <code>body_text</code> — the email content in both formats.</li>
+<li><code>hero_image_url</code>, <code>cta_text</code>, <code>cta_url</code> — the image and call-to-action.</li>
+</ul>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+
+<h2>5. How the Workflow Orchestrates Both Agents</h2>
+
+<p class="section-intro">
+The workflow lives in <code>src/maestro/workflow.py</code>. It's a single async DBOS function decorated with <code>@DBOS.workflow()</code>. It owns the lifecycle: create the event, run Agent 1, persist the decision, sleep, re-evaluate, run Agent 2, simulate send. If the server crashes during the sleep, DBOS picks up exactly where it left off.
+</p>
+
+<h3>5a. Helper Functions</h3>
+
+<pre><code>def _get_db_params() -> dict:
+    """Get Lakebase connection params — env vars (Apps) or SDK (local)."""
+    import os
+    if os.environ.get("LAKEBASE_PASSWORD"):
+        return dict(
+            host=os.environ.get("LAKEBASE_HOST", "ep-wispy-bonus-d2qqe068.database.us-east-1.cloud.databricks.com"),
+            port=5432,
+            database=os.environ.get("LAKEBASE_DATABASE", "maestro_cdp"),
+            user=os.environ.get("LAKEBASE_USER", "maestro_app"),
+            password=os.environ["LAKEBASE_PASSWORD"],
+            sslmode="require",
+        )
+    from maestro.app import app
+    if hasattr(app.state, "db_params") and app.state.db_params:
+        return app.state.db_params
+    from maestro.bootstrap import get_lakebase_conn_params as _cli_params
+    return _cli_params()
+
+
+def _get_model():
+    """Get the module-level MODEL from app.py (already initialized)."""
+    from maestro.app import MODEL
+    return MODEL</code></pre>
+
+<div class="explanation">
+These helpers solve two problems:
+<ul>
+<li><code>_get_db_params()</code> — handles both local (SDK-based auth) and cloud (env-var-based) deployments.</li>
+<li><code>_get_model()</code> — retrieves the pre-initialized LLM model. We don't create a new one per workflow step; we reuse the module-level instance.</li>
+</ul>
+</div>
+
+<h3>5b. Async DBOS Steps (for LLM Calls)</h3>
+
+<pre><code>@DBOS.step()
+async def run_agent_step(event_json: str) -> str:
+    """Run the Maestro agent. Returns DecisionArtifact as JSON."""
+    from maestro.agent import run_maestro
+
+    event = CartAbandonedEvent.model_validate_json(event_json)
+    model = _get_model()
+    result = await run_maestro(event, model, None)
+    return result.model_dump_json()
+
+
+@DBOS.step()
+async def compose_email_step(artifact_json: str) -> str:
+    """Compose personalized email via copywriter agent. Returns EmailContent JSON."""
+    from maestro.email_agent import compose_email
+
+    model = _get_model()
+    email = await compose_email(artifact_json, model)
+    return email.model_dump_json()</code></pre>
+
+<div class="explanation">
+<code>@DBOS.step()</code> marks a function as a durable step. DBOS:
+<ul>
+<li>Checkpoints <em>after</em> each step completes (not before).</li>
+<li>Persists the checkpoint to Lakebase (the system database).</li>
+<li>If the process crashes, DBOS rehydrates from the last checkpoint and resumes from the next step.</li>
+</ul>
+
+These two steps are marked async because they call LLMs (Claude via Pydantic AI). The result is always JSON — that way, the next step can deserialize it.
+</div>
+
+<h3>5c. Sync DBOS Steps (for Database Operations)</h3>
+
+<pre><code>@DBOS.step()
+def persist_decision_step(decision_json: str) -> str:
+    """Persist DecisionArtifact to Lakebase decisions table."""
+    import psycopg2
+
+    decision = json.loads(decision_json)
+    decision_id = decision.get("decision_id", f"dec_{uuid.uuid4().hex[:8]}")
+    params = _get_db_params()
+
+    conn = psycopg2.connect(**params)
+    conn.autocommit = True
+    cur = conn.cursor()
+    cur.execute(
+        """INSERT INTO decisions (decision_id, customer_id, journey_id,
+            trigger_event_id, verdict, decisions, contributing_signals,
+            rationale, trace_id, created_at)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        ON CONFLICT (decision_id) DO UPDATE SET
+            verdict = EXCLUDED.verdict,
+            decisions = EXCLUDED.decisions,
+            contributing_signals = EXCLUDED.contributing_signals,
+            rationale = EXCLUDED.rationale""",
+        (
+            decision_id,
+            decision["customer_id"],
+            decision.get("journey_id", ""),
+            decision.get("trigger_event_id", ""),
+            decision["verdict"],
+            json.dumps(decision.get("decisions", [])),
+            json.dumps(decision.get("contributing_signals", [])),
+            decision.get("rationale", ""),
+            decision.get("trace_id"),
+            decision.get("created_at", datetime.now(CT).isoformat()),
+        ),
+    )
+    cur.close()
+    conn.close()
+    return decision_id</code></pre>
+
+<div class="explanation">
+Even sync database operations get the <code>@DBOS.step()</code> decorator. This step:
+<ul>
+<li>Parses the decision JSON (from Agent 1).</li>
+<li>Inserts (or updates) the decision in the <code>decisions</code> table.</li>
+<li>Returns the <code>decision_id</code> for the next steps to reference.</li>
+</ul>
+
+If the workflow crashes after this step, DBOS knows it's already persisted and won't repeat it.
+</div>
+
+<h3>5d. The Unified Workflow — Everything Together</h3>
+
+<pre><code>@DBOS.workflow()
+async def unified_journey_workflow(event_json: str, delay_seconds: int = 15) -> str:
+    """Complete Beat 2 + 2.5 + 3 workflow (async).
+
+    Steps:
+      1. Agent reasoning -> DecisionArtifact
+      2. Persist decision to Lakebase
+      3. Save journey state
+      4. Durable sleep (simulates optimal send window)
+      5. Re-evaluate context (check for changes)
+      6. Compose email (copywriter agent)
+      7. Simulate send (write to sent_emails)
+
+    Returns: JSON dict with journey_id, decision_id, email_id, evaluation
+    """
+    # ── Step 1: Agent reasoning ────────────────────────────────────────
+    decision_json = await run_agent_step(event_json)
+    decision = json.loads(decision_json)
+    customer_id = decision.get("customer_id", "unknown")
+
+    # ── Step 2: Save journey state (before decision — FK constraint) ──
+    journey_id = decision.get(
+        "journey_id",
+        f"jrn_{customer_id}_{uuid.uuid4().hex[:6]}",
+    )
+    send_time_decisions = [
+        d for d in decision.get("decisions", []) if d.get("type") == "send_time"
+    ]
+    due_ts = (
+        send_time_decisions[0].get("value", datetime.now(CT).isoformat())
+        if send_time_decisions
+        else datetime.now(CT).isoformat()
+    )
+    save_journey_step(
+        journey_id=journey_id,
+        customer_id=customer_id,
+        step="awaiting_send",
+        due_ts=due_ts,
+        state_blob=decision_json,
+    )
+
+    # ── Step 3: Persist decision ───────────────────────────────────────
+    decision_id = persist_decision_step(decision_json)
+
+    # ── Step 4: Durable sleep ──────────────────────────────────────────
+    await DBOS.sleep_async(delay_seconds)
+
+    # ── Step 5: Re-evaluate context ────────────────────────────────────
+    eval_json = re_evaluate_step(journey_id, decision_json)
+    evaluation = json.loads(eval_json)
+
+    # ── Step 6: Compose email (if proceed/adjust) ──────────────────────
+    email_json = None
+    email_id = None
+    if evaluation["action"] in ("proceed", "adjust"):
+        context = (
+            decision_json
+            if evaluation["action"] == "proceed"
+            else evaluation.get("updated_artifact", decision_json)
+        )
+        email_json = await compose_email_step(context)
+
+        # ── Step 7: Simulate send ──────────────────────────────────────
+        email_id = simulate_send_step(journey_id, customer_id, email_json)
+        update_journey_status_step(journey_id, "completed")
+    else:
+        update_journey_status_step(journey_id, "failed")
+
+    return json.dumps({
+        "journey_id": journey_id,
+        "decision_id": decision_id,
+        "email_id": email_id,
+        "evaluation": evaluation["action"],
+    })</code></pre>
+
+<div class="explanation">
+This is the heart of the system. Let's trace it:
+
+<strong>Step 1: Agent Reasoning</strong>
+<code>await run_agent_step(event_json)</code> calls Agent 1. It's async, so the event loop doesn't block. Claude reasons, makes tool calls, and returns a DecisionArtifact as JSON.
+
+<strong>Step 2: Save Journey State</strong>
+Before we persist the decision, we extract the <code>send_time</code> from the decision (which Agent 1 produced). This becomes the <code>due_ts</code> for when we should wake up. We save it to the <code>journey_state</code> table, which tracks the lifecycle.
+
+<strong>Step 3: Persist Decision</strong>
+The decision artifact is saved to the <code>decisions</code> table.
+
+<strong>Step 4: Durable Sleep</strong>
+<code>await DBOS.sleep_async(delay_seconds)</code> is the magic. DBOS persists the sleep deadline to Lakebase. If the server crashes, DBOS knows to wake up at that time. This is how the workflow survives restarts.
+
+<strong>Step 5: Re-evaluate Context</strong>
+After waking up, we check if anything changed (customer moved to a different segment, another campaign triggered, etc.). If changes are detected, the decision might be adjusted.
+
+<strong>Steps 6-7: Compose Email & Send</strong>
+If the re-evaluation says "proceed" or "adjust", we run Agent 2 (the copywriter). It produces an EmailContent. Then we simulate sending (write to the <code>sent_emails</code> table).
+
+<strong>Return Value</strong>
+The workflow returns a JSON object with all the IDs for downstream tracking.
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+
+<h2>6. How It All Gets Triggered</h2>
+
+<p class="section-intro">
+The API lives in <code>src/maestro/app.py</code>. Two endpoints kick off the agent loop — one for testing, one for durable execution.
+</p>
+
+<h3>6a. The /api/run Endpoint — Instant Agent Execution</h3>
+
+<pre><code>@app.post("/api/run")
+async def run_agent():
+    """Run Beat 2 agent — async endpoint, works with DBOS event loop."""
+    import traceback
+    try:
+        from maestro.agent import run_maestro
+        from maestro.synthetic import CINDY_CAMPAIGNS, CINDY_EVENT
+
+        start = time.perf_counter()
+        result = await run_maestro(CINDY_EVENT, MODEL)
+        elapsed = time.perf_counter() - start
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed: {e}\n{traceback.format_exc()[-500:]}")
+
+    suppress_targets = {d.target for d in result.decisions if d.type == "suppress_from"}
+    prioritize_targets = {d.target for d in result.decisions if d.type == "prioritize_in"}
+    campaigns = []
+    for c in CINDY_CAMPAIGNS:
+        st = c.status
+        if c.campaign_id in suppress_targets or c.name in suppress_targets:
+            st = "suppressed"
+        elif c.campaign_id in prioritize_targets or c.name in prioritize_targets:
+            st = "prioritized"
+        campaigns.append({"name": c.name, "campaign_id": c.campaign_id, "status": st})
+
+    return {"artifact": result.model_dump(), "campaigns": campaigns, "latency_s": elapsed}</code></pre>
+
+<div class="explanation">
+<code>/api/run</code> is for <strong>testing and UI panels</strong>. It:
+<ul>
+<li>Calls Agent 1 directly (not through the workflow).</li>
+<li>Returns the DecisionArtifact immediately.</li>
+<li>Also enriches the response with campaign statuses (suppressed/prioritized) for the UI.</li>
+<li>Measures latency so we know if Agent 1 is staying under the 2-second ceiling.</li>
+</ul>
+
+This is <strong>not durable</strong> — if the server crashes during the LLM call, the request is lost.
+</div>
+
+<h3>6b. The /api/workflow Endpoint — Durable Workflow Execution</h3>
+
+<pre><code>@app.post("/api/workflow")
+async def start_unified_workflow(body: dict):
+    """Start unified Beat 2+2.5+3 workflow: agent -> persist -> sleep -> re-eval -> email -> send."""
+    import random
+
+    from maestro.synthetic import CINDY_EVENT
+    from maestro.workflow import unified_journey_workflow
+
+    event_json = CINDY_EVENT.model_dump_json()
+    delay = body.get("delay", random.randint(15, 20))
+
+    handle = await DBOS.start_workflow_async(unified_journey_workflow, event_json, delay)
+    return {
+        "workflow_id": handle.get_workflow_id(),
+        "delay": delay,
+        "status": "started",
+    }</code></pre>
+
+<div class="explanation">
+<code>/api/workflow</code> is for <strong>production durable execution</strong>. It:
+<ul>
+<li>Calls <code>DBOS.start_workflow_async(unified_journey_workflow, event_json, delay)</code>.</li>
+<li>DBOS handles all the checkpointing, recovery, and retries.</li>
+<li>Returns immediately with a <code>workflow_id</code>.</li>
+<li>The frontend can poll <code>/api/workflow/{workflow_id}/phases</code> to track progress.</li>
+</ul>
+
+This is <strong>durable</strong> — the entire workflow survives server crashes.
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+
+<h2>7. The Key Insight</h2>
+
+<div class="card card-blue">
+<p style="font-size: 1.1rem; margin-bottom: 1rem;">
+<strong>The two agents never talk to each other directly.</strong>
+</p>
+
+<p>
+Agent 1 produces a <code>DecisionArtifact</code> — a structured record of what to do, why, and when.
+</p>
+
+<p>
+That artifact gets persisted to Lakebase. After the durable sleep, the artifact is loaded and passed to Agent 2 as context.
+</p>
+
+<p>
+The <span class="highlight">DBOS workflow is the glue</span> — it owns the lifecycle, the timing, and the recovery. If the server restarts during step 4 (the sleep), DBOS wakes up at the right time and resumes at step 5, with the artifact already persisted and available.
+</p>
+
+<p style="margin-top: 1.5rem; font-size: 0.95rem; color: var(--text-muted);">
+This decoupling is intentional. Agent 1 is a <em>reasoner</em> (high latency, high stakes). Agent 2 is a <em>writer</em> (low latency, deterministic). Splitting them lets us:
+<ul style="margin-top: 0.5rem;">
+<li>Test each agent independently.</li>
+<li>Swap Agent 2's implementation without touching Agent 1.</li>
+<li>Inject delays between reasoning and writing (simulating the optimal send window).</li>
+<li>Re-evaluate context between the two agents (checking for last-minute changes).</li>
+</ul>
+</p>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+
+<h2>File Reference</h2>
+
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>src/maestro/agent.py</code></td>
+<td>Agent 1: reasoning agent, 8 tools, system prompt, runner</td>
+</tr>
+<tr>
+<td><code>src/maestro/email_agent.py</code></td>
+<td>Agent 2: copywriter agent, no tools, prompt templates</td>
+</tr>
+<tr>
+<td><code>src/maestro/workflow.py</code></td>
+<td>DBOS workflow orchestrating both agents, persistence, sleep, re-evaluation</td>
+</tr>
+<tr>
+<td><code>src/maestro/models.py</code></td>
+<td>Pydantic data models: DecisionArtifact, EmailContent, all tool return types</td>
+</tr>
+<tr>
+<td><code>src/maestro/app.py</code></td>
+<td>FastAPI app, model init, /api/run (instant), /api/workflow (durable)</td>
+</tr>
+</tbody>
+</table>
+
+<div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.9rem;">
+<p><strong>Next steps:</strong> Read the files in the order above. Start with models.py to understand the data shapes, then agent.py to see how Agent 1 reasons, then email_agent.py, then workflow.py to see how DBOS orchestrates, then app.py to see how the API triggers it all.</p>
+</div>
+
+</div>
+
+</body>
+</html>
