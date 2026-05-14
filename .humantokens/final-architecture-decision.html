@@ -8,85 +8,60 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
 <style>
+  /* ── Databricks Light Mode (DEFAULT) ─────────────────────────────── */
   :root {
-    --bg: #0B2026;
-    --surface: #0f2d34;
-    --surface2: #143a43;
-    --border: #1e4f5a;
-    --text: #F9F7F4;
-    --text-muted: #8fb5bf;
-    --accent: #40d1f5;
-    --green: #00D4AA;
-    --red: #FF3621;
-    --orange: #FF8C2A;
+    --bg: #F9F7F4;
+    --surface: #FFFFFF;
+    --surface2: #F1F5FA;
+    --border: #D8DEE4;
+    --text: #0B2026;
+    --text-muted: #8A9BA8;
+    --accent: #1B6AC9;
+    --green: #00875A;
+    --red: #D0021B;
+    --orange: #C75300;
     --purple: #4462c9;
-    --db-red: #FF3621;
-    --db-cyan: #40d1f5;
+    --db-red: #EB1600;
+    --db-cyan: #1B6AC9;
     --db-navy: #0B2026;
     --db-cream: #F9F7F4;
-    --wake: #f0883e;
+    --wake: #C75300;
   }
 
-  /* Databricks Light Mode */
-  @media (prefers-color-scheme: light) {
-    :root {
-      --bg: #F9F7F4;
-      --surface: #FFFFFF;
-      --surface2: #F1F5FA;
-      --border: #D8DEE4;
-      --text: #0B2026;
-      --text-muted: #4A4A4A;
-      --accent: #1B6AC9;
-      --green: #00875A;
-      --red: #D0021B;
-      --orange: #C75300;
-      --purple: #4462c9;
-      --db-red: #FF3621;
-      --db-cyan: #1B6AC9;
-      --db-navy: #0B2026;
-      --db-cream: #F9F7F4;
-      --wake: #C75300;
-    }
-
-    .db-header {
-      background: linear-gradient(135deg, #0B2026 0%, #143a43 100%);
-    }
-    .db-header .db-logo-text,
-    .db-header .db-header-title { color: #F9F7F4; }
-
-    .callout {
-      background: rgba(27,106,201,0.06);
-      border-color: rgba(27,106,201,0.25);
-    }
-
-    .badge-green { background: rgba(0,135,90,0.12); }
-    .badge-red { background: rgba(208,2,27,0.1); }
-    .badge-orange { background: rgba(199,83,0,0.1); }
-
-    .flow-node.event { background: rgba(199,83,0,0.08); }
-    .flow-node.agent { background: rgba(27,106,201,0.08); }
-    .flow-node.tool { background: rgba(68,98,201,0.08); }
-    .flow-node.persist { background: rgba(0,135,90,0.08); }
-    .flow-node.wake { background: rgba(199,83,0,0.08); }
-    .flow-node.action { background: rgba(0,135,90,0.1); }
-
-    .arch-layer.l1 { background: rgba(199,83,0,0.08); }
-    .arch-layer.l2 { background: rgba(27,106,201,0.08); }
-    .arch-layer.l3 { background: rgba(68,98,201,0.08); }
-    .arch-layer.l4 { background: rgba(0,135,90,0.08); }
-    .arch-layer.l5 { background: rgba(208,2,27,0.06); }
-
-    .tl-content { background: var(--surface); }
-    .tl-content.sleep { background: var(--bg); }
-    .tl-dot { background: var(--bg); }
-
-    .sleep-bar {
-      background: linear-gradient(90deg, rgba(199,83,0,0.1), rgba(0,135,90,0.1));
-    }
-
-    code { background: rgba(27,106,201,0.08); }
-    pre { background: #F1F5FA; border-color: var(--border); }
+  .callout {
+    background: rgba(27,106,201,0.06);
+    border-color: rgba(27,106,201,0.25);
   }
+
+  .badge-green { background: rgba(0,135,90,0.12); color: #00875A; }
+  .badge-red { background: rgba(208,2,27,0.1); color: #D0021B; }
+  .badge-orange { background: rgba(199,83,0,0.1); color: #C75300; }
+
+  .flow-node.event { background: rgba(199,83,0,0.08); }
+  .flow-node.agent { background: rgba(27,106,201,0.08); }
+  .flow-node.tool { background: rgba(68,98,201,0.08); }
+  .flow-node.persist { background: rgba(0,135,90,0.08); }
+  .flow-node.wake { background: rgba(199,83,0,0.08); }
+  .flow-node.action { background: rgba(0,135,90,0.1); }
+
+  .arch-layer.l1 { background: rgba(199,83,0,0.08); border-color: var(--orange); }
+  .arch-layer.l2 { background: rgba(27,106,201,0.08); border-color: var(--db-cyan); }
+  .arch-layer.l3 { background: rgba(68,98,201,0.08); border-color: var(--purple); }
+  .arch-layer.l4 { background: rgba(0,135,90,0.08); border-color: var(--green); }
+  .arch-layer.l5 { background: rgba(208,2,27,0.06); border-color: var(--db-red); }
+
+  .tl-content { background: var(--surface); }
+  .tl-content.sleep { background: var(--bg); }
+  .tl-dot { background: var(--bg); }
+
+  .sleep-bar {
+    background: linear-gradient(90deg, rgba(199,83,0,0.1), rgba(0,135,90,0.1));
+  }
+
+  code { background: rgba(27,106,201,0.08); color: #0B2026; }
+  pre { background: #F1F5FA; border-color: var(--border); color: #0B2026; }
+
+  /* Dark mode removed — light mode only for Databricks brand consistency */
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
@@ -130,13 +105,10 @@
   .card-orange { border-left: 4px solid var(--orange); }
   .card-blue { border-left: 4px solid var(--accent); }
   .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
-  .badge-green { background: rgba(0,212,170,0.2); color: var(--green); }
-  .badge-red { background: rgba(255,54,33,0.2); color: var(--red); }
-  .badge-orange { background: rgba(255,140,42,0.2); color: var(--orange); }
-  code { background: var(--surface2); padding: 2px 6px; border-radius: 4px; font-size: 0.85rem; font-family: 'DM Mono', monospace; }
-  pre { background: var(--surface2); padding: 1rem; border-radius: 8px; overflow-x: auto; font-size: 0.85rem; margin: 1rem 0; border: 1px solid var(--border); font-family: 'DM Mono', monospace; }
+  code { background: var(--surface2); padding: 2px 6px; border-radius: 4px; font-size: 0.85rem; font-family: 'DM Mono', monospace; color: var(--text); }
+  pre { background: var(--surface2); padding: 1rem; border-radius: 8px; overflow-x: auto; font-size: 0.85rem; margin: 1rem 0; border: 1px solid var(--border); font-family: 'DM Mono', monospace; color: var(--text); }
   .verdict { font-size: 1.1rem; font-weight: 600; margin-top: 0.5rem; }
-  .callout { background: rgba(64,209,245,0.08); border: 1px solid rgba(64,209,245,0.3); border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; }
+  .callout { border: 1px solid; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; }
   .fatal { color: var(--red); font-weight: 600; }
   ul, ol { margin: 0.5rem 0 0.5rem 1.5rem; }
   li { margin-bottom: 0.3rem; }
@@ -150,11 +122,6 @@
   }
   .arch-layer:first-child { border-radius: 10px 10px 0 0; }
   .arch-layer:last-child { border-radius: 0 0 10px 10px; }
-  .arch-layer.l1 { background: rgba(255,140,42,0.12); border-color: var(--orange); }
-  .arch-layer.l2 { background: rgba(64,209,245,0.1); border-color: var(--db-cyan); }
-  .arch-layer.l3 { background: rgba(68,98,201,0.12); border-color: var(--purple); }
-  .arch-layer.l4 { background: rgba(0,212,170,0.1); border-color: var(--green); }
-  .arch-layer.l5 { background: rgba(255,54,33,0.08); border-color: var(--db-red); }
   .arch-label { font-weight: 600; }
   .arch-detail { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem; }
 

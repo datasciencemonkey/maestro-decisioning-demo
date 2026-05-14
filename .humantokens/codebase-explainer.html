@@ -8,51 +8,38 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
 <style>
+  /* ── Databricks Light Mode (DEFAULT) ─────────────────────────────── */
   :root {
-    --bg: #0B2026;
-    --surface: #0f2d34;
-    --surface2: #143a43;
-    --border: #1e4f5a;
-    --text: #F9F7F4;
-    --text-muted: #8fb5bf;
-    --accent: #40d1f5;
-    --green: #00D4AA;
-    --red: #FF3621;
-    --orange: #FF8C2A;
+    --bg: #F9F7F4;
+    --surface: #FFFFFF;
+    --surface2: #F1F5FA;
+    --border: #D8DEE4;
+    --text: #0B2026;
+    --text-muted: #8A9BA8;
+    --accent: #1B6AC9;
+    --green: #00875A;
+    --red: #D0021B;
+    --orange: #C75300;
     --purple: #4462c9;
-    --db-red: #FF3621;
-    --db-cyan: #40d1f5;
+    --db-red: #EB1600;
+    --db-cyan: #1B6AC9;
     --db-navy: #0B2026;
     --db-cream: #F9F7F4;
   }
 
-  @media (prefers-color-scheme: light) {
-    :root {
-      --bg: #F9F7F4;
-      --surface: #FFFFFF;
-      --surface2: #F1F5FA;
-      --border: #D8DEE4;
-      --text: #0B2026;
-      --text-muted: #4A4A4A;
-      --accent: #1B6AC9;
-      --green: #00875A;
-      --red: #D0021B;
-      --orange: #C75300;
-      --purple: #4462c9;
-      --db-red: #FF3621;
-      --db-cyan: #1B6AC9;
-      --db-navy: #0B2026;
-      --db-cream: #F9F7F4;
-    }
-    .db-header { background: linear-gradient(135deg, #0B2026 0%, #143a43 100%); }
-    .db-header .db-logo-text, .db-header .db-header-title { color: #F9F7F4; }
-    .callout { background: rgba(27,106,201,0.06); border-color: rgba(27,106,201,0.25); }
-    .badge-green { background: rgba(0,135,90,0.12); }
-    .badge-red { background: rgba(208,2,27,0.1); }
-    .badge-orange { background: rgba(199,83,0,0.1); }
-    code { background: rgba(27,106,201,0.08); }
-    pre { background: #F1F5FA; border-color: var(--border); }
+  .callout {
+    background: rgba(27,106,201,0.06);
+    border-color: rgba(27,106,201,0.25);
   }
+
+  .badge-green { background: rgba(0,135,90,0.12); color: #00875A; }
+  .badge-red { background: rgba(208,2,27,0.1); color: #D0021B; }
+  .badge-orange { background: rgba(199,83,0,0.1); color: #C75300; }
+
+  code { background: rgba(27,106,201,0.08); color: #0B2026; }
+  pre { background: #F1F5FA; border-color: var(--border); color: #0B2026; }
+
+  /* Dark mode removed — light mode only for Databricks brand consistency */
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -125,8 +112,7 @@
   .card-blue { border-left: 4px solid var(--accent); }
 
   .callout {
-    background: rgba(64,209,245,0.08);
-    border: 1px solid rgba(64,209,245,0.3);
+    border: 1px solid;
     border-radius: 8px;
     padding: 1rem 1.25rem;
     margin: 1.5rem 0;
@@ -134,6 +120,7 @@
 
   code {
     background: var(--surface2);
+    color: var(--text);
     padding: 2px 6px;
     border-radius: 4px;
     font-size: 0.85rem;
@@ -142,6 +129,7 @@
 
   pre {
     background: var(--surface2);
+    color: var(--text);
     padding: 1rem;
     border-radius: 8px;
     overflow-x: auto;
