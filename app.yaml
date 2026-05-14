@@ -15,7 +15,5 @@ env:
     value: maestro_cdp
   - name: LAKEBASE_USER
     value: maestro_app
-  - name: LAKEBASE_SECRET_SCOPE
-    value: sgscope
-  - name: LAKEBASE_SECRET_KEY
-    value: LAKEBASE_PASSWORD
+  - name: LAKEBASE_PASSWORD
+    valueFrom: LAKEBASE_SECRET_KEY

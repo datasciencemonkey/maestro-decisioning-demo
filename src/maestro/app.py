@@ -48,14 +48,12 @@ def _get_db_config():
 
     # Resolve Lakebase password: direct env var OR Databricks secret scope
     lakebase_pw = os.environ.get("LAKEBASE_PASSWORD")
-    if not lakebase_pw and os.environ.get("LAKEBASE_SECRET_SCOPE"):
-        scope = os.environ["LAKEBASE_SECRET_SCOPE"]
-        key = os.environ.get("LAKEBASE_SECRET_KEY", "LAKEBASE_PASSWORD")
+    if not lakebase_pw:
         try:
-            lakebase_pw = _w.secrets.get_secret(scope=scope, key=key).value
-            print(f"Lakebase password loaded from secret scope: {scope}/{key}")
+            lakebase_pw = _w.secrets.get_secret(scope="sgscope", key="LAKEBASE_PASSWORD").value
+            print("Lakebase password loaded from secret scope: sgscope/LAKEBASE_PASSWORD")
         except Exception as e:
-            print(f"Failed to read secret {scope}/{key}: {e}")
+            print(f"Failed to read secret sgscope/LAKEBASE_PASSWORD: {e}")
 
     if lakebase_pw:
         print("Using Lakebase native Postgres role")
